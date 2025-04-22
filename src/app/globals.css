@@ -140,3 +140,67 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Form styles */
+.required::after {
+  content: "*";
+  color: hsl(var(--destructive));
+  margin-left: 2px;
+}
+
+/* Form step styles */
+.form-step {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease-in-out;
+}
+
+.form-step.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Enhanced focus styles for form fields */
+input:focus-visible, 
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .form-card {
+    padding: 1rem;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* Toast custom styles */
+.toaster .group {
+  --normal-bg: hsl(var(--background));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--foreground));
+  
+  --success-bg: hsl(142, 76%, 97%);
+  --success-border: hsl(142, 72%, 29%, 0.2);
+  --success-text: hsl(142, 72%, 29%);
+  
+  --error-bg: hsl(359, 100%, 97%);
+  --error-border: hsl(359, 100%, 94%);
+  --error-text: hsl(359, 83%, 47%);
+}
+
+/* Dark mode toast adjustments */
+.dark .toaster .group {
+  --success-bg: hsl(142, 72%, 12%);
+  --success-border: hsl(142, 72%, 24%, 0.4);
+  --success-text: hsl(142, 72%, 82%);
+  
+  --error-bg: hsl(359, 83%, 11%);
+  --error-border: hsl(359, 83%, 18%);
+  --error-text: hsl(359, 100%, 85%);
+}

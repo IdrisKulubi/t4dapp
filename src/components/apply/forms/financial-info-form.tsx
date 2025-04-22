@@ -1,46 +1,458 @@
 "use client";
 
+import { UseFormReturn } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { financialInfoSchema } from "../schemas/financial-info-schema";
 
+// Define form value types
+type FinancialInfoFormValues = z.infer<typeof financialInfoSchema>;
+
+// Funding sources options
+const FUNDING_SOURCES = [
+  { id: "personal", label: "Personal Savings/Investments" },
+  { id: "family", label: "Family & Friends" },
+  { id: "bank", label: "Bank Loan" },
+  { id: "venture", label: "Venture Capital" },
+  { id: "angel", label: "Angel Investors" },
+  { id: "grant", label: "Grant Funding" },
+  { id: "government", label: "Government Support" },
+  { id: "crowdfunding", label: "Crowdfunding" },
+];
+
+// Props type
 type FinancialInfoFormProps = {
-  form: any;
+  form: UseFormReturn<any>;
   onNext: () => void;
   onPrevious: () => void;
 };
 
 export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFormProps) {
+  const { formState } = form;
+  
   const handleSubmit = async (data: any) => {
-    console.log("Financial Info Data:", data);
+    try {
+      // Validate the form data against the schema
+      financialInfoSchema.parse(data);
+      console.log("Financial Info Data:", data.financial);
     onNext();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast.error("Please fill all required fields correctly.");
+        // Trigger validation to show errors
+        form.trigger("financial");
+      }
+    }
   };
   
   return (
+    <Card className="border-0 shadow-none">
+      <CardContent className="p-0">
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Financial Information</h2>
-        <p className="text-muted-foreground">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Financial Information</h2>
+            <p className="text-muted-foreground mt-1">
           Provide details about your business finances and funding history.
         </p>
       </div>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-          {/* Form fields will be implemented in the next step */}
-          <div className="h-60 flex items-center justify-center border border-dashed rounded-md">
-            <p className="text-muted-foreground">Financial information form fields will be implemented here.</p>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+              {/* Current Financial Status Section */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg space-y-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Current Financial Status</h3>
+                
+                {/* Annual Revenue */}
+                <FormField
+                  control={form.control}
+                  name="financial.annualRevenue"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel>Annual Revenue (USD)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="0"
+                          step="100"
+                          className="bg-white dark:bg-gray-800"
+                          placeholder="E.g., 10000"
+                          {...field}
+                          value={field.value === null ? "" : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value === "" ? null : parseFloat(e.target.value);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Your company's annual revenue in USD (if applicable).
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Revenue Growth Rate */}
+                <FormField
+                  control={form.control}
+                  name="financial.revenueGrowthRate"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel>Revenue Growth Rate (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="-100"
+                          max="1000"
+                          className="bg-white dark:bg-gray-800"
+                          placeholder="E.g., 20"
+                          {...field}
+                          value={field.value === null ? "" : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value === "" ? null : parseFloat(e.target.value);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Your annual revenue growth rate as a percentage.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Profit Margin */}
+                <FormField
+                  control={form.control}
+                  name="financial.profitMargin"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel>Profit Margin (%)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="-100"
+                          max="100"
+                          className="bg-white dark:bg-gray-800"
+                          placeholder="E.g., 15"
+                          {...field}
+                          value={field.value === null ? "" : field.value}
+                          onChange={(e) => {
+                            const value = e.target.value === "" ? null : parseFloat(e.target.value);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              {/* Previous Funding Section */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg space-y-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Previous Funding</h3>
+                
+                {/* Has Previous Funding */}
+                <FormField
+                  control={form.control}
+                  name="financial.previousFunding"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3">
+                      <FormLabel className="required">Have you received any funding before?</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={(value) => field.onChange(value === "true")}
+                          defaultValue={field.value ? "true" : "false"}
+                          className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-6"
+                        >
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="true" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Yes</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-3 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="false" />
+                            </FormControl>
+                            <FormLabel className="font-normal">No</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Previous Funding Sources - Conditional */}
+                {form.watch("financial.previousFunding") && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="financial.previousFundingSources"
+                      render={() => (
+                        <FormItem>
+                          <div className="mb-4">
+                            <FormLabel>Funding Sources</FormLabel>
+                            <FormDescription>
+                              Select all sources of previous funding.
+                            </FormDescription>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {FUNDING_SOURCES.map((source) => (
+                              <FormField
+                                key={source.id}
+                                control={form.control}
+                                name="financial.previousFundingSources"
+                                render={({ field }) => {
+                                  return (
+                                    <FormItem
+                                      key={source.id}
+                                      className="flex flex-row items-start space-x-3 space-y-0"
+                                    >
+                                      <FormControl>
+                                        <Checkbox
+                                          checked={field.value?.includes(source.id)}
+                                          onCheckedChange={(checked) => {
+                                            const current = field.value || [];
+                                            return checked
+                                              ? field.onChange([...current, source.id])
+                                              : field.onChange(
+                                                  current.filter((value) => value !== source.id)
+                                                );
+                                          }}
+                                        />
+                                      </FormControl>
+                                      <FormLabel className="font-normal">
+                                        {source.label}
+                                      </FormLabel>
+                                    </FormItem>
+                                  );
+                                }}
+                              />
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="financial.previousFundingAmount"
+                      render={({ field }) => (
+                        <FormItem className="max-w-xs">
+                          <FormLabel>Total Previous Funding (USD)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              min="0"
+                              step="100"
+                              className="bg-white dark:bg-gray-800"
+                              placeholder="E.g., 50000"
+                              {...field}
+                              value={field.value === null ? "" : field.value}
+                              onChange={(e) => {
+                                const value = e.target.value === "" ? null : parseFloat(e.target.value);
+                                field.onChange(value);
+                              }}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Total amount of funding received so far.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+              </div>
+              
+              {/* Funding Request Section */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg space-y-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Funding Request</h3>
+                
+                {/* Requested Funding Amount */}
+                <FormField
+                  control={form.control}
+                  name="financial.requestedFundingAmount"
+                  render={({ field }) => (
+                    <FormItem className="max-w-xs">
+                      <FormLabel className="required">Requested Funding Amount (USD)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1000"
+                          max="100000"
+                          step="100"
+                          className="bg-white dark:bg-gray-800"
+                          placeholder="E.g., 25000"
+                          {...field}
+                          value={field.value === null ? "" : field.value}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            field.onChange(value);
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Amount must be between $1,000 and $100,000 USD.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Funding Use */}
+                <FormField
+                  control={form.control}
+                  name="financial.fundingUse"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="required">Use of Funds</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe how you plan to use the funding" 
+                          className="bg-white dark:bg-gray-800 min-h-[150px]" 
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Provide a detailed breakdown of how you will allocate the funds.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              {/* Business Model Section */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg space-y-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Business Model</h3>
+                
+                {/* Revenue Model */}
+                <FormField
+                  control={form.control}
+                  name="financial.revenueModel"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="required">Revenue Model</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe your revenue model" 
+                          className="bg-white dark:bg-gray-800 min-h-[100px]" 
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Explain how your business generates or will generate revenue.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Cost Structure */}
+                <FormField
+                  control={form.control}
+                  name="financial.costStructure"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="required">Cost Structure</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe your cost structure" 
+                          className="bg-white dark:bg-gray-800 min-h-[100px]" 
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Outline your main costs and expenses.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              {/* Sustainability Section */}
+              <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg space-y-6">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Path to Sustainability</h3>
+                
+                {/* Path to Sustainability */}
+                <FormField
+                  control={form.control}
+                  name="financial.pathToSustainability"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="required">Path to Financial Sustainability</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe your plan for achieving financial sustainability" 
+                          className="bg-white dark:bg-gray-800 min-h-[150px]" 
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Explain your strategy for achieving long-term financial sustainability.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                {/* Financial Challenges */}
+                <FormField
+                  control={form.control}
+                  name="financial.financialChallenges"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="required">Financial Challenges</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Describe your current financial challenges" 
+                          className="bg-white dark:bg-gray-800 min-h-[100px]" 
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
           </div>
           
+              {/* Navigation Buttons */}
           <div className="flex justify-between">
-            <Button type="button" variant="outline" onClick={onPrevious}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={onPrevious}
+                  className="w-full md:w-auto"
+                >
               Previous: Climate Adaptation
             </Button>
-            <Button type="submit">
-              Next: Support Needs
+                <Button 
+                  type="submit" 
+                  className="w-full md:w-auto"
+                  disabled={formState.isSubmitting}
+                >
+                  {formState.isSubmitting ? "Saving..." : "Next: Support Needs"}
             </Button>
           </div>
         </form>
       </Form>
     </div>
+      </CardContent>
+    </Card>
   );
 } 
