@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ghana flag -->
+  <rect width="800" height="200" fill="#CE1126"/>
+  <rect y="200" width="800" height="200" fill="#FCD116"/>
+  <rect y="400" width="800" height="200" fill="#006B3F"/>
+  
+  <!-- Star -->
+  <path d="M400,300 L427,352 L486,352 L438,387 L458,443 L400,415 L342,443 L362,387 L314,352 L373,352 Z" fill="#000000"/>
+</svg> 
