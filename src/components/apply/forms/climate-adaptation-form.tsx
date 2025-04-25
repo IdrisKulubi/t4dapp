@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { UseFormReturn } from "react-hook-form";
@@ -12,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { climateAdaptationSchema } from "../schemas/climate-adaptation-schema";
 
-// Define form value types
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ClimateAdaptationFormValues = z.infer<typeof climateAdaptationSchema>;
 
 // Secondary climate challenges options
@@ -40,12 +41,26 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
   
   const handleSubmit = async (data: any) => {
     try {
+      // Log the data being validated
+      console.log("Validating Climate Adaptation Data:", data.adaptation);
+      
+      // Explicitly check measurableImpact as it's required
+      if (!data.adaptation?.measurableImpact || data.adaptation.measurableImpact.length < 10) {
+        toast.error("Measurable Impact is required and must be at least 10 characters.");
+        form.setError("adaptation.measurableImpact", {
+          type: "manual",
+          message: "Description must be at least 10 characters"
+        });
+        return;
+      }
+      
       // Validate the form data against the schema
       climateAdaptationSchema.parse(data);
-      console.log("Climate Adaptation Data:", data.adaptation);
-    onNext();
+      console.log("Climate Adaptation Data is valid:", data.adaptation);
+      onNext();
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation errors:", error.errors);
         toast.error("Please fill all required fields correctly.");
         // Trigger validation to show errors
         form.trigger("adaptation");
@@ -200,7 +215,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                                         return checked
                                           ? field.onChange([...current, challenge.id])
                                           : field.onChange(
-                                              current.filter((value) => value !== challenge.id)
+                                              current.filter((value: any) => value !== challenge.id)
                                             );
                                       }}
                                     />
@@ -387,7 +402,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                         />
                       </FormControl>
                       <FormDescription>
-                        Provide specific metrics or data showing your solution's impact (minimum 10 characters)
+                        Provide specific metrics or data showing your solution&apos;s impact (minimum 10 characters)
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

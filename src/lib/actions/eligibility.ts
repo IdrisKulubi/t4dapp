@@ -6,12 +6,16 @@ import { revalidatePath } from "next/cache";
 import db from "../../../db/drizzle";
 
 // Function to calculate age from date of birth
-function getAge(birthDate: Date): number {
+function getAge(birthDate: Date | string): number {
   const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference = today.getMonth() - birthDate.getMonth();
   
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+  // Convert string date to Date object if needed
+  const birthDateObj = typeof birthDate === 'string' ? new Date(birthDate) : birthDate;
+  
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDifference = today.getMonth() - birthDateObj.getMonth();
+  
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
     age--;
   }
   

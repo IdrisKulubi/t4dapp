@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { UseFormReturn } from "react-hook-form";
@@ -126,7 +128,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                                         return checked
                                           ? field.onChange([...current, type.id])
                                           : field.onChange(
-                                              current.filter((value) => value !== type.id)
+                                              current.filter((value: any) => value !== type.id)
                                             );
                                       }}
                                     />
@@ -203,7 +205,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                       <div className="mb-4">
                         <FormLabel className="required">Preferred Mentor Expertise</FormLabel>
                         <FormDescription>
-                          Select the areas of expertise you'd like in a mentor.
+                          Select the areas of expertise you&apos;d like in a mentor.
                         </FormDescription>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -226,7 +228,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                                         return checked
                                           ? field.onChange([...current, expertise.id])
                                           : field.onChange(
-                                              current.filter((value) => value !== expertise.id)
+                                              current.filter((value: any) => value !== expertise.id)
                                             );
                                       }}
                                     />
@@ -330,7 +332,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                       <div className="mb-4">
                         <FormLabel className="required">Desired Networking Connections</FormLabel>
                         <FormDescription>
-                          Select the types of connections you'd like to make.
+                          Select the types of connections you&apos;d like to make.
                         </FormDescription>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -353,7 +355,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                                         return checked
                                           ? field.onChange([...current, connection.id])
                                           : field.onChange(
-                                              current.filter((value) => value !== connection.id)
+                                              current.filter((value: any) => value !== connection.id)
                                             );
                                       }}
                                     />

@@ -87,6 +87,7 @@ export default function ExportPage() {
       const cleanedValues = {
         ...values,
         filters: Object.fromEntries(
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           Object.entries(values.filters).filter(([_, v]) => v !== null && (Array.isArray(v) ? v.length > 0 : true))
         ),
       };

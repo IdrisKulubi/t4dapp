@@ -1,4 +1,5 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+  "use client";
 
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { financialInfoSchema } from "../schemas/financial-info-schema";
 
 // Define form value types
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type FinancialInfoFormValues = z.infer<typeof financialInfoSchema>;
 
 // Funding sources options
@@ -92,7 +94,7 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                         />
                       </FormControl>
                       <FormDescription>
-                        Your company's annual revenue in USD (if applicable).
+                        Your company&apos;s annual revenue in USD (if applicable).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -227,7 +229,7 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                                             return checked
                                               ? field.onChange([...current, source.id])
                                               : field.onChange(
-                                                  current.filter((value) => value !== source.id)
+                                                  current.filter((value: any) => value !== source.id)
                                                 );
                                           }}
                                         />

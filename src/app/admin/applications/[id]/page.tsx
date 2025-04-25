@@ -20,55 +20,41 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getApplicationById } from "@/lib/actions/actions";
+import { notFound } from 'next/navigation';
 
 export default async function ApplicationDetail({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>
 }) {
-  // TODO: Fetch application data from the database
-  const applicationId = params.id;
+  const awaitedParams = await params;
+  const applicationId = parseInt(awaitedParams.id, 10);
+
+  const result = await getApplicationById(applicationId);
   
-  // Placeholder data
-  const application = {
-    id: applicationId,
-    status: "submitted",
-    submittedAt: new Date().toISOString(),
-    business: {
-      name: "Example Business",
-      country: "kenya",
-      city: "Nairobi",
-    },
-    applicant: {
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-      gender: "male",
-      dateOfBirth: "1995-05-15",
-    },
-    eligibility: {
-      isEligible: true,
-      totalScore: 65,
-      mandatoryCriteria: {
-        ageEligible: true,
-        registrationEligible: true,
-        revenueEligible: true,
-        businessPlanEligible: true,
-        impactEligible: true,
-      },
-      evaluationScores: {
-        marketPotentialScore: 8,
-        innovationScore: 7,
-        climateAdaptationScore: 15,
-        jobCreationScore: 6,
-        viabilityScore: 8,
-        managementCapacityScore: 9,
-        locationBonus: 5,
-        genderBonus: 0,
-      },
-    },
-  };
+  if (!result.success || !result.data) {
+    if (result.error === "Application not found") {
+      notFound();
+    } else {
+      return (
+        <div className="container mx-auto py-8 text-center">
+          <h1 className="text-2xl font-bold text-red-600">Error Fetching Application</h1>
+          <p className="text-muted-foreground">{result.error || "An unexpected error occurred."}</p>
+          <Button asChild className="mt-4">
+            <Link href="/admin/applications">Back to Applications</Link>
+          </Button>
+        </div>
+      );
+    }
+  }
+
+  const application = result.data;
   
+  const formattedSubmittedAt = application.submittedAt 
+    ? new Date(application.submittedAt).toLocaleString() 
+    : "Not Submitted";
+
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
@@ -80,7 +66,7 @@ export default async function ApplicationDetail({
             ← Back to Applications
           </Link>
           <h1 className="text-3xl font-bold">
-            Application #{applicationId}
+            Application #{application.id}
           </h1>
           <p className="text-muted-foreground">
             {application.business.name} - {application.applicant.firstName}{" "}
@@ -156,7 +142,7 @@ export default async function ApplicationDetail({
                       <div>
                         <h3 className="text-sm font-medium mb-1">Location</h3>
                         <p>
-                          {application.business.city}, {application.business.country.toUpperCase()}
+                          {application.business.city}, {application.business.country?.toUpperCase() ?? 'N/A'}
                         </p>
                       </div>
                       <div>
@@ -171,18 +157,24 @@ export default async function ApplicationDetail({
                       </div>
                       <div>
                         <h3 className="text-sm font-medium mb-1">Submitted</h3>
-                        <p>{new Date(application.submittedAt).toLocaleString()}</p>
+                        <p>{formattedSubmittedAt}</p>
                       </div>
                       <div>
                         <h3 className="text-sm font-medium mb-1">Status</h3>
-                        <p className="capitalize">{application.status}</p>
+                        <p className="capitalize">{application.status.replace('_', ' ')}</p>
                       </div>
                     </div>
                     
                     <div className="border-t pt-4 mt-4">
-                      <h3 className="text-sm font-medium mb-2">Summary</h3>
-                      <p className="text-muted-foreground">
-                        Full application details will be displayed here.
+                      <h3 className="text-lg font-semibold mb-2">Business Description</h3>
+                      <p className="text-muted-foreground whitespace-pre-wrap">
+                        {application.business.description || "No description provided."} 
+                      </p>
+                    </div>
+                    <div className="border-t pt-4 mt-4">
+                      <h3 className="text-lg font-semibold mb-2">Problem Solved</h3>
+                      <p className="text-muted-foreground whitespace-pre-wrap">
+                        {application.business.problemSolved || "Not specified."} 
                       </p>
                     </div>
                   </div>
@@ -196,10 +188,16 @@ export default async function ApplicationDetail({
                   <CardTitle>Personal Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Personal information details will be displayed here.
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><h3 className="text-sm font-medium">First Name</h3><p>{application.applicant.firstName}</p></div>
+                    <div><h3 className="text-sm font-medium">Last Name</h3><p>{application.applicant.lastName}</p></div>
+                    <div><h3 className="text-sm font-medium">Email</h3><p>{application.applicant.email}</p></div>
+                    <div><h3 className="text-sm font-medium">Phone</h3><p>{application.applicant.phoneNumber}</p></div>
+                    <div><h3 className="text-sm font-medium">Gender</h3><p className="capitalize">{application.applicant.gender}</p></div>
+                    <div><h3 className="text-sm font-medium">Date of Birth</h3><p>{application.applicant.dateOfBirth}</p></div>
+                    <div><h3 className="text-sm font-medium">Citizenship</h3><p className="capitalize">{application.applicant.citizenship === 'other' ? application.applicant.citizenshipOther : application.applicant.citizenship}</p></div>
+                    <div><h3 className="text-sm font-medium">Country of Residence</h3><p className="capitalize">{application.applicant.countryOfResidence === 'other' ? application.applicant.residenceOther : application.applicant.countryOfResidence}</p></div>
+                    <div><h3 className="text-sm font-medium">Highest Education</h3><p className="capitalize">{application.applicant.highestEducation.replace(/_/g, ' ')}</p></div>
                   </div>
                 </CardContent>
               </Card>
@@ -211,11 +209,48 @@ export default async function ApplicationDetail({
                   <CardTitle>Business Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Business information details will be displayed here.
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div><h3 className="text-sm font-medium">Business Name</h3><p>{application.business.name}</p></div>
+                    <div><h3 className="text-sm font-medium">Start Date</h3><p>{application.business.startDate}</p></div>
+                    <div><h3 className="text-sm font-medium">Registered?</h3><p>{application.business.isRegistered ? 'Yes' : 'No'}</p></div>
+                    {application.business.isRegistered && application.business.registrationCertificateUrl && (
+                      <div>
+                        <h3 className="text-sm font-medium">Registration Certificate</h3>
+                        <Link href={application.business.registrationCertificateUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Certificate</Link>
+                      </div>
+                    )}
+                    <div><h3 className="text-sm font-medium">Country of Operation</h3><p className="capitalize">{application.business.country === 'other' ? application.business.countryOther : application.business.country}</p></div>
+                    <div><h3 className="text-sm font-medium">City</h3><p>{application.business.city}</p></div>
+                    <div><h3 className="text-sm font-medium">Registered Countries (Other)</h3><p>{application.business.registeredCountries}</p></div>
+                    <div><h3 className="text-sm font-medium">Revenue (Last 2 Years)</h3><p>${application.business.revenueLastTwoYears?.toLocaleString() ?? 'N/A'}</p></div>
+                    <div><h3 className="text-sm font-medium">Target Customers</h3><p>{application.business.targetCustomers.join(', ').replace(/_/g, ' ') || 'N/A'}</p></div>
+                    <div><h3 className="text-sm font-medium">Unit Price</h3><p>${application.business.unitPrice?.toLocaleString() ?? 'N/A'}</p></div>
+                    <div><h3 className="text-sm font-medium">Customers (Last 6 Mo)</h3><p>{application.business.customerCountLastSixMonths ?? 'N/A'}</p></div>
+                    <div><h3 className="text-sm font-medium">Production Capacity (Last 6 Mo)</h3><p>{application.business.productionCapacityLastSixMonths || 'N/A'}</p></div>
                   </div>
+                  <div className="mt-6 border-t pt-6">
+                    <h3 className="text-lg font-semibold mb-2">Employees</h3>
+                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                      <div><h4 className="font-medium">Total Full-Time</h4><p>{application.business.employees.fullTimeTotal}</p></div>
+                      <div><h4 className="font-medium">Full-Time Male</h4><p>{application.business.employees.fullTimeMale}</p></div>
+                      <div><h4 className="font-medium">Full-Time Female</h4><p>{application.business.employees.fullTimeFemale}</p></div>
+                      <div><h4 className="font-medium">Part-Time Male</h4><p>{application.business.employees.partTimeMale}</p></div>
+                      <div><h4 className="font-medium">Part-Time Female</h4><p>{application.business.employees.partTimeFemale}</p></div>
+                    </div>
+                  </div>
+                  <div className="mt-6 border-t pt-6">
+                    <h3 className="text-lg font-semibold mb-2">Challenges & Support Needed</h3>
+                    <div className="space-y-4">
+                      <div><h4 className="font-medium text-sm">Current Challenges</h4><p className="text-muted-foreground whitespace-pre-wrap text-sm">{application.business.currentChallenges || 'N/A'}</p></div>
+                      <div><h4 className="font-medium text-sm">Support Needed</h4><p className="text-muted-foreground whitespace-pre-wrap text-sm">{application.business.supportNeeded || 'N/A'}</p></div>
+                    </div>
+                  </div>
+                   {application.business.additionalInformation && (
+                    <div className="mt-6 border-t pt-6">
+                      <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
+                      <p className="text-muted-foreground whitespace-pre-wrap text-sm">{application.business.additionalInformation}</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -227,9 +262,9 @@ export default async function ApplicationDetail({
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p className="text-muted-foreground">
-                      Climate adaptation solution details will be displayed here.
-                    </p>
+                    <div><h3 className="text-sm font-medium">Contribution to Climate Adaptation</h3><p className="text-muted-foreground whitespace-pre-wrap">{application.business.climateAdaptationContribution || 'N/A'}</p></div>
+                    <div><h3 className="text-sm font-medium">Product/Service Description</h3><p className="text-muted-foreground whitespace-pre-wrap">{application.business.productServiceDescription || 'N/A'}</p></div>
+                    <div><h3 className="text-sm font-medium">Impact of Climate Extremes</h3><p className="text-muted-foreground whitespace-pre-wrap">{application.business.climateExtremeImpact || 'N/A'}</p></div>
                   </div>
                 </CardContent>
               </Card>
@@ -241,10 +276,34 @@ export default async function ApplicationDetail({
                   <CardTitle>Financial Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  {application.business.funding && application.business.funding.length > 0 ? (
+                    <div className="space-y-6">
+                      {application.business.funding.map((fund, index) => (
+                        <div key={fund.id} className={index > 0 ? "border-t pt-6" : ""}>
+                          <h3 className="font-semibold mb-2">Funding Record {index + 1}</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div><h4 className="font-medium">Has External Funding?</h4><p>{fund.hasExternalFunding ? 'Yes' : 'No'}</p></div>
+                            {fund.hasExternalFunding && (
+                              <>
+                                <div><h4 className="font-medium">Funding Source</h4><p className="capitalize">{fund.fundingSource === 'other' ? fund.fundingSourceOther : fund.fundingSource?.replace(/_/g, ' ')}</p></div>
+                                <div><h4 className="font-medium">Funder Name</h4><p>{fund.funderName || 'N/A'}</p></div>
+                                <div><h4 className="font-medium">Funding Date</h4><p>{fund.fundingDate ? new Date(fund.fundingDate).toLocaleDateString() : 'N/A'}</p></div>
+                                <div><h4 className="font-medium">Amount (USD)</h4><p>${fund.amountUsd?.toLocaleString() ?? 'N/A'}</p></div>
+                                <div><h4 className="font-medium">Instrument</h4><p className="capitalize">{fund.fundingInstrument === 'other' ? fund.fundingInstrumentOther : fund.fundingInstrument}</p></div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
                     <p className="text-muted-foreground">
-                      Financial information details will be displayed here.
+                      No external funding information provided.
                     </p>
+                  )}
+                  <div className="mt-6 border-t pt-6">
+                    <h3 className="font-semibold mb-2">Revenue (Last 2 Years)</h3>
+                    <p>${application.business.revenueLastTwoYears?.toLocaleString() ?? 'N/A'}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -257,103 +316,94 @@ export default async function ApplicationDetail({
             <CardHeader>
               <CardTitle>Eligibility Assessment</CardTitle>
               <CardDescription>
-                Evaluation based on program criteria
+                {application.eligibility ? 
+                  `Last evaluated: ${application.eligibility.evaluatedAt ? new Date(application.eligibility.evaluatedAt).toLocaleString() : 'N/A'}` :
+                  'Not evaluated yet'
+                }
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-sm font-medium">Overall Result</h3>
-                    <span className={application.eligibility.isEligible ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-                      {application.eligibility.isEligible ? "ELIGIBLE" : "INELIGIBLE"}
-                    </span>
+            {application.eligibility ? (
+              <CardContent>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium">Overall Result</h3>
+                      <span className={application.eligibility.isEligible ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                        {application.eligibility.isEligible ? "ELIGIBLE" : "INELIGIBLE"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-sm font-medium">Total Score</h3>
+                      <span className="font-medium">{application.eligibility.totalScore}/80</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-sm font-medium">Total Score</h3>
-                    <span className="font-medium">{application.eligibility.totalScore}/80</span>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Mandatory Criteria</h3>
+                    <ul className="space-y-1 text-sm">
+                      <li className="flex justify-between">
+                        <span>Age (18-35)</span>
+                        <span className={application.eligibility.mandatoryCriteria.ageEligible ? "text-green-600" : "text-red-600"}>
+                          {application.eligibility.mandatoryCriteria.ageEligible ? "✓" : "✗"}
+                        </span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Business Registration</span>
+                        <span className={application.eligibility.mandatoryCriteria.registrationEligible ? "text-green-600" : "text-red-600"}>
+                          {application.eligibility.mandatoryCriteria.registrationEligible ? "✓" : "✗"}
+                        </span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Revenue Generation</span>
+                        <span className={application.eligibility.mandatoryCriteria.revenueEligible ? "text-green-600" : "text-red-600"}>
+                          {application.eligibility.mandatoryCriteria.revenueEligible ? "✓" : "✗"}
+                        </span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Business Plan</span>
+                        <span className={application.eligibility.mandatoryCriteria.businessPlanEligible ? "text-green-600" : "text-red-600"}>
+                          {application.eligibility.mandatoryCriteria.businessPlanEligible ? "✓" : "✗"}
+                        </span>
+                      </li>
+                      <li className="flex justify-between">
+                        <span>Climate Impact</span>
+                        <span className={application.eligibility.mandatoryCriteria.impactEligible ? "text-green-600" : "text-red-600"}>
+                          {application.eligibility.mandatoryCriteria.impactEligible ? "✓" : "✗"}
+                        </span>
+                      </li>
+                    </ul>
                   </div>
+                  
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Evaluation Scores</h3>
+                    <ul className="space-y-1 text-sm">
+                      <li className="flex justify-between"><span>Market Potential</span><span>{application.eligibility.evaluationScores.marketPotentialScore}/10</span></li>
+                      <li className="flex justify-between"><span>Innovation</span><span>{application.eligibility.evaluationScores.innovationScore}/10</span></li>
+                      <li className="flex justify-between"><span>Climate Adaptation</span><span>{application.eligibility.evaluationScores.climateAdaptationScore}/20</span></li>
+                      <li className="flex justify-between"><span>Job Creation</span><span>{application.eligibility.evaluationScores.jobCreationScore}/10</span></li>
+                      <li className="flex justify-between"><span>Financial Viability</span><span>{application.eligibility.evaluationScores.viabilityScore}/10</span></li>
+                      <li className="flex justify-between"><span>Management Capacity</span><span>{application.eligibility.evaluationScores.managementCapacityScore}/10</span></li>
+                      <li className="flex justify-between"><span>Location Bonus</span><span>{application.eligibility.evaluationScores.locationBonus}/5</span></li>
+                      <li className="flex justify-between"><span>Gender Bonus</span><span>{application.eligibility.evaluationScores.genderBonus}/5</span></li>
+                    </ul>
+                  </div>
+                  {application.eligibility.evaluationNotes && (
+                    <div className="border-t pt-4">
+                       <h3 className="text-sm font-medium mb-2">Evaluation Notes</h3>
+                       <p className="text-sm text-muted-foreground whitespace-pre-wrap">{application.eligibility.evaluationNotes}</p>
+                    </div>
+                  )}
                 </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Mandatory Criteria</h3>
-                  <ul className="space-y-1 text-sm">
-                    <li className="flex justify-between">
-                      <span>Age (18-35)</span>
-                      <span className={application.eligibility.mandatoryCriteria.ageEligible ? "text-green-600" : "text-red-600"}>
-                        {application.eligibility.mandatoryCriteria.ageEligible ? "✓" : "✗"}
-                      </span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Business Registration</span>
-                      <span className={application.eligibility.mandatoryCriteria.registrationEligible ? "text-green-600" : "text-red-600"}>
-                        {application.eligibility.mandatoryCriteria.registrationEligible ? "✓" : "✗"}
-                      </span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Revenue Generation</span>
-                      <span className={application.eligibility.mandatoryCriteria.revenueEligible ? "text-green-600" : "text-red-600"}>
-                        {application.eligibility.mandatoryCriteria.revenueEligible ? "✓" : "✗"}
-                      </span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Business Plan</span>
-                      <span className={application.eligibility.mandatoryCriteria.businessPlanEligible ? "text-green-600" : "text-red-600"}>
-                        {application.eligibility.mandatoryCriteria.businessPlanEligible ? "✓" : "✗"}
-                      </span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Climate Impact</span>
-                      <span className={application.eligibility.mandatoryCriteria.impactEligible ? "text-green-600" : "text-red-600"}>
-                        {application.eligibility.mandatoryCriteria.impactEligible ? "✓" : "✗"}
-                      </span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Evaluation Scores</h3>
-                  <ul className="space-y-1 text-sm">
-                    <li className="flex justify-between">
-                      <span>Market Potential</span>
-                      <span>{application.eligibility.evaluationScores.marketPotentialScore}/10</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Innovation</span>
-                      <span>{application.eligibility.evaluationScores.innovationScore}/10</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Climate Adaptation</span>
-                      <span>{application.eligibility.evaluationScores.climateAdaptationScore}/20</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Job Creation</span>
-                      <span>{application.eligibility.evaluationScores.jobCreationScore}/10</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Financial Viability</span>
-                      <span>{application.eligibility.evaluationScores.viabilityScore}/10</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Management Capacity</span>
-                      <span>{application.eligibility.evaluationScores.managementCapacityScore}/10</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Location Bonus</span>
-                      <span>{application.eligibility.evaluationScores.locationBonus}/5</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Gender Bonus</span>
-                      <span>{application.eligibility.evaluationScores.genderBonus}/5</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            ) : (
+              <CardContent>
+                <p className="text-muted-foreground text-sm text-center py-4">This application has not been evaluated yet.</p>
+              </CardContent>
+            )}
             <CardFooter>
               <Button className="w-full" variant="outline" asChild>
-                <Link href={`/admin/applications/${applicationId}/evaluate`}>
-                  Re-evaluate Application
+                <Link href={`/admin/applications/${application.id}/evaluate`}>
+                  {application.eligibility ? 'Re-evaluate Application' : 'Evaluate Application'}
                 </Link>
               </Button>
             </CardFooter>

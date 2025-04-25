@@ -110,11 +110,20 @@ export function ApplicationForm() {
     const currentStepData = form.getValues()[activeStep as keyof ApplicationFormValues];
     
     try {
-      // Check if the schema has a shape property and use it, otherwise use the schema directly
-      // This handles cases like 'personal' where the schema is direct vs others nested under a key
-      const schemaToUse = currentStep.schema.shape?.[activeStep as keyof typeof currentStep.schema.shape] ?? currentStep.schema;
+      // Use the appropriate schema based on the step ID to validate
+      let schemaToUse;
+      
+      if (activeStep === 'adaptation') {
+        // Handle adaptation schema specifically
+        schemaToUse = climateAdaptationSchema.shape.adaptation;
+        console.log("Validating adaptation data:", currentStepData);
+      } else if (currentStep.schema instanceof z.ZodObject) {
+        schemaToUse = currentStep.schema;
+      } else {
+        schemaToUse = z.object({});
+      }
 
-      // Validate the current step data against the specific part of the schema
+      // Validate the current step data against the schema
       schemaToUse.parse(currentStepData);
       
       // Mark step as completed if not already

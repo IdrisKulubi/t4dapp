@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import { stringify } from 'csv-stringify/sync';
 import db from "../../../db/drizzle";
-import { applications, businesses, applicants, eligibilityResults } from "../../../db/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { applications,  applicants, eligibilityResults } from "../../../db/schema";
+import { eq, and, desc, inArray, gte, lte } from "drizzle-orm";
 
 type ExportFormat = 'csv' | 'json';
 type ExportType = 'applications' | 'applicants' | 'eligibility';
@@ -129,11 +130,11 @@ async function getApplicationsExportData(filters: ExportOptions['filters'] = {})
   }
   
   if (filters.submittedAfter) {
-    queryFilters.push(applications.submittedAt >= filters.submittedAfter);
+    queryFilters.push(gte(applications.submittedAt, filters.submittedAfter));
   }
   
   if (filters.submittedBefore) {
-    queryFilters.push(applications.submittedAt <= filters.submittedBefore);
+    queryFilters.push(lte(applications.submittedAt, filters.submittedBefore));
   }
   
   // Fetch applications with business and applicant data

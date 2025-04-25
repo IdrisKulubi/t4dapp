@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { 
   CheckCircle2,

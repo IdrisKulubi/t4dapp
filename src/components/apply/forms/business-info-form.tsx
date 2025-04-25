@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -31,7 +32,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { businessInfoSchema } from "../schemas/business-info-schema";
 
 const customerSegmentOptions = [
   { id: "household_individuals", label: "Household Individuals" },

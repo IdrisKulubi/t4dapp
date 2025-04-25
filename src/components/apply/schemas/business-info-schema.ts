@@ -2,6 +2,7 @@ import { z } from "zod";
 
 // Get the current date for validation
 const now = new Date();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const twoYearsAgo = new Date(now.getFullYear() - 2, now.getMonth(), now.getDate());
 
 export const businessInfoSchema = z.object({

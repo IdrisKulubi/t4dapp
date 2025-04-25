@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getApplicationStats } from "@/lib/actions/actions";
 
 export default async function AdminDashboard() {
-  // TODO: Fetch real stats once database is populated
-  const stats = {
+  // Fetch real stats from the database
+  const statsResult = await getApplicationStats();
+  
+  // Set default stats if fetch fails
+  const stats = statsResult.success ? statsResult.data : {
     totalApplications: 0,
     eligibleApplications: 0,
     pendingReview: 0,
@@ -30,7 +34,7 @@ export default async function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.totalApplications}</div>
+            <div className="text-3xl font-bold">{stats?.totalApplications}</div>
           </CardContent>
         </Card>
         
@@ -44,7 +48,7 @@ export default async function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.eligibleApplications}</div>
+            <div className="text-3xl font-bold">{stats?.eligibleApplications}</div>
           </CardContent>
         </Card>
         
@@ -58,7 +62,7 @@ export default async function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats.pendingReview}</div>
+            <div className="text-3xl font-bold">{stats?.pendingReview}</div>
           </CardContent>
         </Card>
       </div>
@@ -92,11 +96,56 @@ export default async function AdminDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-60 flex items-center justify-center">
-              <p className="text-muted-foreground">
-                Statistics will be displayed here once applications are received.
-              </p>
-            </div>
+            {stats?.totalApplications && stats.totalApplications > 0 ? (
+              <div className="h-60 flex flex-col gap-4">
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold inline-block text-gray-600">
+                        Eligible Applications
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold inline-block text-gray-600">
+                        {stats?.eligibleApplications != null && stats?.totalApplications ? Math.round((stats.eligibleApplications / stats.totalApplications) * 100) : 0}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="flex flex-col justify-center bg-green-500 rounded-full"
+                      style={{ width: `${stats?.eligibleApplications != null && stats?.totalApplications ? (stats.eligibleApplications / stats.totalApplications) * 100 : 0}%` }} 
+                    />
+                  </div>
+                </div>
+                <div className="relative pt-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold inline-block text-gray-600">
+                        Pending Review
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold inline-block text-gray-600">
+                        {stats?.pendingReview != null && stats?.totalApplications ? Math.round((stats.pendingReview / stats.totalApplications) * 100) : 0}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex h-2 mt-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="flex flex-col justify-center bg-amber-500 rounded-full"
+                      style={{ width: `${stats?.pendingReview != null && stats?.totalApplications ? (stats.pendingReview / stats.totalApplications) * 100 : 0}%` }} 
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="h-60 flex items-center justify-center">
+                <p className="text-muted-foreground">
+                  Statistics will be displayed here once applications are received.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

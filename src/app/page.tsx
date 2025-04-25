@@ -92,7 +92,7 @@ export default function Home() {
                 variants={fadeIn}
                 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent"
               >
-                In-country YouthAdapt Challenge
+                In-country YouthAdapt Program
               </motion.h1>
               
               <motion.p 
