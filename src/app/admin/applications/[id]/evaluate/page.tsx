@@ -75,10 +75,11 @@ interface EvaluationFormState {
   evaluationNotes: string;
 }
 
-export default function EvaluateApplicationPage({ params }: { params: { id: string } }) {
-  const applicationId = parseInt(params.id, 10);
-  const router = useRouter();
+export default function EvaluateApplicationPage({ params }: { params: Promise<{ id: string }> }) {
+  // We still need to parse the ID inside, but the prop type must match
+  const [applicationId, setApplicationId] = useState<number | null>(null);
   const [application, setApplication] = useState<EvaluationApplicationData | null>(null);
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, startTransition] = useTransition();
@@ -95,13 +96,32 @@ export default function EvaluateApplicationPage({ params }: { params: { id: stri
   });
   const [totalScore, setTotalScore] = useState(0);
 
+  // Effect to get the actual ID from the promise prop
   useEffect(() => {
+    async function resolveParams() {
+      try {
+        const resolvedParams = await params;
+        setApplicationId(parseInt(resolvedParams.id, 10));
+      } catch (err) {
+        console.error("Error resolving params promise:", err);
+        setError("Failed to load application ID.");
+      }
+    }
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
+    // Return early if applicationId is still null
+    if (applicationId === null) {
+      return;
+    }
+    
     async function fetchData() {
       setLoading(true);
       setError(null);
       try {
-        // Fetching data on the client side - consider RSC fetching if preferred
-        const result = await getApplicationById(applicationId);
+        // Now we know applicationId is a number here
+        const result = await getApplicationById(applicationId as number);
         if (!result.success || !result.data) {
           if (result.error === "Application not found") {
             // We can't call notFound() directly in useEffect/client component
@@ -138,7 +158,7 @@ export default function EvaluateApplicationPage({ params }: { params: { id: stri
       }
     }
     fetchData();
-  }, [applicationId]);
+  }, [applicationId]); // Dependency is now the resolved applicationId
 
   // Calculate total score whenever form state changes
   useEffect(() => {
@@ -164,6 +184,12 @@ export default function EvaluateApplicationPage({ params }: { params: { id: stri
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    // Ensure we have the ID before submitting
+    if (applicationId === null) {
+      toast.error("Application ID is missing, cannot save evaluation.");
+      return;
+    }
     
     startTransition(async () => {
       setError(null); // Clear previous errors
