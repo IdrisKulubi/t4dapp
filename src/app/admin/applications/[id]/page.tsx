@@ -22,16 +22,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { getApplicationById } from "@/lib/actions/actions";
 import { notFound } from 'next/navigation';
+import { use } from 'react';
 
-export default async function ApplicationDetail({
+export default function ApplicationDetail({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
-  const awaitedParams = await params;
+  const awaitedParams = use(params);
   const applicationId = parseInt(awaitedParams.id, 10);
 
-  const result = await getApplicationById(applicationId);
+  const result = use(getApplicationById(applicationId));
   
   if (!result.success || !result.data) {
     if (result.error === "Application not found") {

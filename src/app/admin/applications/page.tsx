@@ -28,6 +28,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Badge } from "@/components/ui/badge";
 import { getApplications } from "@/lib/actions/actions";
 import { Eye } from "lucide-react";
+import { use } from 'react';
 
 // Map status to badge color
 const statusColors: Record<string, string> = {
@@ -38,13 +39,13 @@ const statusColors: Record<string, string> = {
   rejected: "bg-red-200 text-red-800",
 };
 
-export default async function ApplicationsPage({
+export default function ApplicationsPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string; search?: string; page?: string }>;
 }) {
   // Wait for searchParams to be available
-  const params = await searchParams;
+  const params = use(searchParams);
   
   // Parse search parameters
   const status = params.status || "all";
@@ -53,12 +54,12 @@ export default async function ApplicationsPage({
   const limit = 10; // Items per page
   
   // Fetch applications with filters
-  const result = await getApplications({
+  const result = use(getApplications({
     status,
     search,
     page,
     limit,
-  });
+  }));
   
   // Get applications or empty array if fetch failed
   const applications = result.success ? result.data : [];

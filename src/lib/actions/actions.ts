@@ -360,7 +360,6 @@ export async function getApplications(filters: ApplicationFilters = {}) {
       );
     }
     
-    // Count total applications (for pagination)
     // Re-apply only the status filter for accurate total count before search/eligibility filtering
     const countConditions: SQL[] = [];
     if (filters.status && filters.status !== 'all' && filters.status !== 'eligible' && filters.status !== 'ineligible') {
@@ -508,6 +507,107 @@ export async function getApplicationById(id: number) {
     return {
       success: false,
       error: "Failed to fetch application details",
+    };
+  }
+}
+
+// --- Evaluation Action ---
+
+interface EvaluationData {
+  applicationId: number;
+  marketPotentialScore: number;
+  innovationScore: number;
+  climateAdaptationScore: number;
+  jobCreationScore: number;
+  viabilityScore: number;
+  managementCapacityScore: number;
+  locationBonus: number;
+  genderBonus: number;
+  totalScore: number;
+  evaluationNotes: string | null;
+}
+
+/**
+ * Save manual evaluation scores and notes for an application
+ */
+export async function saveEvaluation(data: EvaluationData) {
+  try {
+    console.log(`Saving evaluation for application ID: ${data.applicationId}`);
+    
+    // TODO: Add validation using Zod if desired
+    
+    // TODO: Get evaluator user ID once auth is implemented
+    const evaluatorId = null; // Placeholder
+    
+    // Find the existing eligibility record to update or create if missing
+    const existingResult = await db.query.eligibilityResults.findFirst({
+      where: eq(eligibilityResults.applicationId, data.applicationId),
+    });
+    
+    const evaluationPayload = {
+        applicationId: data.applicationId,
+        marketPotentialScore: data.marketPotentialScore,
+        innovationScore: data.innovationScore,
+        climateAdaptationScore: data.climateAdaptationScore,
+        jobCreationScore: data.jobCreationScore,
+        viabilityScore: data.viabilityScore,
+        managementCapacityScore: data.managementCapacityScore,
+        locationBonus: data.locationBonus,
+        genderBonus: data.genderBonus,
+        totalScore: data.totalScore,
+        evaluationNotes: data.evaluationNotes,
+        evaluatedAt: new Date(),
+        evaluatedBy: evaluatorId, // Use actual evaluator ID later
+        updatedAt: new Date(),
+        // Keep existing mandatory flags if updating, set defaults if inserting
+        isEligible: existingResult?.isEligible ?? false, // Preserve or default
+        ageEligible: existingResult?.ageEligible ?? false,
+        registrationEligible: existingResult?.registrationEligible ?? false,
+        revenueEligible: existingResult?.revenueEligible ?? false,
+        businessPlanEligible: existingResult?.businessPlanEligible ?? false,
+        impactEligible: existingResult?.impactEligible ?? false,
+    };
+
+    if (existingResult) {
+      // Update the existing eligibility record
+      console.log(`Updating existing eligibility record ID: ${existingResult.id}`);
+      await db.update(eligibilityResults)
+        .set(evaluationPayload)
+        .where(eq(eligibilityResults.id, existingResult.id));
+    } else {
+      // Insert a new eligibility record
+      console.log(`No existing eligibility record found. Inserting new one for application ID: ${data.applicationId}`);
+      await db.insert(eligibilityResults)
+        .values(evaluationPayload);
+      // Note: If inserting, the mandatory fields default to false.
+      // Consider if checkEligibility should be re-run here or if manual review is sufficient.
+    }
+      
+    // Optionally, update the application status (e.g., to 'under_review' or 'evaluated')
+    await db.update(applications)
+      .set({ 
+        status: 'under_review', // Or another status like 'evaluated'
+        updatedAt: new Date()
+      })
+      .where(eq(applications.id, data.applicationId));
+      
+    console.log(`✅ Evaluation saved successfully for application ID: ${data.applicationId}`);
+    
+    // Revalidate paths to reflect changes
+    revalidatePath(`/admin/applications/${data.applicationId}`);
+    revalidatePath(`/admin/applications/${data.applicationId}/evaluate`);
+    revalidatePath(`/admin/applications`); // Revalidate list page too
+    
+    return {
+      success: true,
+      message: "Evaluation saved successfully.",
+    };
+
+  } catch (error) {
+    console.error("Error saving evaluation:", error);
+    return {
+      success: false,
+      error: "Failed to save evaluation.",
     };
   }
 } 
