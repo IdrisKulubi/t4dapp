@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import db from "../../../db/drizzle";
 import { checkEligibility } from "./eligibility";
 import { eq, and, desc, count as drizzleCount, SQL, InferSelectModel } from "drizzle-orm";
+import { randomUUID } from 'crypto';
 
 // Calculate min and max dates for age validation (18-35 years)
 const now = new Date();
@@ -108,7 +109,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
     console.log("✅ Form data validated successfully");
     
     // TODO: Add userId once authentication is implemented
-    const userId = "00000000-0000-0000-0000-000000000000"; // Placeholder
+    const userId = randomUUID();
     
     // Insert applicant information
     console.log("Saving applicant information to database...");

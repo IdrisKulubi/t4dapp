@@ -103,51 +103,65 @@ export function ApplicationForm() {
   
   const validateCurrentStep = (onSuccess: () => void) => {
     const currentStep = STEPS.find((step) => step.id === activeStep);
-    
-    if (!currentStep || !currentStep.schema) return;
-    
-    // Get current step data
-    const currentStepData = form.getValues()[activeStep as keyof ApplicationFormValues];
-    
-    try {
-      // Use the appropriate schema based on the step ID to validate
-      let schemaToUse;
-      
-      if (activeStep === 'adaptation') {
-        // Handle adaptation schema specifically
-        schemaToUse = climateAdaptationSchema.shape.adaptation;
-        console.log("Validating adaptation data:", currentStepData);
-      } else if (currentStep.schema instanceof z.ZodObject) {
-        schemaToUse = currentStep.schema;
-      } else {
-        schemaToUse = z.object({});
-      }
+    if (!currentStep || !currentStep.schema || currentStep.id === 'review') {
+        // If no schema for the step or it's the review step, just succeed
+        if (!completedSteps.includes(activeStep) && currentStep?.id !== 'review') {
+          setCompletedSteps([...completedSteps, activeStep]);
+        }
+        onSuccess();
+        return;
+    }
 
-      // Validate the current step data against the schema
-      schemaToUse.parse(currentStepData);
-      
-      // Mark step as completed if not already
-      if (!completedSteps.includes(activeStep)) {
-        setCompletedSteps([...completedSteps, activeStep]);
-      }
-      
-      // Move to next step
-      onSuccess();
+    // Get the data for the current step
+    const currentStepData = form.getValues()[activeStep as keyof ApplicationFormValues];
+
+    try {
+        // Determine the correct schema part to use for validation
+        let schemaPartToUse: z.ZodTypeAny | undefined;
+
+        // Check if the schema has a shape property and a key matching the active step
+        // Example: businessInfoSchema.shape.business
+        if (currentStep.schema instanceof z.ZodObject && currentStep.schema.shape && activeStep in currentStep.schema.shape) {
+            schemaPartToUse = currentStep.schema.shape[activeStep as keyof typeof currentStep.schema.shape];
+        } else {
+            // Otherwise, assume the schema directly defines the shape for this step's data
+            // Example: personalInfoSchema directly defines { firstName: ... }
+            schemaPartToUse = currentStep.schema;
+        }
+
+        if (!schemaPartToUse) {
+            console.warn(`Could not determine schema part for step: ${activeStep}. Skipping validation.`);
+            onSuccess(); // Allow moving forward if schema part is indeterminable
+            return;
+        }
+        
+        // Validate the current step's data against the determined schema part
+        const validationResult = schemaPartToUse.safeParse(currentStepData);
+
+        if (!validationResult.success) {
+             // Throw the ZodError to be caught below
+             throw validationResult.error;
+        }
+
+        // Mark step as completed if not already
+        if (!completedSteps.includes(activeStep)) {
+          setCompletedSteps([...completedSteps, activeStep]);
+        }
+
+        onSuccess(); // Validation successful, proceed
+
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Show toast with validation errors
-        toast.error("Please fill all required fields before proceeding");
-        
-        // Format error messages for display
-        const errorMessages = error.errors.map(err => 
-          `${err.path.join('.')}: ${err.message}`
-        ).join(', ');
-        
-        console.error("Validation errors:", errorMessages);
-        
-        // Trigger validation on the form to show errors under the correct step namespace
-        form.trigger(activeStep as keyof ApplicationFormValues);
-      }
+        if (error instanceof z.ZodError) {
+          toast.error("Please fill all required fields correctly before proceeding.");
+          // Log the specific Zod errors for debugging
+          console.error(`Zod Validation Errors for step '${activeStep}':`, error.errors);
+          
+          // Trigger validation on the form to show errors under the correct step namespace
+          form.trigger(activeStep as keyof ApplicationFormValues);
+        } else {
+          console.error(`Unexpected error during validation for step '${activeStep}':`, error);
+          toast.error("An unexpected error occurred during validation.");
+        }
     }
   };
   
@@ -269,25 +283,7 @@ export function ApplicationForm() {
                     Next
                     <ChevronRight className="h-4 w-4" />
                   </Button>
-                ) : (
-                  <Button 
-                    onClick={() => {
-                      // Handle final submission
-                      const isValid = form.formState.isValid;
-                      if (isValid) {
-                        toast.success("Application submitted successfully!");
-                        // Submit form logic here
-                      } else {
-                        toast.error("Please fix the errors before submitting.");
-                        form.trigger();
-                      }
-                    }}
-                    disabled={isAnimating}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    Submit Application
-                  </Button>
-                )}
+                ) : null}
               </div>
             </div>
           </div>

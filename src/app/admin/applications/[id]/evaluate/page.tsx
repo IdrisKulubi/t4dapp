@@ -192,7 +192,7 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
     }
     
     startTransition(async () => {
-      setError(null); // Clear previous errors
+      setError(null); 
       try {
         const result = await saveEvaluation({
           applicationId,

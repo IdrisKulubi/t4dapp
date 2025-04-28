@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { LoaderCircle } from "lucide-react";
 import { submitApplication } from "@/lib/actions/actions";
 import { ApplicationFormValues } from "../application-form";
-import { ZodIssue } from "zod";
+import { useRouter } from "next/navigation";
 // Props type
 type ReviewSubmitFormProps = {
   form: UseFormReturn<ApplicationFormValues>;
@@ -24,6 +24,7 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [updatesAccepted, setUpdatesAccepted] = useState(false);
+  const router = useRouter();
   
   const formValues = form.getValues();
   
@@ -112,20 +113,25 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
       console.log(`[Application ${submissionId}] Server response:`, response);
       
       if (!response.success) {
-        // Handle validation errors from server
+        // Improved: Log and display the actual error message from the server
         if (response.errors) {
           console.error(`[Application ${submissionId}] Validation errors:`, response.errors);
-          throw new Error(`Validation failed: ${response.errors.map((e: ZodIssue) => e.message).join(', ')}`);
+          toast.error(`Validation failed: ${response.errors.map((e: unknown) => (typeof e === 'object' && e && 'message' in e) ? (e as { message: string }).message : String(e)).join(', ')}`);
+        } else if (response.message) {
+          console.error(`[Application ${submissionId}] Server error message:`, response.message);
+          toast.error(`Submission failed: ${response.message}`);
         } else {
-          throw new Error(response.message || 'Submission failed');
+          toast.error('Submission failed: Unknown error');
         }
+        setIsSubmitting(false);
+        return;
       }
       
       console.log(`[Application ${submissionId}] Success! Application ID: ${response.data?.applicationId}`);
       
       toast.success("Application submitted successfully!");
-      // You could redirect to a success page here
-      // router.push(`/apply/success?id=${response.data.applicationId}`);
+      // Redirect to homepage after success
+      router.push("/");
     } catch (error) {
       console.error(`[Application ${submissionId}] Submission error:`, error);
       toast.error("There was a problem submitting your application. Please try again.");
