@@ -12,6 +12,8 @@ import {
   UserGroupIcon,
   DocumentCheckIcon
 } from "@heroicons/react/24/outline";
+import { HeroSection } from "@/components/home/HeroSection";
+import { PartnerLogosSection } from "@/components/home/PartnerLogosSection";
 
 // Animation variants
 const fadeIn = {
@@ -47,108 +49,11 @@ const drawLine = {
 export default function Home() {
   return (
     <div className="relative bg-gray-900 text-gray-100">
-      {/* Hero Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-to-b from-green-950/30 to-blue-950/30 pointer-events-none overflow-hidden">
-        <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <motion.path
-            d="M0,120 C150,180 350,50 500,120 C650,190 750,100 1000,140 L1000,300 L0,300 Z"
-            fill="none"
-            stroke="rgba(20, 184, 166, 0.3)"
-            strokeWidth="2"
-            initial="hidden"
-            animate="visible"
-            variants={drawLine}
-          />
-          <motion.path
-            d="M0,150 C150,220 350,90 500,150 C650,210 750,140 1000,180 L1000,300 L0,300 Z"
-            fill="none"
-            stroke="rgba(6, 182, 212, 0.3)"
-            strokeWidth="2"
-            initial="hidden"
-            animate="visible"
-            variants={drawLine}
-          />
-        </svg>
-      </div>
-
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <motion.div 
-              className="space-y-6"
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              <motion.div variants={fadeIn} className="inline-block">
-                <span className="inline-flex items-center px-3 py-1 text-sm font-medium rounded-full bg-teal-900 text-teal-100">
-                  <SparklesIcon className="w-4 h-4 mr-1" />
-                  Open for Applications
-                </span>
-              </motion.div>
-              
-              <motion.h1 
-                variants={fadeIn}
-                className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent"
-              >
-                In-country YouthAdapt Program
-              </motion.h1>
-              
-              <motion.p 
-                variants={fadeIn}
-                className="text-xl text-gray-300 max-w-xl"
-              >
-                Supporting young entrepreneurs and MSMEs in Africa building innovative solutions for climate resilience.
-              </motion.p>
-              
-              <motion.div variants={fadeIn} className="pt-4 flex flex-wrap gap-4">
-                <Button size="lg" className="rounded-full bg-teal-600 hover:bg-teal-700 text-white" asChild>
-                  <Link href="/apply" className="flex items-center gap-2">
-                    Apply Now
-                    <ArrowRightIcon className="w-5 h-5" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="rounded-full text-teal-300 border-teal-700 hover:bg-teal-900/50" asChild>
-                  <a href="#eligibility">Learn More</a>
-                </Button>
-              </motion.div>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8 }}
-              className="relative aspect-square max-w-md mx-auto lg:ml-auto"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-900/50 to-blue-900/50 rounded-full opacity-70"></div>
-              <div className="absolute inset-4 bg-gradient-to-br from-teal-800/40 to-blue-800/40 rounded-full opacity-70 animate-pulse"></div>
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-                <motion.circle
-                  cx="50"
-                  cy="50"
-                  r="40"
-                  fill="none"
-                  stroke="rgba(94, 234, 212, 0.5)"
-                  strokeWidth="0.5"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 2, repeat: Infinity, repeatType: "loop" }}
-                />
-              </svg>
-              <div className="relative h-full w-full flex items-center justify-center">
-                <Image
-                  src="/images/africa-map.svg"
-                  width={300}
-                  height={300}
-                  alt="Africa Map"
-                  className="w-3/4 h-3/4 object-contain brightness-125 contrast-125"
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
+
+      {/* Partner Logos Section */}
+      <PartnerLogosSection />
 
       {/* Features Section */}
       <section className="py-16 bg-gray-800">
@@ -284,13 +189,14 @@ export default function Home() {
               >
                 <div className="w-full aspect-[4/3] relative mb-3 bg-gray-800 rounded">
                   <Image
-                    src={`/images/flags/${country.code}.svg`}
+                    src={`/images/flags/${country.code}.png`}
                     fill
                     alt={country.name}
                     className="object-cover rounded"
                   />
                 </div>
                 <p className="font-medium text-teal-200">{country.name}</p>
+
               </motion.div>
             ))}
           </div>
@@ -381,10 +287,11 @@ const eligibilityCriteria = [
 ];
 
 const countries = [
-  { name: "Kenya", code: "ke" },
-  { name: "Tanzania", code: "tz" },
-  { name: "Rwanda", code: "rw" },
-  { name: "Ghana", code: "gh" },
-  { name: "Nigeria", code: "ng" }
+  { name: "Kenya", code: "kenya" },
+  { name: "Tanzania", code: "tanzania" },
+  { name: "Rwanda", code: "rwanda" },
+  { name: "Ghana", code: "ghana" },
+  { name: "Uganda", code: "uganda" }
+  
 ];
 

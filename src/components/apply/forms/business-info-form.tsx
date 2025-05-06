@@ -32,6 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { UploadButton } from "@/components/ui/upload-button";
 
 const customerSegmentOptions = [
   { id: "household_individuals", label: "Household Individuals" },
@@ -179,6 +180,162 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 )}
               />
             )}
+          </div>
+          
+          {/* Document Uploads Section */}
+          <div className="space-y-4 pt-4 border-t border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-800">Business Overview & Compliance Documents</h3>
+            <p className="text-gray-600 mb-2">Upload or provide a link for each required document. All uploads are secure and confidential.</p>
+            {/* Business Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="business.businessOverviewUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Overview (PDF or DOCX)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://example.com/business-overview.pdf" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormDescription>Provide a link or upload below.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                {/* UploadThing UploadButton for Business Overview */}
+                <UploadButton
+                  endpoint="businessOverviewUploader"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]?.url) form.setValue("business.businessOverviewUrl", res[0].url);
+                  }}
+                  onUploadError={(error) => {
+                    // Optionally show error toast
+                  }}
+                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
+                />
+              </div>
+            </div>
+            {/* CR12 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="business.cr12Url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CR12 Document</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://example.com/cr12.pdf" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormDescription>Provide a link or upload below.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <UploadButton
+                  endpoint="cr12Uploader"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]?.url) form.setValue("business.cr12Url", res[0].url);
+                  }}
+                  onUploadError={() => {}}
+                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
+                />
+              </div>
+            </div>
+            {/* Audited Accounts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="business.auditedAccountsUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last 2 Years' Audited Accounts</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://example.com/audited-accounts.pdf" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormDescription>Provide a link or upload below.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <UploadButton
+                  endpoint="auditedAccountsUploader"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]?.url) form.setValue("business.auditedAccountsUrl", res[0].url);
+                  }}
+                  onUploadError={() => {}}
+                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
+                />
+              </div>
+            </div>
+            {/* Tax Compliance Certificate */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="business.taxComplianceUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tax Compliance Certificate</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://example.com/tax-certificate.pdf" {...field} value={field.value || ""} />
+                    </FormControl>
+                    <FormDescription>Provide a link or upload below.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <UploadButton
+                  endpoint="taxComplianceUploader"
+                  onClientUploadComplete={(res) => {
+                    if (res && res[0]?.url) form.setValue("business.taxComplianceUrl", res[0].url);
+                  }}
+                  onUploadError={() => {}}
+                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Sector Categorization Section */}
+          <div className="space-y-4 pt-4 border-t border-gray-200">
+            <h3 className="text-xl font-semibold text-gray-800">Sector Categorization</h3>
+            <FormField
+              control={form.control}
+              name="business.sector"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Which sector best describes your business?</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select sector" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="food-security">
+                        Food Security
+                        <span className="block text-xs text-gray-500">Ensuring reliable access to sufficient, safe, and nutritious food.</span>
+                      </SelectItem>
+                      <SelectItem value="infrastructure">
+                        Infrastructure
+                        <span className="block text-xs text-gray-500">Developing and maintaining essential facilities and systems.</span>
+                      </SelectItem>
+                      <SelectItem value="other">
+                        Other
+                        <span className="block text-xs text-gray-500">Any other sector relevant to your business.</span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Select the sector that most closely aligns with your business. Hover for descriptions.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
           
           {/* Location Section */}

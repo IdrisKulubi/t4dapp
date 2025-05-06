@@ -27,8 +27,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-teal-950 via-blue-950 to-green-900 min-h-screen`}
       >
+        <header className="w-full flex items-center justify-between px-6 py-4 bg-black/40 backdrop-blur-md z-50 relative">
+          <div className="flex items-center gap-4">
+            <img src="/images/gca-logo.png" alt="GCA Logo" className="h-10 w-auto" />
+            <img src="/images/kcic-logo.png" alt="KCIC Logo" className="h-10 w-auto" />
+          </div>
+          <span className="text-lg font-semibold text-white tracking-wide">YouthAdapt Challenge</span>
+        </header>
         <Toaster />
         <ThemeProvider
           attribute="class"
@@ -36,7 +43,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <main className="pt-4">{children}</main>
         </ThemeProvider>
       </body>
     </html>
