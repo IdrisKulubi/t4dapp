@@ -210,6 +210,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     if (res && res[0]?.url) form.setValue("business.businessOverviewUrl", res[0].url);
                   }}
                   onUploadError={(error) => {
+                    console.error("Upload error:", error);
                     // Optionally show error toast
                   }}
                   className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
@@ -250,7 +251,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 name="business.auditedAccountsUrl"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last 2 Years' Audited Accounts</FormLabel>
+                    <FormLabel>Last 2 Years&apos; Audited Accounts</FormLabel>
                     <FormControl>
                       <Input placeholder="https://example.com/audited-accounts.pdf" {...field} value={field.value || ""} />
                     </FormControl>

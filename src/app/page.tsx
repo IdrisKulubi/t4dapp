@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { 
   ArrowRightIcon, 
-  SparklesIcon, 
   GlobeAltIcon, 
   LightBulbIcon,
   UserGroupIcon,
@@ -35,16 +34,6 @@ const staggerContainer = {
   }
 };
 
-const drawLine = {
-  hidden: { pathLength: 0 },
-  visible: { 
-    pathLength: 1,
-    transition: { 
-      duration: 2,
-      ease: "easeInOut"
-    }
-  }
-};
 
 export default function Home() {
   return (

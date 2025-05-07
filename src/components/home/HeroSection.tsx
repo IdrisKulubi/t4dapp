@@ -22,7 +22,7 @@ export function HeroSection() {
               YouthAdapt 2024
             </span>
             <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
-              Empowering Africa's Next Generation of Climate Innovators
+              Empowering Africa&apos;s Next Generation of Climate Innovators
             </h1>
             <p className="text-xl text-gray-300 max-w-xl">
               Join the YouthAdapt Challenge and help build a resilient, sustainable future for Africa. Open to young entrepreneurs and MSMEs driving change in food security and infrastructure.
