@@ -32,7 +32,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { UploadButton } from "@/components/ui/upload-button";
+import { UploadButton } from "@/utils/uploadthing";
 
 const customerSegmentOptions = [
   { id: "household_individuals", label: "Household Individuals" },

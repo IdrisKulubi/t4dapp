@@ -149,7 +149,7 @@ export const applications = pgTable('applications', {
 
 export const eligibilityResults = pgTable('eligibility_results', {
   id: serial('id').primaryKey(),
-  applicationId: integer('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }),
+  applicationId: integer('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }).unique(),
   isEligible: boolean('is_eligible').notNull(),
   ageEligible: boolean('age_eligible').notNull(),
   registrationEligible: boolean('registration_eligible').notNull(),

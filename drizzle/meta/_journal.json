@@ -8,6 +8,13 @@
       "when": 1745268875472,
       "tag": "0000_new_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1746746954038,
+      "tag": "0001_minor_lake",
+      "breakpoints": true
     }
   ]
 }
