@@ -3,7 +3,8 @@
 
 import { useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, FileIcon, ExternalLinkIcon, XIcon, UploadIcon } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -48,11 +49,140 @@ type BusinessInfoFormProps = {
   onPrevious: () => void;
 };
 
+// Enhanced Document Upload Component
+interface DocumentUploadProps {
+  endpoint: string;
+  formFieldName: string;
+  label: string;
+  description?: string;
+  currentUrl?: string;
+  form: any;
+}
+
+function DocumentUpload({ 
+  endpoint, 
+  formFieldName, 
+  label, 
+  description, 
+  currentUrl, 
+  form 
+}: DocumentUploadProps) {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleUploadComplete = (res: any) => {
+    setIsUploading(false);
+    if (res && res[0]?.url) {
+      form.setValue(formFieldName, res[0].url);
+      toast.success(`${label} uploaded successfully!`, { id: `upload-${formFieldName}` });
+    }
+  };
+
+  const handleUploadError = (error: Error) => {
+    setIsUploading(false);
+    console.error("Upload error:", error);
+    toast.error(`Failed to upload ${label}. Please try again.`, { id: `upload-${formFieldName}` });
+  };
+
+  const handleDelete = () => {
+    form.setValue(formFieldName, "");
+    toast.success(`${label} removed successfully.`);
+  };
+
+  const getFileName = (url: string) => {
+    try {
+      const urlParts = url.split('/');
+      return decodeURIComponent(urlParts[urlParts.length - 1]);
+    } catch {
+      return 'Document';
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <FormField
+        control={form.control}
+        name={formFieldName}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{label}</FormLabel>
+            <FormControl>
+              <Input 
+                placeholder={`https://example.com/${label.toLowerCase().replace(/\s+/g, '-')}.pdf`} 
+                {...field} 
+                value={field.value || ""} 
+              />
+            </FormControl>
+            {description && <FormDescription>{description}</FormDescription>}
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      
+      <div className="space-y-3">
+        {currentUrl ? (
+          <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-950/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileIcon className="h-4 w-4 text-green-600" />
+                <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                  {getFileName(currentUrl).slice(0, 12)}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(currentUrl, '_blank')}
+                  className="h-8 w-8 p-0"
+                >
+                  <ExternalLinkIcon className="h-3 w-3" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDelete}
+                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                >
+                  <XIcon className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-green-600 mt-1">Document uploaded successfully</p>
+          </div>
+        ) : (
+          <div className="border-2 border-dashed rounded-lg p-6 text-center bg-gray-50 dark:bg-gray-900/50">
+            <UploadIcon className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Click on the choose file to upload 👇
+            </p>
+          </div>
+        )}
+        
+        <UploadButton
+          endpoint={endpoint as any}
+          onBeforeUploadBegin={(files) => {
+            setIsUploading(true);
+            toast.loading(`Uploading ${label}...`, { id: `upload-${formFieldName}` });
+            return files;
+          }}
+          onClientUploadComplete={handleUploadComplete}
+          onUploadError={handleUploadError}
+          className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full ut-button:disabled:bg-gray-400"
+          disabled={isUploading}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormProps) {
   const [showCertificateUpload, setShowCertificateUpload] = useState(false);
   
   const handleSubmit = async (data: any) => {
     console.log("Business Info Data:", data);
+    toast.success("Business information saved successfully!");
     onNext();
   };
   
@@ -183,121 +313,51 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
           </div>
           
           {/* Document Uploads Section */}
-          <div className="space-y-4 pt-4 border-t border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-800">Business Overview & Compliance Documents</h3>
-            <p className="text-gray-600 mb-2">Upload or provide a link for each required document. All uploads are secure and confidential.</p>
+          <div className="space-y-6 pt-4 border-t border-gray-200">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-800">Business Overview & Compliance Documents</h3>
+              <p className="text-gray-600 mt-1">Upload or provide a link for each required document. All uploads are secure and confidential.</p>
+            </div>
+            
             {/* Business Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="business.businessOverviewUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Overview (PDF or DOCX)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/business-overview.pdf" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormDescription>Provide a link or upload below.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div>
-                {/* UploadThing UploadButton for Business Overview */}
-                <UploadButton
-                  endpoint="businessOverviewUploader"
-                  onClientUploadComplete={(res) => {
-                    if (res && res[0]?.url) form.setValue("business.businessOverviewUrl", res[0].url);
-                  }}
-                  onUploadError={(error) => {
-                    console.error("Upload error:", error);
-                    // Optionally show error toast
-                  }}
-                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
-                />
-              </div>
-            </div>
+            <DocumentUpload
+              endpoint="businessOverviewUploader"
+              formFieldName="business.businessOverviewUrl"
+              label="Business Overview (PDF or DOCX)"
+              description="Provide a link or upload below."
+              currentUrl={form.watch("business.businessOverviewUrl")}
+              form={form}
+            />
+            
             {/* CR12 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="business.cr12Url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>CR12 Document</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/cr12.pdf" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormDescription>Provide a link or upload below.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div>
-                <UploadButton
-                  endpoint="cr12Uploader"
-                  onClientUploadComplete={(res) => {
-                    if (res && res[0]?.url) form.setValue("business.cr12Url", res[0].url);
-                  }}
-                  onUploadError={() => {}}
-                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
-                />
-              </div>
-            </div>
+            <DocumentUpload
+              endpoint="cr12Uploader"
+              formFieldName="business.cr12Url"
+              label="CR12 Document"
+              description="Provide a link or upload below."
+              currentUrl={form.watch("business.cr12Url")}
+              form={form}
+            />
+            
             {/* Audited Accounts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="business.auditedAccountsUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last 2 Years&apos; Audited Accounts</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/audited-accounts.pdf" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormDescription>Provide a link or upload below.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div>
-                <UploadButton
-                  endpoint="auditedAccountsUploader"
-                  onClientUploadComplete={(res) => {
-                    if (res && res[0]?.url) form.setValue("business.auditedAccountsUrl", res[0].url);
-                  }}
-                  onUploadError={() => {}}
-                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
-                />
-              </div>
-            </div>
+            <DocumentUpload
+              endpoint="auditedAccountsUploader"
+              formFieldName="business.auditedAccountsUrl"
+              label="Last 2 Years' Audited Accounts"
+              description="Provide a link or upload below."
+              currentUrl={form.watch("business.auditedAccountsUrl")}
+              form={form}
+            />
+            
             {/* Tax Compliance Certificate */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="business.taxComplianceUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tax Compliance Certificate</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/tax-certificate.pdf" {...field} value={field.value || ""} />
-                    </FormControl>
-                    <FormDescription>Provide a link or upload below.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div>
-                <UploadButton
-                  endpoint="taxComplianceUploader"
-                  onClientUploadComplete={(res) => {
-                    if (res && res[0]?.url) form.setValue("business.taxComplianceUrl", res[0].url);
-                  }}
-                  onUploadError={() => {}}
-                  className="ut-button:bg-teal-700 ut-button:ut-ready:bg-teal-700/50 w-full"
-                />
-              </div>
-            </div>
+            <DocumentUpload
+              endpoint="taxComplianceUploader"
+              formFieldName="business.taxComplianceUrl"
+              label="Tax Compliance Certificate"
+              description="Provide a link or upload below."
+              currentUrl={form.watch("business.taxComplianceUrl")}
+              form={form}
+            />
           </div>
 
           {/* Sector Categorization Section */}

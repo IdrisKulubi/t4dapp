@@ -3,8 +3,13 @@ import { UploadThingError } from "uploadthing/server";
 
 const f = createUploadthing();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const auth = (req: Request) => ({ id: "fakeId" }); // Replace with real auth
+// Improved auth function for development - replace with real auth in production
+const auth = async (req: Request) => {
+  // In development, we'll create a simple user ID
+  // In production, replace this with your actual authentication logic
+  const userId = `user_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  return { id: userId };
+};
 
 // Define a reusable document uploader configuration
 const documentUploader = f({
@@ -14,9 +19,17 @@ const documentUploader = f({
   // Add other document types if needed e.g. excel, powerpoint
 })
 .middleware(async ({ req }) => {
-  const user = await auth(req); // Replace with your actual authentication logic
-  if (!user) throw new UploadThingError("Unauthorized");
-  return { userId: user.id };
+  try {
+    const user = await auth(req);
+    if (!user?.id) {
+      throw new UploadThingError("Failed to authenticate user");
+    }
+    console.log("Upload middleware - User authenticated:", user.id);
+    return { userId: user.id };
+  } catch (error) {
+    console.error("Upload middleware error:", error);
+    throw new UploadThingError("Unauthorized");
+  }
 })
 .onUploadComplete(async ({ metadata, file }) => {
   console.log(`Upload complete for ${file.name} by userId:`, metadata.userId);
@@ -27,13 +40,20 @@ const documentUploader = f({
 export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB" } })
     .middleware(async ({ req }) => {
-      const user = await auth(req);
-      if (!user) throw new UploadThingError("Unauthorized");
-      return { userId: user.id };
+      try {
+        const user = await auth(req);
+        if (!user?.id) {
+          throw new UploadThingError("Failed to authenticate user");
+        }
+        return { userId: user.id };
+      } catch (error) {
+        console.error("Image upload middleware error:", error);
+        throw new UploadThingError("Unauthorized");
+      }
     })
     .onUploadComplete(async ({ metadata, file }) => {
       console.log("Upload complete for userId:", metadata.userId);
-      console.log("file url", file.url); // Use file.url for consistency
+      console.log("file url", file.url);
       return { uploadedBy: metadata.userId, fileUrl: file.url };
     }),
   // Document uploaders for the business form

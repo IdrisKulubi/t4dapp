@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
+
+
+
 export function HeroSection() {
   return (
     <section className="relative pt-20 pb-32 overflow-hidden bg-gradient-to-br from-teal-950/60 to-blue-950/60">
