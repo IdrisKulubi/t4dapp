@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "sonner";
-import Image from "next/image";
+import { Header } from "@/components/Header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,21 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-teal-950 via-blue-950 to-green-900 min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <header className="w-full flex items-center justify-between px-6 py-4 bg-black/40 backdrop-blur-md z-50 relative">
-          <div className="flex items-center gap-4">
-            <Image src="/images/GCA.svg" alt="GCA Logo" className="h-10 w-auto"
-            width={100}
-            height={100}
-             />
-            <Image src="/images/KCIC.png" alt="KCIC Logo" className="h-10 w-auto"
-            width={100}
-            height={100}
-            />
-          </div>
-          <span className="text-lg font-semibold text-white tracking-wide">YouthAdapt Challenge</span>
-        </header>
+        <Header />
         <Toaster />
         <ThemeProvider
           attribute="class"
@@ -50,7 +38,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <main className="pt-4">{children}</main>
+          <main className="pt-20">{children}</main>
         </ThemeProvider>
       </body>
     </html>

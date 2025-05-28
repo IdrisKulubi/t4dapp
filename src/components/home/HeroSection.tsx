@@ -79,17 +79,7 @@ export function HeroSection() {
                 </Link>
               </Button>
               
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="group rounded-full border-2 border-slate-600 text-slate-300 hover:bg-slate-800/50 hover:border-emerald-500/50 px-8 py-4 text-lg backdrop-blur-sm transition-all duration-300" 
-                asChild
-              >
-                <a href="#about" className="flex items-center gap-3">
-                  <PlayIcon className="w-5 h-5" />
-                  Watch Demo
-                </a>
-              </Button>
+             
             </motion.div>
             
             {/* Stats */}

@@ -8,7 +8,7 @@ const countries = [
   { name: "Tanzania", code: "tanzania", description: "Agricultural transformation leader" },
   { name: "Rwanda", code: "rwanda", description: "Technology and sustainability pioneer" },
   { name: "Ghana", code: "ghana", description: "West Africa's economic powerhouse" },
-  { name: "Uganda", code: "uganda", description: "Emerging market opportunities" }
+  { name: "Nigeria", code: "nigeria", description: "Emerging market opportunities" }
 ];
 
 const fadeIn = {
