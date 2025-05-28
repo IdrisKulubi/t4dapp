@@ -68,6 +68,24 @@ export const personalInfoSchema = z.object({
       required_error: "Please select your highest level of education",
     }
   ),
+}).refine((data) => {
+  // If citizenship is "other", citizenshipOther must be provided
+  if (data.citizenship === "other" && (!data.citizenshipOther || data.citizenshipOther.trim().length < 2)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Please specify your country of citizenship",
+  path: ["citizenshipOther"],
+}).refine((data) => {
+  // If residence is "other", residenceOther must be provided
+  if (data.countryOfResidence === "other" && (!data.residenceOther || data.residenceOther.trim().length < 2)) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Please specify your country of residence",
+  path: ["residenceOther"],
 });
 
 export type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>; 
