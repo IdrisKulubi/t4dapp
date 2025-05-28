@@ -172,21 +172,24 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       >
                         <FormItem className="flex items-center space-x-3 space-y-0 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
                           <FormControl>
-                            <RadioGroupItem value="male" className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
+                            <RadioGroupItem
+                              value="male"
+                              className="bg-gray-100 border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                            />
                           </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">Male</FormLabel>
+                          <FormLabel className="font-normal cursor-pointer text-gray-900">Male</FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
                           <FormControl>
-                            <RadioGroupItem value="female" className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
+                            <RadioGroupItem value="female" className="bg-gray-100 border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
                           </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">Female</FormLabel>
+                          <FormLabel className="font-normal cursor-pointer text-gray-900">Female</FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
                           <FormControl>
-                            <RadioGroupItem value="other" className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
+                            <RadioGroupItem value="other" className="bg-gray-100 border-gray-300 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600" />
                           </FormControl>
-                          <FormLabel className="font-normal cursor-pointer">Other</FormLabel>
+                          <FormLabel className="font-normal cursor-pointer text-gray-900">Other</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -199,11 +202,12 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
               <FormField
                 control={form.control}
                 name="personal.dateOfBirth"
+                
                 render={({ field }) => {
                   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                     const value = e.target.value;
                     setDateOfBirthInput(value);
-                    
+
                     // Try to parse the input value
                     try {
                       const date = parse(value, "yyyy-MM-dd", new Date());
@@ -224,7 +228,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                           type="date"
                           value={dateOfBirthInput}
                           onChange={handleInputChange}
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12 pr-10"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12 pr-10"
                           max={format(new Date(), "yyyy-MM-dd")}
                         />
                         <Popover>
@@ -302,7 +306,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12">
+                        <SelectTrigger className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12">
                           <SelectValue placeholder="Select your country of citizenship" />
                         </SelectTrigger>
                       </FormControl>
@@ -331,7 +335,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       <FormControl>
                         <Input 
                           placeholder="Enter country name" 
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                           {...field}
                           value={field.value || ""}
                         />
@@ -357,7 +361,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12">
+                        <SelectTrigger className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12">
                           <SelectValue placeholder="Select your country of residence" />
                         </SelectTrigger>
                       </FormControl>
@@ -419,7 +423,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       <FormControl>
                         <Input 
                           placeholder="Enter your phone number" 
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                           {...field} 
                         />
                       </FormControl>
@@ -438,7 +442,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                         <Input 
                           placeholder="Enter your email address" 
                           type="email"
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                           {...field} 
                         />
                       </FormControl>
@@ -456,7 +460,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                     <FormLabel className="text-gray-900 font-medium">Highest Education Level *</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
-                        <SelectTrigger className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12">
+                        <SelectTrigger className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12">
                           <SelectValue placeholder="Select your highest education level" />
                         </SelectTrigger>
                       </FormControl>
@@ -475,7 +479,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
             </div>
           </div>
           
-          {/* Desktop Navigation Buttons - REMOVED: Using mobile navigation for all screen sizes */}
+         
         </form>
       </Form>
     </div>

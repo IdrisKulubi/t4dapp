@@ -60,11 +60,82 @@ export function ApplicationForm() {
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: {
-      personal: {},
-      business: defaultBusinessInfo.business,
-      adaptation: defaultClimateAdaptation.adaptation,
-      financial: defaultFinancialInfo.financial,
-      support: defaultSupportNeeds.support,
+      personal: {
+        firstName: "",
+        lastName: "",
+        gender: undefined,
+        dateOfBirth: undefined,
+        email: "",
+        phoneNumber: "",
+        citizenship: undefined,
+        citizenshipOther: "",
+        countryOfResidence: undefined,
+        residenceOther: "",
+        highestEducation: undefined,
+      },
+      business: {
+        ...defaultBusinessInfo.business,
+        name: "",
+        description: "",
+        problemSolved: "",
+        city: "",
+        startDate: undefined,
+        isRegistered: undefined,
+        country: undefined,
+        countryOther: "",
+        climateAdaptationContribution: "",
+        productServiceDescription: "",
+        climateExtremeImpact: "",
+        productionCapacityLastSixMonths: "",
+        currentChallenges: "",
+        supportNeeded: "",
+        customerSegments: [],
+        registeredCountries: "",
+      },
+      adaptation: {
+        ...defaultClimateAdaptation.adaptation,
+        solutionTitle: "",
+        solutionDescription: "",
+        primaryChallenge: undefined,
+        primaryChallengeOther: "",
+        secondaryChallenges: [],
+        targetBeneficiaries: "",
+        estimatedBeneficiariesCount: null,
+        technologyDescription: "",
+        innovationDescription: "",
+        implementationApproach: "",
+        scalingStrategy: "",
+        measurableImpact: "",
+      },
+      financial: {
+        ...defaultFinancialInfo.financial,
+        annualRevenue: null,
+        revenueGrowthRate: null,
+        profitMargin: null,
+        previousFunding: undefined,
+        previousFundingSources: [],
+        previousFundingAmount: null,
+        requestedFundingAmount: undefined,
+        fundingUse: "",
+        revenueModel: "",
+        costStructure: "",
+        pathToSustainability: "",
+        financialChallenges: "",
+      },
+      support: {
+        ...defaultSupportNeeds.support,
+        supportTypes: [],
+        supportTypesOther: "",
+        mentorshipNeeds: "",
+        preferredMentorExpertise: [],
+        trainingNeeds: "",
+        preferredTrainingFormat: undefined,
+        networkingNeeds: "",
+        desiredNetworkingConnections: [],
+        resourcesNeeded: "",
+        expectedBusinessImpact: "",
+        expectedEnvironmentalImpact: "",
+      },
     },
     mode: "onChange",
   });
@@ -452,13 +523,19 @@ export function ApplicationForm() {
               </Tabs>
 
               {/* Navigation Buttons - Now visible on all screen sizes */}
-              <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 p-4 mt-8">
-                <div className="flex justify-between gap-3 max-w-md mx-auto lg:max-w-none">
-                  <Button 
-                    variant="outline" 
+              <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-700 p-4 mt-8 rounded-lg text-gray-950">
+                <div className="flex justify-between gap-3 max-w-md mx-auto lg:max-w-none text-gray-950">
+                  <Button
+                    variant="outline"
                     onClick={goToPreviousStep}
                     disabled={activeStep === STEPS[0].id || isAnimating}
-                    className="flex-1 lg:flex-none lg:px-6 h-12 border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                    className={cn(
+                      "flex-1 lg:flex-none lg:px-6 h-12 border-2",
+                      "border-gray-300 text-gray-700 bg-white",
+                      "hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700",
+                      "dark:border-gray-600 dark:text-gray-100 dark:bg-gray-900",
+                      "dark:hover:border-blue-400 dark:hover:bg-blue-950 dark:hover:text-blue-300"
+                    )}
                   >
                     <ChevronLeft className="h-4 w-4 mr-1" />
                     Previous

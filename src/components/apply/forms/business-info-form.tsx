@@ -68,6 +68,7 @@ function DocumentUpload({
   form 
 }: DocumentUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleUploadComplete = (res: any) => {
     setIsUploading(false);
@@ -97,92 +98,251 @@ function DocumentUpload({
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <FormField
-          control={form.control}
-          name={formFieldName}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-gray-900 font-medium">{label}</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder={`https://example.com/${label.toLowerCase().replace(/\s+/g, '-')}.pdf`} 
-                  {...field} 
-                  value={field.value || ""} 
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </FormControl>
-              {description && <FormDescription className="text-gray-600">{description}</FormDescription>}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Document Label & Description */}
+      <div className="space-y-2">
+        <h4 className="text-lg font-semibold text-gray-900">{label}</h4>
+        {description && (
+          <p className="text-sm text-gray-600">{description}</p>
+        )}
+      </div>
+
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* URL Input Section */}
+        <div className="space-y-3">
+          <FormField
+            control={form.control}
+            name={formFieldName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-gray-700">
+                  Document URL (Optional)
+                </FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder={`https://drive.google.com/file/d/...`} 
+                    {...field} 
+                    value={field.value || ""} 
+                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                  />
+                </FormControl>
+                <FormDescription className="text-xs text-gray-500">
+                  Paste a link from Google Drive, Dropbox, or any cloud storage
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Upload Section */}
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-gray-700 block">
+            Upload Document
+          </label>
+          
           {currentUrl ? (
-            <div className="border border-green-200 rounded-lg p-4 bg-gradient-to-r from-green-50 to-emerald-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <FileIcon className="h-4 w-4 text-green-600" />
+            /* Success State */
+            <div className="relative group">
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-green-50 border-2 border-emerald-200 rounded-xl transition-all duration-200 hover:shadow-md">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                      <FileIcon className="w-5 h-5 text-emerald-600" />
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-sm font-medium text-green-800">
-                      {getFileName(currentUrl).slice(0, 20)}...
-                    </span>
-                    <p className="text-xs text-green-600">Document uploaded successfully</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-emerald-900 truncate">
+                      {getFileName(currentUrl)}
+                    </p>
+                    <p className="text-xs text-emerald-600">
+                      ✓ Successfully uploaded
+                    </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center space-x-2">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={() => window.open(currentUrl, '_blank')}
-                    className="h-8 w-8 p-0 border-green-200 hover:bg-green-50"
+                    className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
                   >
-                    <ExternalLinkIcon className="h-3 w-3 text-green-600" />
+                    <ExternalLinkIcon className="h-4 w-4" />
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
                     onClick={handleDelete}
-                    className="h-8 w-8 p-0 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
                   >
-                    <XIcon className="h-3 w-3" />
+                    <XIcon className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-blue-200 rounded-lg p-6 text-center bg-gradient-to-br from-blue-50 to-indigo-50 hover:border-blue-300 transition-colors">
-              <div className="p-3 bg-blue-100 rounded-full mx-auto w-fit mb-3">
-                <UploadIcon className="h-6 w-6 text-blue-600" />
-              </div>
-              <p className="text-sm text-blue-700 font-medium mb-1">
-                Upload your document
-              </p>
-              <p className="text-xs text-blue-600">
-                Click the button below to upload
-              </p>
+            /* Upload Area */
+            <div className="relative">
+              <UploadButton
+                endpoint={endpoint as any}
+                onBeforeUploadBegin={(files) => {
+                  setIsUploading(true);
+                  toast.loading(`Uploading ${label}...`, { id: `upload-${formFieldName}` });
+                  return files;
+                }}
+                onClientUploadComplete={handleUploadComplete}
+                onUploadError={handleUploadError}
+                className="w-full ut-button:w-full ut-button:h-auto ut-button:bg-transparent ut-button:border-0 ut-button:p-0 ut-button:shadow-none ut-button:ring-0 ut-button:focus:ring-0 ut-button:focus-visible:ring-0 ut-button:hover:bg-transparent ut-allowed-content:hidden ut-label:hidden"
+                content={{
+                  button({ ready, isUploading: uploading }) {
+                    if (uploading) {
+                      return (
+                        <div className="relative overflow-hidden">
+                          <div className="flex flex-col items-center justify-center p-8 border-2 border-blue-300 border-dashed rounded-xl bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-50">
+                            <div className="flex flex-col items-center space-y-4">
+                              <div className="relative">
+                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                                  <UploadIcon className="w-6 h-6 text-blue-600 animate-bounce" />
+                                </div>
+                                <div className="absolute inset-0 w-12 h-12 border-2 border-blue-300 rounded-full animate-ping"></div>
+                              </div>
+                              <div className="text-center space-y-1">
+                                <p className="text-base font-semibold text-blue-900">
+                                  Uploading your document...
+                                </p>
+                                <p className="text-sm text-blue-700">
+                                  Please wait while we securely process your file
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    if (ready) {
+                      return (
+                        <div 
+                          className={cn(
+                            "relative group cursor-pointer transition-all duration-300 ease-out",
+                            isDragOver 
+                              ? "transform scale-[1.02]" 
+                              : "hover:transform hover:scale-[1.01]"
+                          )}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
+                          <div className={cn(
+                            "flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl transition-all duration-300",
+                            isDragOver 
+                              ? "border-blue-400 bg-gradient-to-br from-blue-100 via-indigo-100 to-blue-100 shadow-lg" 
+                              : "border-gray-300 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:via-indigo-50 hover:to-blue-50 hover:shadow-md"
+                          )}>
+                            <div className="flex flex-col items-center space-y-4">
+                              <div className={cn(
+                                "relative transition-all duration-300",
+                                isDragOver ? "transform scale-110" : "group-hover:transform group-hover:scale-105"
+                              )}>
+                                <div className={cn(
+                                  "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300",
+                                  isDragOver 
+                                    ? "bg-blue-200 shadow-lg" 
+                                    : "bg-blue-100 group-hover:bg-blue-200 group-hover:shadow-md"
+                                )}>
+                                  <UploadIcon className={cn(
+                                    "w-8 h-8 transition-all duration-300",
+                                    isDragOver 
+                                      ? "text-blue-700" 
+                                      : "text-blue-600 group-hover:text-blue-700"
+                                  )} />
+                                </div>
+                                {isDragOver && (
+                                  <div className="absolute inset-0 w-16 h-16 border-2 border-blue-400 rounded-2xl animate-ping"></div>
+                                )}
+                              </div>
+                              
+                              <div className="text-center space-y-2">
+                                <h3 className={cn(
+                                  "text-lg font-bold transition-colors duration-300",
+                                  isDragOver 
+                                    ? "text-blue-900" 
+                                    : "text-gray-900 group-hover:text-blue-900"
+                                )}>
+                                  {isDragOver ? "Drop your file here" : "Choose file or drag & drop"}
+                                </h3>
+                                <p className={cn(
+                                  "text-sm transition-colors duration-300",
+                                  isDragOver 
+                                    ? "text-blue-700 font-medium" 
+                                    : "text-gray-600 group-hover:text-blue-700"
+                                )}>
+                                  {isDragOver 
+                                    ? "Release to upload your document" 
+                                    : "PDF, DOC, DOCX files up to 10MB"
+                                  }
+                                </p>
+                                {!isDragOver && (
+                                  <p className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-300">
+                                    Your files are encrypted and secure
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    return (
+                      <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center animate-pulse">
+                            <UploadIcon className="w-6 h-6 text-gray-500" />
+                          </div>
+                          <div className="text-center space-y-1">
+                            <p className="text-sm font-medium text-gray-600">
+                              Preparing upload...
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Please wait a moment
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  },
+                  allowedContent() {
+                    return null;
+                  }
+                }}
+                disabled={isUploading}
+              />
             </div>
           )}
           
-          <UploadButton
-            endpoint={endpoint as any}
-            onBeforeUploadBegin={(files) => {
-              setIsUploading(true);
-              toast.loading(`Uploading ${label}...`, { id: `upload-${formFieldName}` });
-              return files;
-            }}
-            onClientUploadComplete={handleUploadComplete}
-            onUploadError={handleUploadError}
-            className="ut-button:bg-gradient-to-r ut-button:from-green-600 ut-button:to-emerald-600 ut-button:hover:from-green-700 ut-button:hover:to-emerald-700 w-full ut-button:disabled:bg-gray-400 ut-button:shadow-md ut-button:border-0"
-            disabled={isUploading}
-          />
+          <p className="text-xs text-gray-500">
+            Supported formats: PDF, DOC, DOCX • Maximum size: 10MB
+          </p>
         </div>
       </div>
     </div>
@@ -193,7 +353,6 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
   const [showCertificateUpload, setShowCertificateUpload] = useState(false);
   
   const handleSubmit = async (data: any) => {
-    console.log("Business Info Data:", data);
     toast.success("Business information saved successfully!");
     onNext();
   };
@@ -254,8 +413,8 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "h-12 pl-3 text-left font-normal border-gray-300 focus:border-blue-500",
-                                !field.value && "text-muted-foreground"
+                                "h-12 pl-3 text-left font-normal border-gray-300 text-gray-900",
+                                !field.value && "text-gray-500"
                               )}
                             >
                               {field.value ? (
@@ -296,10 +455,10 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           <Switch
                             checked={field.value}
                             onCheckedChange={(checked) => {
-                              field.onChange(checked);
-                              setShowCertificateUpload(checked);
+                              field.onChange(checked );
+                              setShowCertificateUpload(checked );
                             }}
-                            className="data-[state=checked]:bg-green-600"
+                            className="data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-gray-900"
                           />
                           <span className={cn(
                             "text-sm font-medium",
@@ -356,13 +515,13 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
               </div>
             </div>
             
-            <div className="p-6 space-y-6">
+            <div className="p-8 space-y-12">
               {/* Business Overview */}
               <DocumentUpload
                 endpoint="businessOverviewUploader"
                 formFieldName="business.businessOverviewUrl"
                 label="Business Overview (PDF or DOCX)"
-                description="Provide a link or upload below."
+                description="A comprehensive overview of your business operations, mission, and vision."
                 currentUrl={form.watch("business.businessOverviewUrl")}
                 form={form}
               />
@@ -372,7 +531,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 endpoint="cr12Uploader"
                 formFieldName="business.cr12Url"
                 label="CR12 Document"
-                description="Provide a link or upload below."
+                description="Certificate of Registration (CR12) or equivalent business registration document."
                 currentUrl={form.watch("business.cr12Url")}
                 form={form}
               />
@@ -382,7 +541,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 endpoint="auditedAccountsUploader"
                 formFieldName="business.auditedAccountsUrl"
                 label="Last 2 Years' Audited Accounts"
-                description="Provide a link or upload below."
+                description="Financial statements audited by a certified public accountant for the past two years."
                 currentUrl={form.watch("business.auditedAccountsUrl")}
                 form={form}
               />
@@ -392,7 +551,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 endpoint="taxComplianceUploader"
                 formFieldName="business.taxComplianceUrl"
                 label="Tax Compliance Certificate"
-                description="Provide a link or upload below."
+                description="Current tax compliance certificate showing your business is up to date with tax obligations."
                 currentUrl={form.watch("business.taxComplianceUrl")}
                 form={form}
               />
@@ -474,7 +633,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
+                          <SelectTrigger className="h-12 border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500">
                             <SelectValue placeholder="Select country" />
                           </SelectTrigger>
                         </FormControl>
@@ -577,7 +736,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="Describe your business, its mission, and vision..." 
-                        className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -598,7 +757,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="What problem does your business solve? How does it address a market need?" 
-                        className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -635,7 +794,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         value={field.value || ""}
-                        className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
                     <FormDescription className="text-gray-600">
@@ -666,7 +825,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                               {...field}
                               onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                               value={field.value || ""}
-                              className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11"
+                              className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-11"
                             />
                           </FormControl>
                           <FormMessage />
@@ -688,7 +847,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                 value={field.value || ""}
-                                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11"
+                                className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-11"
                               />
                             </FormControl>
                             <FormMessage />
@@ -709,7 +868,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                 value={field.value || ""}
-                                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-11"
+                                className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-11"
                               />
                             </FormControl>
                             <FormMessage />
@@ -739,7 +898,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                               {...field}
                               onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                               value={field.value || ""}
-                              className="border-gray-300 focus:border-green-500 focus:ring-green-500 h-11"
+                              className="border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 h-11"
                             />
                           </FormControl>
                           <FormMessage />
@@ -760,7 +919,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                               {...field}
                               onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                               value={field.value || ""}
-                              className="border-gray-300 focus:border-green-500 focus:ring-green-500 h-11"
+                              className="border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 h-11"
                             />
                           </FormControl>
                           <FormMessage />
@@ -792,7 +951,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="Describe your main products or services..." 
-                        className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -818,7 +977,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           value={field.value || ""}
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                         />
                       </FormControl>
                       <FormDescription className="text-gray-600">
@@ -842,7 +1001,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           value={field.value || ""}
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                         />
                       </FormControl>
                       <FormDescription className="text-gray-600">
@@ -864,7 +1023,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                       <Input 
                         placeholder="e.g., 500 units per month, 10 clients per week" 
                         {...field} 
-                        className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
                     <FormDescription className="text-gray-600">
@@ -947,7 +1106,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="How does your business contribute to climate adaptation?" 
-                        className="min-h-[120px] border-gray-300 focus:border-green-500 focus:ring-green-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -968,7 +1127,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="How does your business address extreme climate events?" 
-                        className="min-h-[120px] border-gray-300 focus:border-green-500 focus:ring-green-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -1001,7 +1160,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="What challenges is your business currently facing?" 
-                        className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -1022,7 +1181,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="What support do you need to overcome these challenges?" 
-                        className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
@@ -1043,7 +1202,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="Any other information you would like to share..." 
-                        className="min-h-[120px] border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field}
                         value={field.value || ""}
                       />
