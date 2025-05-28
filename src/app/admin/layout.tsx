@@ -31,6 +31,11 @@ export default function AdminLayout({
                 </Link>
               </li>
               <li>
+                <Link href="/admin/analytics" className="hover:underline">
+                  Analytics
+                </Link>
+              </li>
+              <li>
                 <Link href="/admin/settings" className="hover:underline">
                   Settings
                 </Link>

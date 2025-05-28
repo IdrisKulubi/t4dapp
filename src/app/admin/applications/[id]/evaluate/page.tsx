@@ -11,12 +11,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
-import { getApplicationById, saveEvaluation } from "@/lib/actions/actions"; // Import saveEvaluation
+import { getApplicationById, saveEvaluation } from "@/lib/actions/actions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Eye, TrendingUp, Lightbulb, Leaf, Users, DollarSign, UserCheck, MapPin, Heart } from "lucide-react";
 import { toast } from "sonner";
 
 interface EvaluationApplicationData {
@@ -27,14 +35,54 @@ interface EvaluationApplicationData {
     id: number;
     name: string;
     country: string;
+    countryOther?: string | null;
     city: string;
-    // ... other business fields if needed ...
+    startDate: string;
+    isRegistered: boolean;
+    registrationCertificateUrl?: string | null;
+    registeredCountries: string;
+    description: string;
+    problemSolved: string;
+    revenueLastTwoYears: string;
+    employees: {
+      fullTimeTotal: number;
+      fullTimeMale: number;
+      fullTimeFemale: number;
+      partTimeMale: number;
+      partTimeFemale: number;
+    };
+    climateAdaptationContribution: string;
+    productServiceDescription: string;
+    climateExtremeImpact: string;
+    unitPrice: string;
+    customerCountLastSixMonths: number;
+    productionCapacityLastSixMonths: string;
+    currentChallenges: string;
+    supportNeeded: string;
+    additionalInformation?: string | null;
+    funding?: Array<{
+      fundingSource?: string | null;
+      fundingSourceOther?: string | null;
+      amountUsd?: string | null;
+      fundingDate?: string | null;
+      fundingInstrument?: string | null;
+    }>;
+    targetCustomers?: string[];
   };
   applicant: {
     id: number;
+    userId: string;
     firstName: string;
     lastName: string;
-    // ... other applicant fields if needed ...
+    gender: string;
+    dateOfBirth: string;
+    citizenship: string;
+    citizenshipOther?: string | null;
+    countryOfResidence: string;
+    residenceOther?: string | null;
+    phoneNumber: string;
+    email: string;
+    highestEducation: string;
   };
   eligibility: {
     id: number;
@@ -62,7 +110,6 @@ interface EvaluationApplicationData {
   } | null;
 }
 
-// Define state for form inputs
 interface EvaluationFormState {
   marketPotentialScore: number;
   innovationScore: number;
@@ -75,8 +122,79 @@ interface EvaluationFormState {
   evaluationNotes: string;
 }
 
+interface EvaluationCriterionProps {
+  id: string;
+  label: string;
+  maxScore: number;
+  value: number;
+  onChange: (value: number[]) => void;
+  icon: React.ReactNode;
+  modalTitle: string;
+  modalContent: React.ReactNode;
+  description?: string;
+}
+
+function EvaluationCriterion({
+  id,
+  label,
+  maxScore,
+  value,
+  onChange,
+  icon,
+  modalTitle,
+  modalContent,
+  description
+}: EvaluationCriterionProps) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <Label htmlFor={id} className="text-sm font-medium flex items-center gap-2">
+          {icon}
+          {label} (0-{maxScore})
+        </Label>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 px-3">
+              <Eye className="h-4 w-4 mr-1" />
+              View Details
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {icon}
+                {modalTitle}
+              </DialogTitle>
+              {description && (
+                <DialogDescription>{description}</DialogDescription>
+              )}
+            </DialogHeader>
+            <div className="mt-4">
+              {modalContent}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div className="flex items-center gap-3">
+        <Slider
+          id={id}
+          min={0}
+          max={maxScore}
+          step={1}
+          value={[value]}
+          onValueChange={onChange}
+          className="flex-1"
+        />
+        <div className="w-12 text-right">
+          <span className="font-medium text-lg">{value}</span>
+          <span className="text-sm text-muted-foreground">/{maxScore}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function EvaluateApplicationPage({ params }: { params: Promise<{ id: string }> }) {
-  // We still need to parse the ID inside, but the prop type must match
   const [applicationId, setApplicationId] = useState<number | null>(null);
   const [application, setApplication] = useState<EvaluationApplicationData | null>(null);
   const router = useRouter();
@@ -96,7 +214,6 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
   });
   const [totalScore, setTotalScore] = useState(0);
 
-  // Effect to get the actual ID from the promise prop
   useEffect(() => {
     async function resolveParams() {
       try {
@@ -111,7 +228,6 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
   }, [params]);
 
   useEffect(() => {
-    // Return early if applicationId is still null
     if (applicationId === null) {
       return;
     }
@@ -120,20 +236,16 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
       setLoading(true);
       setError(null);
       try {
-        // Now we know applicationId is a number here
         const result = await getApplicationById(applicationId as number);
         if (!result.success || !result.data) {
           if (result.error === "Application not found") {
-            // We can't call notFound() directly in useEffect/client component
-            // Redirect or show specific UI instead
              setError("Application not found. It may have been deleted.");
-             setApplication(null); // Ensure no stale data is shown
+             setApplication(null);
           } else {
             throw new Error(result.error || "Failed to fetch application data.");
           }
         } else {
           setApplication(result.data);
-          // Initialize form state with existing evaluation data if available
           if (result.data.eligibility) {
             setFormState({
               marketPotentialScore: result.data.eligibility.evaluationScores.marketPotentialScore,
@@ -158,9 +270,8 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
       }
     }
     fetchData();
-  }, [applicationId]); // Dependency is now the resolved applicationId
+  }, [applicationId]);
 
-  // Calculate total score whenever form state changes
   useEffect(() => {
     const score = 
       formState.marketPotentialScore +
@@ -185,7 +296,6 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
-    // Ensure we have the ID before submitting
     if (applicationId === null) {
       toast.error("Application ID is missing, cannot save evaluation.");
       return;
@@ -198,12 +308,11 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
           applicationId,
           ...formState,
           totalScore,
-          evaluationNotes: formState.evaluationNotes || null, // Send null if empty
+          evaluationNotes: formState.evaluationNotes || null,
         });
 
         if (result.success) {
           toast.success(result.message || "Evaluation saved successfully.");
-          // Redirect back to the detail page after successful submission
           router.push(`/admin/applications/${applicationId}`);
         } else {
           throw new Error(result.error || "Failed to save evaluation.");
@@ -215,6 +324,23 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
          toast.error(err.message || "Failed to save evaluation. Please try again.");
       }
     });
+  };
+
+  const formatCurrency = (amount: string | number) => {
+    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(num);
+  };
+
+  const formatCountry = (country: string, countryOther?: string | null) => {
+    if (country === 'other' && countryOther) {
+      return countryOther;
+    }
+    return country.charAt(0).toUpperCase() + country.slice(1);
   };
 
   if (loading) {
@@ -242,7 +368,6 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
   }
   
   if (!application) {
-     // This state might occur briefly or if fetch fails without specific error handled above
      return (
        <div className="container mx-auto py-8 text-center">
          <p className="text-muted-foreground">Application data could not be loaded.</p>
@@ -253,14 +378,13 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
      );
   }
 
-  // Determine overall mandatory eligibility (assuming initial check was done)
   const mandatoryEligible = application.eligibility ? (
       application.eligibility.mandatoryCriteria.ageEligible &&
       application.eligibility.mandatoryCriteria.registrationEligible &&
       application.eligibility.mandatoryCriteria.revenueEligible &&
       application.eligibility.mandatoryCriteria.businessPlanEligible &&
       application.eligibility.mandatoryCriteria.impactEligible
-  ) : false; // Default to false if no eligibility record exists
+  ) : false;
 
   return (
     <div className="container mx-auto py-8">
@@ -279,118 +403,463 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
 
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Evaluation Form Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Evaluation Scores Section */}
             <Card>
               <CardHeader>
                 <CardTitle>Evaluation Scores</CardTitle>
-                <CardDescription>Score each criterion based on the application details.</CardDescription>
+                <CardDescription>
+                  Score each criterion based on the application details. Click "View Details" to see the applicant's responses.
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Sliders for each score */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div>
-                      <Label htmlFor="marketPotentialScore">Market Potential (0-10)</Label>
-                      <div className="flex items-center gap-2">
-                        <Slider
-                          id="marketPotentialScore"
-                          min={0} max={10} step={1}
-                          value={[formState.marketPotentialScore]}
-                          onValueChange={(val) => handleSliderChange('marketPotentialScore', val)}
-                        />
-                        <span className="font-medium w-8 text-right">{formState.marketPotentialScore}</span>
+              <CardContent className="space-y-8">
+                <div className="grid grid-cols-1 gap-8">
+                  <EvaluationCriterion
+                    id="marketPotentialScore"
+                    label="Market Potential"
+                    maxScore={10}
+                    value={formState.marketPotentialScore}
+                    onChange={(val) => handleSliderChange('marketPotentialScore', val)}
+                    icon={<TrendingUp className="h-4 w-4 text-blue-600" />}
+                    modalTitle="Market Potential Assessment"
+                    description="Evaluate the market opportunity and customer demand for this solution"
+                    modalContent={
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-2">Customer Base</h4>
+                            <p className="text-sm text-blue-800">
+                              <strong>Last 6 Months:</strong> {application.business.customerCountLastSixMonths} customers
+                            </p>
+                          </div>
+                          <div className="bg-green-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-green-900 mb-2">Unit Price</h4>
+                            <p className="text-sm text-green-800">
+                              {formatCurrency(application.business.unitPrice)}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <div>
+                            <h4 className="font-semibold mb-2">Product/Service Description</h4>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                              {application.business.productServiceDescription}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-semibold mb-2">Problem Being Solved</h4>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                              {application.business.problemSolved}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-semibold mb-2">Production Capacity</h4>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                              {application.business.productionCapacityLastSixMonths}
+                            </p>
+                          </div>
+                          
+                          {application.business.targetCustomers && application.business.targetCustomers.length > 0 && (
+                            <div>
+                              <h4 className="font-semibold mb-2">Target Customer Segments</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {application.business.targetCustomers.map((segment: string, index: number) => (
+                                  <span key={index} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                    {segment.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="innovationScore">Innovation (0-10)</Label>
-                       <div className="flex items-center gap-2">
-                        <Slider
-                          id="innovationScore"
-                          min={0} max={10} step={1}
-                          value={[formState.innovationScore]}
-                          onValueChange={(val) => handleSliderChange('innovationScore', val)}
-                        />
-                        <span className="font-medium w-8 text-right">{formState.innovationScore}</span>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="innovationScore"
+                    label="Innovation"
+                    maxScore={10}
+                    value={formState.innovationScore}
+                    onChange={(val) => handleSliderChange('innovationScore', val)}
+                    icon={<Lightbulb className="h-4 w-4 text-yellow-600" />}
+                    modalTitle="Innovation Assessment"
+                    description="Assess the novelty and innovative aspects of the solution"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold mb-2">Business Description</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.description}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Product/Service Innovation</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.productServiceDescription}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Current Challenges & Innovation Opportunities</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.currentChallenges}
+                          </p>
+                        </div>
+                        
+                        <div className="bg-yellow-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-yellow-900 mb-2">Business Age</h4>
+                          <p className="text-sm text-yellow-800">
+                            Started: {new Date(application.business.startDate).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="climateAdaptationScore">Climate Adaptation (0-20)</Label>
-                       <div className="flex items-center gap-2">
-                          <Slider
-                            id="climateAdaptationScore"
-                            min={0} max={20} step={1}
-                            value={[formState.climateAdaptationScore]}
-                            onValueChange={(val) => handleSliderChange('climateAdaptationScore', val)}
-                          />
-                          <span className="font-medium w-8 text-right">{formState.climateAdaptationScore}</span>
-                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="jobCreationScore">Job Creation Potential (0-10)</Label>
-                      <div className="flex items-center gap-2">
-                        <Slider
-                          id="jobCreationScore"
-                          min={0} max={10} step={1}
-                          value={[formState.jobCreationScore]}
-                          onValueChange={(val) => handleSliderChange('jobCreationScore', val)}
-                        />
-                        <span className="font-medium w-8 text-right">{formState.jobCreationScore}</span>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="climateAdaptationScore"
+                    label="Climate Adaptation Impact"
+                    maxScore={20}
+                    value={formState.climateAdaptationScore}
+                    onChange={(val) => handleSliderChange('climateAdaptationScore', val)}
+                    icon={<Leaf className="h-4 w-4 text-green-600" />}
+                    modalTitle="Climate Adaptation Impact Assessment"
+                    description="Evaluate the solution's contribution to climate adaptation and resilience"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-semibold mb-2">Climate Adaptation Contribution</h4>
+                          <p className="text-sm text-gray-700 bg-green-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.climateAdaptationContribution}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Impact of Climate Extremes</h4>
+                          <p className="text-sm text-gray-700 bg-green-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.climateExtremeImpact}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Product/Service Climate Focus</h4>
+                          <p className="text-sm text-gray-700 bg-green-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.productServiceDescription}
+                          </p>
+                        </div>
                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="viabilityScore">Financial Viability (0-10)</Label>
-                      <div className="flex items-center gap-2">
-                        <Slider
-                          id="viabilityScore"
-                          min={0} max={10} step={1}
-                          value={[formState.viabilityScore]}
-                          onValueChange={(val) => handleSliderChange('viabilityScore', val)}
-                        />
-                         <span className="font-medium w-8 text-right">{formState.viabilityScore}</span>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="jobCreationScore"
+                    label="Job Creation Potential"
+                    maxScore={10}
+                    value={formState.jobCreationScore}
+                    onChange={(val) => handleSliderChange('jobCreationScore', val)}
+                    icon={<Users className="h-4 w-4 text-purple-600" />}
+                    modalTitle="Job Creation Potential Assessment"
+                    description="Assess the potential for creating employment opportunities"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-purple-900 mb-2">Current Employment</h4>
+                            <div className="space-y-1 text-sm text-purple-800">
+                              <p><strong>Full-time Total:</strong> {application.business.employees.fullTimeTotal}</p>
+                              <p><strong>Full-time Male:</strong> {application.business.employees.fullTimeMale}</p>
+                              <p><strong>Full-time Female:</strong> {application.business.employees.fullTimeFemale}</p>
+                              <p><strong>Part-time Male:</strong> {application.business.employees.partTimeMale}</p>
+                              <p><strong>Part-time Female:</strong> {application.business.employees.partTimeFemale}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-2">Growth Indicators</h4>
+                            <div className="space-y-1 text-sm text-blue-800">
+                              <p><strong>Revenue (2 years):</strong> {formatCurrency(application.business.revenueLastTwoYears)}</p>
+                              <p><strong>Customers (6 months):</strong> {application.business.customerCountLastSixMonths}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Support Needed (Growth Plans)</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.supportNeeded}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Current Challenges</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.currentChallenges}
+                          </p>
+                        </div>
                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="managementCapacityScore">Management Capacity (0-10)</Label>
-                      <div className="flex items-center gap-2">
-                        <Slider
-                          id="managementCapacityScore"
-                          min={0} max={10} step={1}
-                          value={[formState.managementCapacityScore]}
-                           onValueChange={(val) => handleSliderChange('managementCapacityScore', val)}
-                        />
-                        <span className="font-medium w-8 text-right">{formState.managementCapacityScore}</span>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="viabilityScore"
+                    label="Financial Viability"
+                    maxScore={10}
+                    value={formState.viabilityScore}
+                    onChange={(val) => handleSliderChange('viabilityScore', val)}
+                    icon={<DollarSign className="h-4 w-4 text-green-600" />}
+                    modalTitle="Financial Viability Assessment"
+                    description="Evaluate the financial sustainability and business model strength"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-green-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-green-900 mb-2">Revenue</h4>
+                            <p className="text-sm text-green-800">
+                              <strong>Last 2 Years:</strong><br />
+                              {formatCurrency(application.business.revenueLastTwoYears)}
+                            </p>
+                          </div>
+                          
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-2">Unit Economics</h4>
+                            <p className="text-sm text-blue-800">
+                              <strong>Unit Price:</strong><br />
+                              {formatCurrency(application.business.unitPrice)}
+                            </p>
+                          </div>
+                          
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-purple-900 mb-2">Customer Base</h4>
+                            <p className="text-sm text-purple-800">
+                              <strong>Last 6 Months:</strong><br />
+                              {application.business.customerCountLastSixMonths} customers
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {application.business.funding && application.business.funding.length > 0 && (
+                          <div>
+                            <h4 className="font-semibold mb-2">Funding History</h4>
+                            <div className="space-y-2">
+                              {application.business.funding.map((fund, index) => (
+                                <div key={index} className="bg-gray-50 p-3 rounded">
+                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                      <strong>Source:</strong> {fund.fundingSource || 'N/A'}
+                                      {fund.fundingSourceOther && ` (${fund.fundingSourceOther})`}
+                                    </div>
+                                    <div>
+                                      <strong>Amount:</strong> {fund.amountUsd ? formatCurrency(fund.amountUsd) : 'N/A'}
+                                    </div>
+                                    <div>
+                                      <strong>Date:</strong> {fund.fundingDate || 'N/A'}
+                                    </div>
+                                    <div>
+                                      <strong>Instrument:</strong> {fund.fundingInstrument || 'N/A'}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Business Registration Status</h4>
+                          <div className="bg-gray-50 p-3 rounded">
+                            <p className="text-sm">
+                              <strong>Registered:</strong> {application.business.isRegistered ? 'Yes' : 'No'}
+                            </p>
+                            {application.business.registeredCountries && (
+                              <p className="text-sm mt-1">
+                                <strong>Registered in:</strong> {application.business.registeredCountries}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="locationBonus">Location Bonus (0-5)</Label>
-                       <div className="flex items-center gap-2">
-                        <Slider
-                          id="locationBonus"
-                          min={0} max={5} step={1}
-                          value={[formState.locationBonus]}
-                           onValueChange={(val) => handleSliderChange('locationBonus', val)}
-                        />
-                        <span className="font-medium w-8 text-right">{formState.locationBonus}</span>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="managementCapacityScore"
+                    label="Management Capacity"
+                    maxScore={10}
+                    value={formState.managementCapacityScore}
+                    onChange={(val) => handleSliderChange('managementCapacityScore', val)}
+                    icon={<UserCheck className="h-4 w-4 text-indigo-600" />}
+                    modalTitle="Management Capacity Assessment"
+                    description="Evaluate the leadership and management capabilities"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-indigo-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-indigo-900 mb-2">Founder Profile</h4>
+                            <div className="space-y-1 text-sm text-indigo-800">
+                              <p><strong>Name:</strong> {application.applicant.firstName} {application.applicant.lastName}</p>
+                              <p><strong>Age:</strong> {new Date().getFullYear() - new Date(application.applicant.dateOfBirth).getFullYear()} years</p>
+                              <p><strong>Education:</strong> {application.applicant.highestEducation.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                              <p><strong>Gender:</strong> {application.applicant.gender.charAt(0).toUpperCase() + application.applicant.gender.slice(1)}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-green-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-green-900 mb-2">Business Experience</h4>
+                            <div className="space-y-1 text-sm text-green-800">
+                              <p><strong>Business Age:</strong> {Math.floor((new Date().getTime() - new Date(application.business.startDate).getTime()) / (1000 * 60 * 60 * 24 * 365))} years</p>
+                              <p><strong>Team Size:</strong> {application.business.employees.fullTimeTotal} full-time employees</p>
+                              <p><strong>Revenue Track Record:</strong> {formatCurrency(application.business.revenueLastTwoYears)} over 2 years</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Business Vision & Strategy</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.description}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Challenge Management</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.currentChallenges}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold mb-2">Support & Development Needs</h4>
+                          <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded whitespace-pre-wrap">
+                            {application.business.supportNeeded}
+                          </p>
+                        </div>
                       </div>
-                   </div>
-                   <div>
-                      <Label htmlFor="genderBonus">Gender Bonus (0-5)</Label>
-                      <div className="flex items-center gap-2">
-                        <Slider
-                          id="genderBonus"
-                          min={0} max={5} step={1}
-                          value={[formState.genderBonus]}
-                          onValueChange={(val) => handleSliderChange('genderBonus', val)}
-                        />
-                         <span className="font-medium w-8 text-right">{formState.genderBonus}</span>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="locationBonus"
+                    label="Location Bonus"
+                    maxScore={5}
+                    value={formState.locationBonus}
+                    onChange={(val) => handleSliderChange('locationBonus', val)}
+                    icon={<MapPin className="h-4 w-4 text-orange-600" />}
+                    modalTitle="Location Bonus Assessment"
+                    description="Bonus points for businesses in focus countries and strategic locations"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-orange-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-orange-900 mb-2">Business Location</h4>
+                            <div className="space-y-1 text-sm text-orange-800">
+                              <p><strong>Country:</strong> {formatCountry(application.business.country, application.business.countryOther)}</p>
+                              <p><strong>City:</strong> {application.business.city}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-2">Founder Location</h4>
+                            <div className="space-y-1 text-sm text-blue-800">
+                              <p><strong>Citizenship:</strong> {formatCountry(application.applicant.citizenship, application.applicant.citizenshipOther)}</p>
+                              <p><strong>Residence:</strong> {formatCountry(application.applicant.countryOfResidence, application.applicant.residenceOther)}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-yellow-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-yellow-900 mb-2">Focus Countries</h4>
+                          <p className="text-sm text-yellow-800 mb-2">
+                            Priority countries for the YouthAdapt Challenge:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {['Ghana', 'Kenya', 'Nigeria', 'Rwanda', 'Tanzania'].map((country) => (
+                              <span key={country} className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full text-xs">
+                                {country}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {application.business.registeredCountries && (
+                          <div>
+                            <h4 className="font-semibold mb-2">Business Registration</h4>
+                            <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">
+                              <strong>Registered in:</strong> {application.business.registeredCountries}
+                            </p>
+                          </div>
+                        )}
                       </div>
-                   </div>
+                    }
+                  />
+
+                  <EvaluationCriterion
+                    id="genderBonus"
+                    label="Gender Bonus"
+                    maxScore={5}
+                    value={formState.genderBonus}
+                    onChange={(val) => handleSliderChange('genderBonus', val)}
+                    icon={<Heart className="h-4 w-4 text-pink-600" />}
+                    modalTitle="Gender Bonus Assessment"
+                    description="Bonus points for women-led enterprises and gender-inclusive teams"
+                    modalContent={
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-pink-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-pink-900 mb-2">Founder Gender</h4>
+                            <p className="text-sm text-pink-800">
+                              <strong>Gender:</strong> {application.applicant.gender.charAt(0).toUpperCase() + application.applicant.gender.slice(1)}
+                            </p>
+                          </div>
+                          
+                          <div className="bg-purple-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-purple-900 mb-2">Team Composition</h4>
+                            <div className="space-y-1 text-sm text-purple-800">
+                              <p><strong>Full-time Male:</strong> {application.business.employees.fullTimeMale}</p>
+                              <p><strong>Full-time Female:</strong> {application.business.employees.fullTimeFemale}</p>
+                              <p><strong>Part-time Male:</strong> {application.business.employees.partTimeMale}</p>
+                              <p><strong>Part-time Female:</strong> {application.business.employees.partTimeFemale}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-green-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-green-900 mb-2">Gender Balance Analysis</h4>
+                          <div className="space-y-2 text-sm text-green-800">
+                            <p>
+                              <strong>Total Female Employees:</strong> {application.business.employees.fullTimeFemale + application.business.employees.partTimeFemale}
+                            </p>
+                            <p>
+                              <strong>Total Male Employees:</strong> {application.business.employees.fullTimeMale + application.business.employees.partTimeMale}
+                            </p>
+                            <p>
+                              <strong>Female Representation:</strong> {
+                                application.business.employees.fullTimeTotal > 0 
+                                  ? Math.round(((application.business.employees.fullTimeFemale + application.business.employees.partTimeFemale) / 
+                                      (application.business.employees.fullTimeFemale + application.business.employees.partTimeFemale + 
+                                       application.business.employees.fullTimeMale + application.business.employees.partTimeMale)) * 100)
+                                  : 0
+                              }%
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-semibold text-blue-900 mb-2">Program Goals</h4>
+                          <p className="text-sm text-blue-800">
+                            The YouthAdapt Challenge aims for 50% women-led enterprises to promote gender equality in climate entrepreneurship.
+                          </p>
+                        </div>
+                      </div>
+                    }
+                  />
                 </div>
               </CardContent>
             </Card>
 
-            {/* Evaluation Notes Section */}
             <Card>
               <CardHeader>
                 <CardTitle>Evaluation Notes</CardTitle>
@@ -408,16 +877,13 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
             </Card>
           </div>
 
-          {/* Summary & Mandatory Criteria Column */}
           <div className="space-y-6">
-            {/* Total Score Summary */}
             <Card>
               <CardHeader>
                 <CardTitle>Total Evaluation Score</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-4xl font-bold text-center">{totalScore} / 80</p>
-                 {/* Display server-side error message if exists */}
                  {error && (
                    <Alert variant="destructive" className="mt-4">
                      <XCircle className="h-4 w-4" />
@@ -428,7 +894,6 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
               </CardContent>
             </Card>
 
-            {/* Mandatory Criteria */}
             <Card>
               <CardHeader>
                 <CardTitle>Mandatory Criteria</CardTitle>
@@ -479,7 +944,6 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
           </div>
         </div>
         
-        {/* Form Actions */}
         <Card className="mt-8">
            <CardFooter className="flex justify-end gap-4 pt-6">
              <Button variant="outline" asChild>

@@ -5,7 +5,7 @@ import { applications, businesses, applicants, businessTargetCustomers, business
 import { revalidatePath } from "next/cache";
 import db from "../../../db/drizzle";
 import { checkEligibility } from "./eligibility";
-import { eq, and, desc, count as drizzleCount, SQL, InferSelectModel } from "drizzle-orm";
+import { eq, and, desc, count as drizzleCount, SQL, InferSelectModel, gte, lte } from "drizzle-orm";
 import { randomUUID } from 'crypto';
 
 // Calculate min and max dates for age validation (18-35 years)
@@ -104,21 +104,18 @@ export async function submitApplication(formData: ApplicationSubmission) {
     console.log("🚀 Starting application submission process...");
     
     // Validate form data
-    console.log("Validating form data...");
     const validatedData = applicationSubmissionSchema.parse(formData);
-    console.log("✅ Form data validated successfully");
     
     // TODO: Add userId once authentication is implemented
     const userId = randomUUID();
     
     // Insert applicant information
-    console.log("Saving applicant information to database...");
     const newApplicant = {
       userId,
       firstName: validatedData.personal.firstName,
       lastName: validatedData.personal.lastName,
       gender: validatedData.personal.gender,
-      dateOfBirth: validatedData.personal.dateOfBirth.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      dateOfBirth: validatedData.personal.dateOfBirth.toISOString().split('T')[0],
       citizenship: validatedData.personal.citizenship,
       citizenshipOther: validatedData.personal.citizenshipOther,
       countryOfResidence: validatedData.personal.countryOfResidence,
@@ -129,14 +126,12 @@ export async function submitApplication(formData: ApplicationSubmission) {
     };
     
     const [applicant] = await db.insert(applicants).values(newApplicant).returning();
-    console.log(`✅ Applicant saved with ID: ${applicant.id}`);
     
     // Insert business information
-    console.log("Saving business information to database...");
     const newBusiness = {
       applicantId: applicant.id,
       name: validatedData.business.name,
-      startDate: validatedData.business.startDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      startDate: validatedData.business.startDate.toISOString().split('T')[0],
       isRegistered: validatedData.business.isRegistered,
       registrationCertificateUrl: validatedData.business.registrationCertificateUrl,
       country: validatedData.business.country,
@@ -163,23 +158,19 @@ export async function submitApplication(formData: ApplicationSubmission) {
     };
     
     const [business] = await db.insert(businesses).values(newBusiness).returning();
-    console.log(`✅ Business saved with ID: ${business.id}`);
     
     // Insert target customers
     if (validatedData.business.targetCustomers.length > 0) {
-      console.log("Saving target customers...");
       const targetCustomerValues = validatedData.business.targetCustomers.map(segment => ({
         businessId: business.id,
         customerSegment: segment,
       }));
       
       await db.insert(businessTargetCustomers).values(targetCustomerValues);
-      console.log(`✅ ${targetCustomerValues.length} target customer segments saved`);
     }
     
     // Insert funding information if business has external funding
     if (validatedData.business.funding.hasExternalFunding) {
-      console.log("Saving funding information...");
       const fundingData = {
         businessId: business.id,
         hasExternalFunding: validatedData.business.funding.hasExternalFunding,
@@ -195,31 +186,24 @@ export async function submitApplication(formData: ApplicationSubmission) {
       };
       
       await db.insert(businessFunding).values(fundingData);
-      console.log(`✅ Funding information saved for business ID: ${business.id}`);
     }
     
     // Insert application and set status to 'submitted'
-    console.log("Creating application record...");
-    const now = new Date();
     const applicationData = {
       businessId: business.id,
       status: 'submitted' as const,
       referralSource: validatedData.referralSource,
       referralSourceOther: validatedData.referralSourceOther,
-      submittedAt: now,
+      submittedAt: new Date(),
     };
     
     const [application] = await db.insert(applications).values(applicationData).returning();
-    console.log(`✅ Application created with ID: ${application.id}`);
     
     // Run eligibility check algorithm
-    console.log("Running eligibility check...");
     const eligibilityResult = await checkEligibility(application.id);
-    console.log(`✅ Eligibility check completed: ${eligibilityResult.data?.eligibilityResult?.isEligible ? 'Eligible' : 'Not Eligible'}`);
     
     revalidatePath("/apply");
     
-    console.log("🎉 Application submission process completed successfully!");
     return {
       success: true,
       message: "Application submitted successfully",
@@ -234,7 +218,6 @@ export async function submitApplication(formData: ApplicationSubmission) {
     console.error("❌ Error submitting application:", error);
     
     if (error instanceof z.ZodError) {
-      console.error("Validation errors:", error.errors);
       return {
         success: false,
         message: "Validation error",
@@ -263,8 +246,6 @@ export interface ApplicationFilters {
  */
 export async function getApplicationStats() {
   try {
-    console.log("Fetching application statistics...");
-    
     // Get total applications count
     const totalApplicationsResult = await db.select({ count: drizzleCount() }).from(applications);
     const totalApplications = totalApplicationsResult[0]?.count ?? 0;
@@ -301,8 +282,6 @@ export async function getApplicationStats() {
  */
 export async function getApplications(filters: ApplicationFilters = {}) {
   try {
-    console.log(`Fetching applications with filters:`, filters);
-    
     // Default pagination
     const page = filters.page || 1;
     const limit = filters.limit || 20;
@@ -316,7 +295,6 @@ export async function getApplications(filters: ApplicationFilters = {}) {
       if (filters.status === 'eligible' || filters.status === 'ineligible') {
         // Special case for eligibility filters - will be handled after fetching
       } else {
-        // Ensure filter.status is treated as the correct enum type
         conditions.push(eq(applications.status, filters.status as InferSelectModel<typeof applications>['status']));
       }
     }
@@ -361,13 +339,7 @@ export async function getApplications(filters: ApplicationFilters = {}) {
       );
     }
     
-    // Re-apply only the status filter for accurate total count before search/eligibility filtering
-    const countConditions: SQL[] = [];
-    if (filters.status && filters.status !== 'all' && filters.status !== 'eligible' && filters.status !== 'ineligible') {
-      countConditions.push(eq(applications.status, filters.status as InferSelectModel<typeof applications>['status']));
-    }
-    const totalCountResult = await db.select({ count: drizzleCount() }).from(applications)
-      .where(countConditions.length ? and(...countConditions) : undefined);
+    const totalCountResult = await db.select({ count: drizzleCount() }).from(applications);
     const totalCount = totalCountResult[0]?.count ?? 0;
     
     return {
@@ -394,21 +366,19 @@ export async function getApplications(filters: ApplicationFilters = {}) {
  */
 export async function getApplicationById(id: number) {
   try {
-    console.log(`Fetching application with ID: ${id}`);
-    
     const applicationData = await db.query.applications.findFirst({
       where: (apps, { eq }) => eq(apps.id, id),
       with: {
         business: {
           with: {
             applicant: true,
-            funding: true, // Assuming you might want funding info later
-            targetCustomers: true, // Assuming you might want target customers later
+            funding: true,
+            targetCustomers: true,
           },
         },
         eligibilityResults: {
-          orderBy: (results, { desc }) => [desc(results.evaluatedAt)], // Get the latest evaluation
-          limit: 1, // Only get the most recent one
+          orderBy: (results, { desc }) => [desc(results.evaluatedAt)],
+          limit: 1,
         },
       },
     });
@@ -420,7 +390,7 @@ export async function getApplicationById(id: number) {
       };
     }
     
-    // Structure the data similarly to your placeholder for easier integration
+    // Structure the data for easier integration
     const structuredData = {
       id: applicationData.id,
       status: applicationData.status,
@@ -431,7 +401,7 @@ export async function getApplicationById(id: number) {
         country: applicationData.business.country,
         countryOther: applicationData.business.countryOther,
         city: applicationData.business.city,
-        startDate: applicationData.business.startDate, // Already a string YYYY-MM-DD
+        startDate: applicationData.business.startDate,
         isRegistered: applicationData.business.isRegistered,
         registrationCertificateUrl: applicationData.business.registrationCertificateUrl,
         registeredCountries: applicationData.business.registeredCountries,
@@ -454,8 +424,8 @@ export async function getApplicationById(id: number) {
         currentChallenges: applicationData.business.currentChallenges,
         supportNeeded: applicationData.business.supportNeeded,
         additionalInformation: applicationData.business.additionalInformation,
-        funding: applicationData.business.funding, // Keep nested funding info
-        targetCustomers: applicationData.business.targetCustomers.map(tc => tc.customerSegment), // Extract segments
+        funding: applicationData.business.funding,
+        targetCustomers: applicationData.business.targetCustomers.map(tc => tc.customerSegment),
       },
       applicant: {
         id: applicationData.business.applicant.id,
@@ -463,7 +433,7 @@ export async function getApplicationById(id: number) {
         firstName: applicationData.business.applicant.firstName,
         lastName: applicationData.business.applicant.lastName,
         gender: applicationData.business.applicant.gender,
-        dateOfBirth: applicationData.business.applicant.dateOfBirth, // Already a string YYYY-MM-DD
+        dateOfBirth: applicationData.business.applicant.dateOfBirth,
         citizenship: applicationData.business.applicant.citizenship,
         citizenshipOther: applicationData.business.applicant.citizenshipOther,
         countryOfResidence: applicationData.business.applicant.countryOfResidence,
@@ -496,7 +466,7 @@ export async function getApplicationById(id: number) {
         evaluationNotes: applicationData.eligibilityResults[0].evaluationNotes,
         evaluatedAt: applicationData.eligibilityResults[0].evaluatedAt?.toISOString() ?? null,
         evaluatedBy: applicationData.eligibilityResults[0].evaluatedBy,
-      } : null, // Handle case where no evaluation exists yet
+      } : null,
     };
 
     return {
@@ -512,8 +482,7 @@ export async function getApplicationById(id: number) {
   }
 }
 
-// --- Evaluation Action ---
-
+// Evaluation Action
 interface EvaluationData {
   applicationId: number;
   marketPotentialScore: number;
@@ -533,12 +502,8 @@ interface EvaluationData {
  */
 export async function saveEvaluation(data: EvaluationData) {
   try {
-    console.log(`Saving evaluation for application ID: ${data.applicationId}`);
-    
-    // TODO: Add validation using Zod if desired
-    
     // TODO: Get evaluator user ID once auth is implemented
-    const evaluatorId = null; // Placeholder
+    const evaluatorId = null;
     
     // Find the existing eligibility record to update or create if missing
     const existingResult = await db.query.eligibilityResults.findFirst({
@@ -558,10 +523,10 @@ export async function saveEvaluation(data: EvaluationData) {
         totalScore: data.totalScore,
         evaluationNotes: data.evaluationNotes,
         evaluatedAt: new Date(),
-        evaluatedBy: evaluatorId, // Use actual evaluator ID later
+        evaluatedBy: evaluatorId,
         updatedAt: new Date(),
         // Keep existing mandatory flags if updating, set defaults if inserting
-        isEligible: existingResult?.isEligible ?? false, // Preserve or default
+        isEligible: existingResult?.isEligible ?? false,
         ageEligible: existingResult?.ageEligible ?? false,
         registrationEligible: existingResult?.registrationEligible ?? false,
         revenueEligible: existingResult?.revenueEligible ?? false,
@@ -571,33 +536,27 @@ export async function saveEvaluation(data: EvaluationData) {
 
     if (existingResult) {
       // Update the existing eligibility record
-      console.log(`Updating existing eligibility record ID: ${existingResult.id}`);
       await db.update(eligibilityResults)
         .set(evaluationPayload)
         .where(eq(eligibilityResults.id, existingResult.id));
     } else {
       // Insert a new eligibility record
-      console.log(`No existing eligibility record found. Inserting new one for application ID: ${data.applicationId}`);
       await db.insert(eligibilityResults)
         .values(evaluationPayload);
-      // Note: If inserting, the mandatory fields default to false.
-      // Consider if checkEligibility should be re-run here or if manual review is sufficient.
     }
       
-    // Optionally, update the application status (e.g., to 'under_review' or 'evaluated')
+    // Update the application status
     await db.update(applications)
       .set({ 
-        status: 'under_review', // Or another status like 'evaluated'
+        status: 'under_review',
         updatedAt: new Date()
       })
       .where(eq(applications.id, data.applicationId));
       
-    console.log(`✅ Evaluation saved successfully for application ID: ${data.applicationId}`);
-    
     // Revalidate paths to reflect changes
     revalidatePath(`/admin/applications/${data.applicationId}`);
     revalidatePath(`/admin/applications/${data.applicationId}/evaluate`);
-    revalidatePath(`/admin/applications`); // Revalidate list page too
+    revalidatePath(`/admin/applications`);
     
     return {
       success: true,
@@ -609,6 +568,620 @@ export async function saveEvaluation(data: EvaluationData) {
     return {
       success: false,
       error: "Failed to save evaluation.",
+    };
+  }
+}
+
+// Analytics Interfaces and Functions
+export interface AnalyticsFilters {
+  dateFrom?: string;
+  dateTo?: string;
+  country?: string;
+  gender?: string;
+  status?: string;
+  isEligible?: string;
+  ageRange?: string;
+  educationLevel?: string;
+}
+
+export interface AnalyticsData {
+  overview: {
+    totalApplications: number;
+    eligibleApplications: number;
+    femaleApplicants: number;
+    maleApplicants: number;
+    averageAge: number;
+    totalRevenue: number;
+    totalEmployees: number;
+  };
+  demographics: {
+    genderDistribution: Array<{ gender: string; count: number; percentage: number }>;
+    ageDistribution: Array<{ ageRange: string; count: number; percentage: number }>;
+    educationDistribution: Array<{ education: string; count: number; percentage: number }>;
+    countryDistribution: Array<{ country: string; count: number; percentage: number }>;
+  };
+  business: {
+    revenueDistribution: Array<{ range: string; count: number; percentage: number }>;
+    employmentDistribution: Array<{ range: string; count: number; percentage: number }>;
+    registrationStatus: Array<{ status: string; count: number; percentage: number }>;
+  };
+  evaluation: {
+    averageScores: {
+      marketPotential: number;
+      innovation: number;
+      climateAdaptation: number;
+      jobCreation: number;
+      viability: number;
+      managementCapacity: number;
+      locationBonus: number;
+      genderBonus: number;
+      total: number;
+    };
+    scoreDistribution: Array<{ scoreRange: string; count: number; percentage: number }>;
+  };
+  timeline: Array<{
+    month: string;
+    applications: number;
+    eligible: number;
+    femaleApplicants: number;
+  }>;
+}
+
+/**
+ * Get comprehensive analytics data with optional filtering
+ */
+export async function getAnalyticsData(filters: AnalyticsFilters = {}) {
+  try {
+    // Build WHERE conditions based on filters
+    const whereConditions: SQL[] = [];
+    
+    if (filters.dateFrom) {
+      whereConditions.push(gte(applications.submittedAt, new Date(filters.dateFrom)));
+    }
+    
+    if (filters.dateTo) {
+      whereConditions.push(lte(applications.submittedAt, new Date(filters.dateTo)));
+    }
+    
+    if (filters.status && filters.status !== 'all') {
+      whereConditions.push(eq(applications.status, filters.status as any));
+    }
+
+    // Get all applications with related data
+    const applicationsData = await db.query.applications.findMany({
+      where: whereConditions.length > 0 ? and(...whereConditions) : undefined,
+      with: {
+        business: {
+          with: {
+            applicant: true,
+            funding: true,
+            targetCustomers: true,
+          },
+        },
+        eligibilityResults: {
+          orderBy: (results, { desc }) => [desc(results.evaluatedAt)],
+          limit: 1,
+        },
+      },
+    });
+
+    // Apply additional filters that require data processing
+    let filteredApplications = applicationsData.filter(app => {
+      // Gender filter
+      if (filters.gender && filters.gender !== 'all') {
+        if (app.business.applicant.gender !== filters.gender) return false;
+      }
+
+      // Country filter
+      if (filters.country && filters.country !== 'all') {
+        if (app.business.country !== filters.country) return false;
+      }
+
+      // Eligibility filter
+      if (filters.isEligible && filters.isEligible !== 'all') {
+        const isEligible = app.eligibilityResults[0]?.isEligible ?? false;
+        if (filters.isEligible === 'true' && !isEligible) return false;
+        if (filters.isEligible === 'false' && isEligible) return false;
+      }
+
+      // Age range filter
+      if (filters.ageRange && filters.ageRange !== 'all') {
+        const birthDate = new Date(app.business.applicant.dateOfBirth);
+        const age = new Date().getFullYear() - birthDate.getFullYear();
+        
+        switch (filters.ageRange) {
+          case '18-24':
+            if (age < 18 || age > 24) return false;
+            break;
+          case '25-29':
+            if (age < 25 || age > 29) return false;
+            break;
+          case '30-34':
+            if (age < 30 || age > 34) return false;
+            break;
+          case '35+':
+            if (age < 35) return false;
+            break;
+        }
+      }
+
+      // Education filter
+      if (filters.educationLevel && filters.educationLevel !== 'all') {
+        if (app.business.applicant.highestEducation !== filters.educationLevel) return false;
+      }
+
+      return true;
+    });
+
+    const totalApplications = filteredApplications.length;
+    
+    // Calculate overview metrics
+    const eligibleApplications = filteredApplications.filter(app => 
+      app.eligibilityResults[0]?.isEligible ?? false
+    ).length;
+    
+    const femaleApplicants = filteredApplications.filter(app => 
+      app.business.applicant.gender === 'female'
+    ).length;
+    
+    const maleApplicants = filteredApplications.filter(app => 
+      app.business.applicant.gender === 'male'
+    ).length;
+
+    const ages = filteredApplications.map(app => {
+      const birthDate = new Date(app.business.applicant.dateOfBirth);
+      return new Date().getFullYear() - birthDate.getFullYear();
+    });
+    const averageAge = ages.length > 0 ? Math.round(ages.reduce((a, b) => a + b, 0) / ages.length) : 0;
+
+    const totalRevenue = filteredApplications.reduce((sum, app) => 
+      sum + parseFloat(app.business.revenueLastTwoYears || '0'), 0
+    );
+
+    const totalEmployees = filteredApplications.reduce((sum, app) => 
+      sum + (app.business.fullTimeEmployeesTotal || 0) + 
+      (app.business.partTimeEmployeesMale || 0) + 
+      (app.business.partTimeEmployeesFemale || 0), 0
+    );
+
+    // Calculate demographics
+    const genderCounts = { female: 0, male: 0, other: 0 };
+    filteredApplications.forEach(app => {
+      genderCounts[app.business.applicant.gender as keyof typeof genderCounts]++;
+    });
+
+    const genderDistribution = Object.entries(genderCounts).map(([gender, count]) => ({
+      gender: gender.charAt(0).toUpperCase() + gender.slice(1),
+      count,
+      percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0,
+    }));
+
+    // Age distribution
+    const ageCounts = { '18-24': 0, '25-29': 0, '30-34': 0, '35+': 0 };
+    filteredApplications.forEach(app => {
+      const birthDate = new Date(app.business.applicant.dateOfBirth);
+      const age = new Date().getFullYear() - birthDate.getFullYear();
+      
+      if (age >= 18 && age <= 24) ageCounts['18-24']++;
+      else if (age >= 25 && age <= 29) ageCounts['25-29']++;
+      else if (age >= 30 && age <= 34) ageCounts['30-34']++;
+      else if (age >= 35) ageCounts['35+']++;
+    });
+
+    const ageDistribution = Object.entries(ageCounts).map(([ageRange, count]) => ({
+      ageRange,
+      count,
+      percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0,
+    }));
+
+    // Education distribution
+    const educationCounts: Record<string, number> = {};
+    filteredApplications.forEach(app => {
+      const education = app.business.applicant.highestEducation;
+      educationCounts[education] = (educationCounts[education] || 0) + 1;
+    });
+
+    const educationLabels: Record<string, string> = {
+      'primary_school_and_below': 'Primary School',
+      'high_school': 'High School',
+      'technical_college': 'Technical College',
+      'undergraduate': 'Undergraduate',
+      'postgraduate': 'Postgraduate',
+    };
+
+    const educationDistribution = Object.entries(educationCounts).map(([education, count]) => ({
+      education: educationLabels[education] || education,
+      count,
+      percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0,
+    }));
+
+    // Country distribution
+    const countryCounts: Record<string, number> = {};
+    filteredApplications.forEach(app => {
+      const country = app.business.country;
+      countryCounts[country] = (countryCounts[country] || 0) + 1;
+    });
+
+    const countryLabels: Record<string, string> = {
+      'ghana': 'Ghana',
+      'kenya': 'Kenya',
+      'nigeria': 'Nigeria',
+      'rwanda': 'Rwanda',
+      'tanzania': 'Tanzania',
+      'other': 'Other',
+    };
+
+    const countryDistribution = Object.entries(countryCounts).map(([country, count]) => ({
+      country: countryLabels[country] || country,
+      count,
+      percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0,
+    }));
+
+    // Business metrics
+    const revenueCounts = { '$0 - $999': 0, '$1,000 - $4,999': 0, '$5,000 - $9,999': 0, '$10,000 - $49,999': 0, '$50,000+': 0 };
+    filteredApplications.forEach(app => {
+      const revenue = parseFloat(app.business.revenueLastTwoYears || '0');
+      if (revenue < 1000) revenueCounts['$0 - $999']++;
+      else if (revenue < 5000) revenueCounts['$1,000 - $4,999']++;
+      else if (revenue < 10000) revenueCounts['$5,000 - $9,999']++;
+      else if (revenue < 50000) revenueCounts['$10,000 - $49,999']++;
+      else revenueCounts['$50,000+']++;
+    });
+
+    const revenueDistribution = Object.entries(revenueCounts).map(([range, count]) => ({
+      range,
+      count,
+      percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0,
+    }));
+
+    const employmentCounts = { '0 employees': 0, '1-4 employees': 0, '5-9 employees': 0, '10-19 employees': 0, '20+ employees': 0 };
+    filteredApplications.forEach(app => {
+      const totalEmp = (app.business.fullTimeEmployeesTotal || 0) + 
+                      (app.business.partTimeEmployeesMale || 0) + 
+                      (app.business.partTimeEmployeesFemale || 0);
+      
+      if (totalEmp === 0) employmentCounts['0 employees']++;
+      else if (totalEmp <= 4) employmentCounts['1-4 employees']++;
+      else if (totalEmp <= 9) employmentCounts['5-9 employees']++;
+      else if (totalEmp <= 19) employmentCounts['10-19 employees']++;
+      else employmentCounts['20+ employees']++;
+    });
+
+    const employmentDistribution = Object.entries(employmentCounts).map(([range, count]) => ({
+      range,
+      count,
+      percentage: totalApplications > 0 ? Math.round((count / totalApplications) * 100) : 0,
+    }));
+
+    const registeredCount = filteredApplications.filter(app => app.business.isRegistered).length;
+    const registrationStatus = [
+      {
+        status: 'Registered',
+        count: registeredCount,
+        percentage: totalApplications > 0 ? Math.round((registeredCount / totalApplications) * 100) : 0,
+      },
+      {
+        status: 'Not Registered',
+        count: totalApplications - registeredCount,
+        percentage: totalApplications > 0 ? Math.round(((totalApplications - registeredCount) / totalApplications) * 100) : 0,
+      },
+    ];
+
+    // Evaluation metrics
+    const evaluatedApplications = filteredApplications.filter(app => app.eligibilityResults.length > 0);
+    const evaluationCount = evaluatedApplications.length;
+
+    let averageScores = {
+      marketPotential: 0,
+      innovation: 0,
+      climateAdaptation: 0,
+      jobCreation: 0,
+      viability: 0,
+      managementCapacity: 0,
+      locationBonus: 0,
+      genderBonus: 0,
+      total: 0,
+    };
+
+    if (evaluationCount > 0) {
+      const totals = evaluatedApplications.reduce((acc, app) => {
+        const result = app.eligibilityResults[0];
+        return {
+          marketPotential: acc.marketPotential + (result.marketPotentialScore || 0),
+          innovation: acc.innovation + (result.innovationScore || 0),
+          climateAdaptation: acc.climateAdaptation + (result.climateAdaptationScore || 0),
+          jobCreation: acc.jobCreation + (result.jobCreationScore || 0),
+          viability: acc.viability + (result.viabilityScore || 0),
+          managementCapacity: acc.managementCapacity + (result.managementCapacityScore || 0),
+          locationBonus: acc.locationBonus + (result.locationBonus || 0),
+          genderBonus: acc.genderBonus + (result.genderBonus || 0),
+          total: acc.total + (result.totalScore || 0),
+        };
+      }, averageScores);
+
+      averageScores = {
+        marketPotential: Math.round((totals.marketPotential / evaluationCount) * 10) / 10,
+        innovation: Math.round((totals.innovation / evaluationCount) * 10) / 10,
+        climateAdaptation: Math.round((totals.climateAdaptation / evaluationCount) * 10) / 10,
+        jobCreation: Math.round((totals.jobCreation / evaluationCount) * 10) / 10,
+        viability: Math.round((totals.viability / evaluationCount) * 10) / 10,
+        managementCapacity: Math.round((totals.managementCapacity / evaluationCount) * 10) / 10,
+        locationBonus: Math.round((totals.locationBonus / evaluationCount) * 10) / 10,
+        genderBonus: Math.round((totals.genderBonus / evaluationCount) * 10) / 10,
+        total: Math.round((totals.total / evaluationCount) * 10) / 10,
+      };
+    }
+
+    const scoreCounts = { '0-19': 0, '20-39': 0, '40-59': 0, '60-79': 0, '80+': 0 };
+    evaluatedApplications.forEach(app => {
+      const score = app.eligibilityResults[0].totalScore || 0;
+      if (score < 20) scoreCounts['0-19']++;
+      else if (score < 40) scoreCounts['20-39']++;
+      else if (score < 60) scoreCounts['40-59']++;
+      else if (score < 80) scoreCounts['60-79']++;
+      else scoreCounts['80+']++;
+    });
+
+    const scoreDistribution = Object.entries(scoreCounts).map(([scoreRange, count]) => ({
+      scoreRange,
+      count,
+      percentage: evaluationCount > 0 ? Math.round((count / evaluationCount) * 100) : 0,
+    }));
+
+    // Timeline data (last 6 months)
+    const timeline = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      
+      const monthApplications = filteredApplications.filter(app => {
+        const submittedAt = new Date(app.submittedAt || '');
+        return submittedAt >= monthStart && submittedAt <= monthEnd;
+      });
+
+      const monthEligible = monthApplications.filter(app => 
+        app.eligibilityResults[0]?.isEligible ?? false
+      ).length;
+
+      const monthFemale = monthApplications.filter(app => 
+        app.business.applicant.gender === 'female'
+      ).length;
+
+      timeline.push({
+        month: date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+        applications: monthApplications.length,
+        eligible: monthEligible,
+        femaleApplicants: monthFemale,
+      });
+    }
+
+    const analyticsData: AnalyticsData = {
+      overview: {
+        totalApplications,
+        eligibleApplications,
+        femaleApplicants,
+        maleApplicants,
+        averageAge,
+        totalRevenue,
+        totalEmployees,
+      },
+      demographics: {
+        genderDistribution,
+        ageDistribution,
+        educationDistribution,
+        countryDistribution,
+      },
+      business: {
+        revenueDistribution,
+        employmentDistribution,
+        registrationStatus,
+      },
+      evaluation: {
+        averageScores,
+        scoreDistribution,
+      },
+      timeline,
+    };
+
+    return {
+      success: true,
+      data: analyticsData,
+    };
+
+  } catch (error) {
+    console.error("Error fetching analytics data:", error);
+    return {
+      success: false,
+      error: "Failed to fetch analytics data",
+    };
+  }
+}
+
+/**
+ * Export analytics data as CSV
+ */
+export async function exportAnalyticsData(filters: AnalyticsFilters = {}) {
+  try {
+    const result = await getAnalyticsData(filters);
+    
+    if (!result.success || !result.data) {
+      return {
+        success: false,
+        error: "Failed to fetch data for export",
+      };
+    }
+
+    // Get detailed application data for CSV export
+    const whereConditions: SQL[] = [];
+    
+    if (filters.dateFrom) {
+      whereConditions.push(gte(applications.submittedAt, new Date(filters.dateFrom)));
+    }
+    
+    if (filters.dateTo) {
+      whereConditions.push(lte(applications.submittedAt, new Date(filters.dateTo)));
+    }
+    
+    if (filters.status && filters.status !== 'all') {
+      whereConditions.push(eq(applications.status, filters.status as any));
+    }
+
+    const applicationsData = await db.query.applications.findMany({
+      where: whereConditions.length > 0 ? and(...whereConditions) : undefined,
+      with: {
+        business: {
+          with: {
+            applicant: true,
+            funding: true,
+            targetCustomers: true,
+          },
+        },
+        eligibilityResults: {
+          orderBy: (results, { desc }) => [desc(results.evaluatedAt)],
+          limit: 1,
+        },
+      },
+    });
+
+    // Apply additional filters
+    let filteredApplications = applicationsData.filter(app => {
+      if (filters.gender && filters.gender !== 'all') {
+        if (app.business.applicant.gender !== filters.gender) return false;
+      }
+
+      if (filters.country && filters.country !== 'all') {
+        if (app.business.country !== filters.country) return false;
+      }
+
+      if (filters.isEligible && filters.isEligible !== 'all') {
+        const isEligible = app.eligibilityResults[0]?.isEligible ?? false;
+        if (filters.isEligible === 'true' && !isEligible) return false;
+        if (filters.isEligible === 'false' && isEligible) return false;
+      }
+
+      if (filters.ageRange && filters.ageRange !== 'all') {
+        const birthDate = new Date(app.business.applicant.dateOfBirth);
+        const age = new Date().getFullYear() - birthDate.getFullYear();
+        
+        switch (filters.ageRange) {
+          case '18-24':
+            if (age < 18 || age > 24) return false;
+            break;
+          case '25-29':
+            if (age < 25 || age > 29) return false;
+            break;
+          case '30-34':
+            if (age < 30 || age > 34) return false;
+            break;
+          case '35+':
+            if (age < 35) return false;
+            break;
+        }
+      }
+
+      if (filters.educationLevel && filters.educationLevel !== 'all') {
+        if (app.business.applicant.highestEducation !== filters.educationLevel) return false;
+      }
+
+      return true;
+    });
+
+    // Convert to CSV format
+    const csvHeaders = [
+      'Application ID',
+      'Status',
+      'Submitted At',
+      'First Name',
+      'Last Name',
+      'Gender',
+      'Age',
+      'Education',
+      'Citizenship',
+      'Country of Residence',
+      'Email',
+      'Phone',
+      'Business Name',
+      'Business Country',
+      'Business City',
+      'Start Date',
+      'Is Registered',
+      'Revenue (Last 2 Years)',
+      'Full Time Employees',
+      'Part Time Employees',
+      'Is Eligible',
+      'Total Score',
+      'Market Potential Score',
+      'Innovation Score',
+      'Climate Adaptation Score',
+      'Job Creation Score',
+      'Viability Score',
+      'Management Capacity Score',
+      'Location Bonus',
+      'Gender Bonus',
+    ];
+
+    const csvRows = filteredApplications.map(app => {
+      const applicant = app.business.applicant;
+      const business = app.business;
+      const eligibility = app.eligibilityResults[0];
+      
+      const birthDate = new Date(applicant.dateOfBirth);
+      const age = new Date().getFullYear() - birthDate.getFullYear();
+      
+      const totalPartTime = (business.partTimeEmployeesMale || 0) + (business.partTimeEmployeesFemale || 0);
+
+      return [
+        app.id,
+        app.status,
+        app.submittedAt?.toISOString().split('T')[0] || '',
+        applicant.firstName,
+        applicant.lastName,
+        applicant.gender,
+        age,
+        applicant.highestEducation,
+        applicant.citizenship,
+        applicant.countryOfResidence,
+        applicant.email,
+        applicant.phoneNumber,
+        business.name,
+        business.country,
+        business.city,
+        business.startDate,
+        business.isRegistered ? 'Yes' : 'No',
+        business.revenueLastTwoYears,
+        business.fullTimeEmployeesTotal || 0,
+        totalPartTime,
+        eligibility?.isEligible ? 'Yes' : 'No',
+        eligibility?.totalScore || 0,
+        eligibility?.marketPotentialScore || 0,
+        eligibility?.innovationScore || 0,
+        eligibility?.climateAdaptationScore || 0,
+        eligibility?.jobCreationScore || 0,
+        eligibility?.viabilityScore || 0,
+        eligibility?.managementCapacityScore || 0,
+        eligibility?.locationBonus || 0,
+        eligibility?.genderBonus || 0,
+      ];
+    });
+
+    // Create CSV content
+    const csvContent = [csvHeaders, ...csvRows]
+      .map(row => row.map(field => `"${field}"`).join(','))
+      .join('\n');
+
+    return {
+      success: true,
+      data: csvContent,
+      filename: `analytics_export_${new Date().toISOString().split('T')[0]}.csv`,
+    };
+
+  } catch (error) {
+    console.error("Error exporting analytics data:", error);
+    return {
+      success: false,
+      error: "Failed to export analytics data",
     };
   }
 } 
