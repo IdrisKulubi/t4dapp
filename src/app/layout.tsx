@@ -32,11 +32,11 @@ export default function RootLayout({
       >
         <header className="w-full flex items-center justify-between px-6 py-4 bg-black/40 backdrop-blur-md z-50 relative">
           <div className="flex items-center gap-4">
-            <Image src="/images/gca-logo.png" alt="GCA Logo" className="h-10 w-auto"
+            <Image src="/images/GCA.svg" alt="GCA Logo" className="h-10 w-auto"
             width={100}
             height={100}
              />
-            <Image src="/images/kcic-logo.png" alt="KCIC Logo" className="h-10 w-auto"
+            <Image src="/images/KCIC.png" alt="KCIC Logo" className="h-10 w-auto"
             width={100}
             height={100}
             />
