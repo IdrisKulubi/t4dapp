@@ -348,10 +348,10 @@ function DocumentUpload({
     </div>
   );
 }
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormProps) {
   const [showCertificateUpload, setShowCertificateUpload] = useState(false);
-  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = async (data: any) => {
     toast.success("Business information saved successfully!");
     onNext();
@@ -1106,7 +1106,8 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormControl>
                       <Textarea 
                         placeholder="How does your business contribute to climate adaptation?" 
-                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 resize-none"
+                        className="min-h-[120px] border-gray-300 text-gray-900
+                         focus:border-green-500 focus:ring-green-500 resize-none"
                         {...field} 
                       />
                     </FormControl>

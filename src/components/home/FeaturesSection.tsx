@@ -96,7 +96,7 @@ export function FeaturesSection() {
           
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-              Empowering Africa's
+              Empowering Africa&apos;s
             </span>
             <br />
             <span className="text-slate-800">Climate Innovators</span>

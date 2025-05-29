@@ -96,8 +96,8 @@ export function EligibilitySection() {
             </h2>
             
             <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-              We're looking for innovative solutions that build resilience to climate change impacts. 
-              Here's what you need to qualify for the YouthAdapt Challenge.
+              We&apos;re looking for innovative solutions that build resilience to climate change impacts. 
+              Here&apos;s what you need to qualify for the YouthAdapt Challenge.
             </p>
           </motion.div>
 
@@ -164,7 +164,7 @@ export function EligibilitySection() {
               
               <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
                 If you meet these criteria and have a climate adaptation solution focused on food security 
-                or infrastructure, we'd love to hear from you.
+                or infrastructure, we&apos;d love to hear from you.
               </p>
               
               <motion.a

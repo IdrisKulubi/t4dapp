@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,14 +31,14 @@ const SECONDARY_CHALLENGES = [
 
 // Props type
 type ClimateAdaptationFormProps = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   form: UseFormReturn<any>;
   onNext: () => void;
   onPrevious: () => void;
 };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdaptationFormProps) {
-  const { formState } = form;
-  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (data: any) => {
     try {
       // Log the data being validated
@@ -232,6 +230,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                                       return checked
                                         ? field.onChange([...current, challenge.id])
                                         : field.onChange(
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             current.filter((value: any) => value !== challenge.id)
                                           );
                                     }}
@@ -448,7 +447,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                       />
                     </FormControl>
                     <FormDescription className="text-gray-600">
-                      Provide specific metrics or data showing your solution's impact (minimum 10 characters)
+                      Provide specific metrics or data showing your solution&apos;s impact (minimum 10 characters)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

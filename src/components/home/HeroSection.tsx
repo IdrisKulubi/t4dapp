@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRightIcon, PlayIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon} from "@heroicons/react/24/outline";
 
 export function HeroSection() {
   return (
@@ -43,7 +43,7 @@ export function HeroSection() {
               transition={{ delay: 0.4, duration: 0.8 }}
             >
               <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
-                Empowering Africa's
+                Empowering Africa&apos;s
               </span>
               <br />
               <span className="text-white">

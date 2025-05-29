@@ -4,6 +4,7 @@ import { UploadThingError } from "uploadthing/server";
 const f = createUploadthing();
 
 // Improved auth function for development - replace with real auth in production
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const auth = async (req: Request) => {
   // In development, we'll create a simple user ID
   // In production, replace this with your actual authentication logic

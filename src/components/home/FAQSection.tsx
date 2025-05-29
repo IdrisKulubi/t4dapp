@@ -100,7 +100,7 @@ export function FAQSection() {
           
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
             Find answers to the most common questions about the YouthAdapt Challenge. 
-            Can't find what you're looking for? Contact our team directly.
+            Can&apos;t find what you&apos;re looking for? Contact our team directly.
           </p>
         </motion.div>
 
@@ -175,7 +175,7 @@ export function FAQSection() {
               Still Have Questions?
             </h3>
             <p className="text-slate-600 mb-6">
-              Our team is here to help! Reach out to us directly and we'll get back to you within 24 hours.
+              Our team is here to help! Reach out to us directly and we&apos;ll get back to you within 24 hours.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <motion.a

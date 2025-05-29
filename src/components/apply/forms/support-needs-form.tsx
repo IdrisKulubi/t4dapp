@@ -222,7 +222,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                     <div className="mb-4">
                       <FormLabel className="text-gray-900 font-medium">Preferred Mentor Expertise</FormLabel>
                       <FormDescription className="text-gray-600">
-                        Select the areas of expertise you'd like in a mentor.
+                        Select the areas of expertise you&apos;d like in a mentor.
                       </FormDescription>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -357,7 +357,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                     <div className="mb-4">
                       <FormLabel className="text-gray-900 font-medium">Desired Networking Connections</FormLabel>
                       <FormDescription className="text-gray-600">
-                        Select the types of connections you'd like to make.
+                        Select the types of connections you&apos;d like to make.
                       </FormDescription>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

@@ -4,8 +4,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,8 +14,6 @@ import { financialInfoSchema } from "../schemas/financial-info-schema";
 import { DollarSign, TrendingUp, Banknote, Target, BarChart3, Leaf } from "lucide-react";
 
 // Define form value types
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type FinancialInfoFormValues = z.infer<typeof financialInfoSchema>;
 
 // Funding sources options
 const FUNDING_SOURCES = [
@@ -37,8 +34,8 @@ type FinancialInfoFormProps = {
   onPrevious: () => void;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFormProps) {
-  const { formState } = form;
   
   const handleSubmit = async (data: any) => {
     try {
@@ -103,7 +100,7 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                       />
                     </FormControl>
                     <FormDescription className="text-gray-600">
-                      Your company's annual revenue in USD (if applicable).
+                      Your company&apos;s annual revenue in USD (if applicable).
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

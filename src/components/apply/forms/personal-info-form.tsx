@@ -28,12 +28,8 @@ export interface PersonalInfoFormProps {
 }
 
 export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
-  const { formState } = form;
   
-  // Add debugging logs
-  console.log("PersonalInfoForm rendered");
-  console.log("Window width:", typeof window !== 'undefined' ? window.innerWidth : 'SSR');
-  console.log("Is large screen (>= 1024px):", typeof window !== 'undefined' ? window.innerWidth >= 1024 : 'SSR');
+ 
   
   const [showOtherCitizenship, setShowOtherCitizenship] = useState(
     form.getValues().personal?.citizenship === "other"
@@ -64,10 +60,10 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
     }
   };
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (data: any) => {
     try {
-      console.log("Personal Info Form - Raw Data:", data);
-      console.log("Personal Info Form - Personal Data:", data.personal);
+     
       
       // Validate the personal data specifically
       const personalData = data.personal;

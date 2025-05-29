@@ -408,7 +408,7 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
               <CardHeader>
                 <CardTitle>Evaluation Scores</CardTitle>
                 <CardDescription>
-                  Score each criterion based on the application details. Click "View Details" to see the applicant's responses.
+                  Score each criterion based on the application details. Click &quot;View Details&quot; to see the applicant&apos;s responses.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">

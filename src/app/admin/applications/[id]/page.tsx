@@ -28,22 +28,9 @@ import {
   ArrowLeft, 
   CheckCircle, 
   XCircle, 
-  Clock, 
-  User, 
-  Building, 
-  Leaf, 
-  DollarSign, 
-  Users, 
-  MapPin, 
-  Calendar,
-  Mail,
-  Phone,
-  GraduationCap,
-  Award,
-  TrendingUp,
+  
   AlertTriangle,
-  FileText,
-  Edit
+  
 } from "lucide-react";
 
 export default function ApplicationDetail({
@@ -86,27 +73,8 @@ export default function ApplicationDetail({
     ? new Date(application.submittedAt).toLocaleString() 
     : "Not Submitted";
 
-  // Helper functions
-  const calculateAge = (dateOfBirth: string) => {
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
 
-  const formatCurrency = (amount: string | number) => {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(num);
-  };
+
 
   const getStatusColor = (status: string) => {
     switch (status) {

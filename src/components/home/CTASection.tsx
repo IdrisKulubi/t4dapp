@@ -76,7 +76,7 @@ export function CTASection() {
             </span>
             <br />
             <span className="text-white">
-              Africa's Future?
+              Africa&apos;s Future?
             </span>
           </motion.h2>
           

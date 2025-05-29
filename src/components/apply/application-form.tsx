@@ -9,7 +9,6 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle, Menu, X } from "lucide-react";
-import { FormStepIndicator } from "./form-step-indicator";
 import { PersonalInfoForm } from "./forms/personal-info-form";
 import { BusinessInfoForm } from "./forms/business-info-form";
 import { ClimateAdaptationForm } from "./forms/climate-adaptation-form";
@@ -188,9 +187,9 @@ export function ApplicationForm() {
 
     // Get the data for the current step - properly handle nested structure
     const allFormData = form.getValues();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let currentStepData: any;
     
-    // Handle different data structures based on step
     if (activeStep === 'personal') {
       currentStepData = allFormData.personal;
     } else if (activeStep === 'business') {

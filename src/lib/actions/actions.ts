@@ -644,6 +644,7 @@ export async function getAnalyticsData(filters: AnalyticsFilters = {}) {
     }
     
     if (filters.status && filters.status !== 'all') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       whereConditions.push(eq(applications.status, filters.status as any));
     }
 
@@ -666,7 +667,7 @@ export async function getAnalyticsData(filters: AnalyticsFilters = {}) {
     });
 
     // Apply additional filters that require data processing
-    let filteredApplications = applicationsData.filter(app => {
+    const filteredApplications = applicationsData.filter(app => {
       // Gender filter
       if (filters.gender && filters.gender !== 'all') {
         if (app.business.applicant.gender !== filters.gender) return false;
@@ -1025,6 +1026,7 @@ export async function exportAnalyticsData(filters: AnalyticsFilters = {}) {
     }
     
     if (filters.status && filters.status !== 'all') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       whereConditions.push(eq(applications.status, filters.status as any));
     }
 
@@ -1046,7 +1048,7 @@ export async function exportAnalyticsData(filters: AnalyticsFilters = {}) {
     });
 
     // Apply additional filters
-    let filteredApplications = applicationsData.filter(app => {
+    const filteredApplications = applicationsData.filter(app => {
       if (filters.gender && filters.gender !== 'all') {
         if (app.business.applicant.gender !== filters.gender) return false;
       }

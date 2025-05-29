@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -74,11 +75,13 @@ const CHART_COLORS = {
 const PIE_COLORS = [CHART_COLORS.primary, CHART_COLORS.secondary, CHART_COLORS.accent, CHART_COLORS.warning, CHART_COLORS.purple];
 
 // Custom tooltip components for better data display
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
         <p className="font-medium text-gray-900">{label}</p>
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {`${entry.name}: ${entry.value}`}
@@ -90,6 +93,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomPieTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
@@ -130,6 +134,7 @@ export default function AnalyticsPage() {
   // Load initial data
   useEffect(() => {
     loadAnalyticsData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadAnalyticsData = async () => {
@@ -723,6 +728,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+              {/* eslint-disable-next-line @typescript-eslint/no-unused-vars */}
               {Object.entries(analyticsData.evaluation.averageScores).map(([key, value], index) => (
                 <div key={key} className="text-center p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-100">
                   <div className="text-2xl font-bold text-blue-600">{value}</div>
