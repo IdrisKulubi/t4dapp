@@ -14,8 +14,10 @@ export function PasscodeModal() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
-    if (passcode.length !== 3) {
+  const handleSubmit = async (codeToValidate?: string) => {
+    const codeToCheck = codeToValidate || passcode;
+    
+    if (codeToCheck.length !== 4) {
       setError("Please enter a 4-digit passcode");
       return;
     }
@@ -26,7 +28,7 @@ export function PasscodeModal() {
     // Small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    const isValid = authenticate(passcode);
+    const isValid = authenticate(codeToCheck);
     
     if (!isValid) {
       setError("Invalid passcode. Please try again.");
@@ -42,7 +44,7 @@ export function PasscodeModal() {
     
     // Auto-submit when 4 digits are entered
     if (value.length === 4) {
-      setTimeout(() => handleSubmit(), 100);
+      setTimeout(() => handleSubmit(value), 100);
     }
   };
 
@@ -88,7 +90,7 @@ export function PasscodeModal() {
                 />
                 <InputOTPSlot 
                   index={3} 
-                  className="w-12 h-12 text-lg text-black   font-semibold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
+                  className="w-12 h-12 text-lg text-black font-semibold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200" 
                 />
               </InputOTPGroup>
             </InputOTP>
@@ -103,7 +105,7 @@ export function PasscodeModal() {
 
           {/* Submit Button */}
           <Button
-            onClick={handleSubmit}
+            onClick={() => handleSubmit()}
             disabled={passcode.length !== 4 || isSubmitting}
             className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold rounded-lg shadow-lg transition-all duration-200"
           >
@@ -125,17 +127,10 @@ export function PasscodeModal() {
             </div>
             <p className="text-sm text-gray-600 leading-relaxed">
               Please contact the admin{" "}
-              <a 
-                href="mailto:kulubiidris@gmail.com" 
-                className="text-blue-600 hover:text-blue-800 font-medium underline"
-              >
-                kulubiidris@gmail.com
-              </a>
+           
               {" "}to be given access to the portal.
             </p>
-            <div className="text-xs text-gray-500 font-mono">
-              @t4dapp
-            </div>
+           
           </div>
         </div>
       </DialogContent>
