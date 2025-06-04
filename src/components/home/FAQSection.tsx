@@ -188,7 +188,7 @@ export function FAQSection() {
               </motion.a>
               {/* TO DO: Add contact form  later*/}
               <motion.a
-                href="/contact"
+                href="/"
                 className="inline-flex items-center px-6 py-3 rounded-full border-2 border-emerald-600 text-emerald-700 font-semibold hover:bg-emerald-50 transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

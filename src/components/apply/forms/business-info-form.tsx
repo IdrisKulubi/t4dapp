@@ -392,7 +392,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                       <Input 
                         placeholder="Enter your business name" 
                         {...field} 
-                        className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
                     <FormMessage />
@@ -616,7 +616,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
             <div className="bg-gradient-to-r from-teal-600 to-blue-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <MapPin className="h-6 w-6" />
-                <h3 className="text-xl font-semibold">Location</h3>
+                <h3 className="text-xl  font-semibold">Location</h3>
               </div>
             </div>
             
@@ -663,7 +663,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                         <Input 
                           placeholder="Enter city name" 
                           {...field} 
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                         />
                       </FormControl>
                       <FormMessage />
@@ -682,7 +682,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                       <Input 
                         placeholder="e.g., Kenya, Rwanda, Tanzania" 
                         {...field} 
-                        className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
                     <FormDescription className="text-gray-600">
