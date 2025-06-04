@@ -13,9 +13,21 @@ export const businessInfoSchema = z.object({
     isRegistered: z.boolean(),
     registrationCertificateUrl: z.string().url({ message: "Please enter a valid URL" }).optional().nullable(),
     
-    // Location
-    country: z.string({ required_error: "Please select a country" }),
-    countryOther: z.string().optional().nullable(),
+    // Document URLs
+    businessOverviewUrl: z.string().url({ message: "Please enter a valid URL" }).optional().nullable(),
+    cr12Url: z.string().url({ message: "Please enter a valid URL" }).optional().nullable(),
+    auditedAccountsUrl: z.string().url({ message: "Please enter a valid URL" }).optional().nullable(),
+    taxComplianceUrl: z.string().url({ message: "Please enter a valid URL" }).optional().nullable(),
+    
+    // Sector Categorization
+    sector: z.enum(["food-security", "infrastructure", "other"], {
+      required_error: "Please select a sector"
+    }).optional(),
+    
+    // Location - Updated to focus on participating countries only
+    country: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"], { 
+      required_error: "Please select a participating country" 
+    }),
     city: z.string().min(2, { message: "City must be at least 2 characters" }),
     registeredCountries: z.string().optional(),
     
@@ -66,14 +78,14 @@ export const businessInfoSchema = z.object({
       .optional()
       .nullable(),
     
-    // Product/Service Information
+    // Product/Service Details
     productServiceDescription: z
       .string()
-      .min(20, { message: "Description must be at least 20 characters" })
-      .max(1000, { message: "Description must not exceed 1000 characters" }),
+      .min(20, { message: "Product/service description must be at least 20 characters" })
+      .max(1000, { message: "Product/service description must not exceed 1000 characters" }),
     unitPrice: z
       .number()
-      .min(0, { message: "Price cannot be negative" })
+      .min(0, { message: "Unit price cannot be negative" })
       .optional()
       .nullable(),
     customerCountLastSixMonths: z
@@ -84,46 +96,96 @@ export const businessInfoSchema = z.object({
       .nullable(),
     productionCapacityLastSixMonths: z
       .string()
-      .min(5, { message: "Capacity description must be at least 5 characters" })
+      .min(10, { message: "Production capacity description must be at least 10 characters" })
       .optional(),
-    customerSegments: z
-      .array(z.string())
-      .min(1, { message: "Please select at least one customer segment" }),
     
-    // Climate Impact
+    // Customer Segments - Updated to match what actions file expects as "targetCustomers"
+    customerSegments: z.array(
+      z.enum([
+        "household_individuals",
+        "micro_small_medium_enterprises",
+        "institutions",
+        "corporates",
+        "government_and_ngos"
+      ])
+    ).optional(),
+    
+    // Target Customers (alias for customerSegments to match actions file)
+    targetCustomers: z.array(
+      z.enum([
+        "household_individuals",
+        "micro_small_medium_enterprises",
+        "institutions",
+        "corporates",
+        "government_and_ngos"
+      ])
+    ).optional(),
+    
+    // Climate Adaptation
     climateAdaptationContribution: z
       .string()
-      .min(20, { message: "Description must be at least 20 characters" })
-      .max(1000, { message: "Description must not exceed 1000 characters" }),
+      .min(50, { message: "Climate adaptation contribution must be at least 50 characters" })
+      .max(1000, { message: "Climate adaptation contribution must not exceed 1000 characters" }),
     climateExtremeImpact: z
       .string()
-      .min(20, { message: "Description must be at least 20 characters" })
-      .max(1000, { message: "Description must not exceed 1000 characters" }),
+      .min(50, { message: "Climate extreme impact description must be at least 50 characters" })
+      .max(1000, { message: "Climate extreme impact description must not exceed 1000 characters" }),
     
-    // Challenges & Support
+    // Challenges and Support
     currentChallenges: z
       .string()
-      .min(20, { message: "Description must be at least 20 characters" })
-      .max(1000, { message: "Description must not exceed 1000 characters" }),
+      .min(20, { message: "Current challenges description must be at least 20 characters" })
+      .max(1000, { message: "Current challenges description must not exceed 1000 characters" }),
     supportNeeded: z
       .string()
-      .min(20, { message: "Description must be at least 20 characters" })
-      .max(1000, { message: "Description must not exceed 1000 characters" }),
-    additionalInformation: z.string().optional().nullable(),
+      .min(20, { message: "Support needed description must be at least 20 characters" })
+      .max(1000, { message: "Support needed description must not exceed 1000 characters" }),
+    additionalInformation: z
+      .string()
+      .max(1000, { message: "Additional information must not exceed 1000 characters" })
+      .optional()
+      .nullable(),
+    
+    // Funding Information - Complete funding schema to match actions file
+    funding: z.object({
+      hasExternalFunding: z.boolean(),
+      fundingSource: z.enum([
+        "high_net_worth_individual",
+        "financial_institutions",
+        "government_agency",
+        "local_or_international_ngo",
+        "other"
+      ]).optional().nullable(),
+      fundingSourceOther: z.string().max(100).optional().nullable(),
+      fundingDate: z.date().optional().nullable(),
+      funderName: z.string().max(200).optional().nullable(),
+      amountUsd: z.number().positive().optional().nullable(),
+      fundingInstrument: z.enum([
+        "debt",
+        "equity",
+        "quasi",
+        "other"
+      ]).optional().nullable(),
+      fundingInstrumentOther: z.string().max(100).optional().nullable(),
+    }).optional(),
   })
 });
 
 export type BusinessInfoFormValues = z.infer<typeof businessInfoSchema>;
 
-// Default values for the form
+// Default values for the form - Fix linter error by using valid enum value
 export const defaultBusinessInfo: BusinessInfoFormValues = {
   business: {
     name: "",
     startDate: new Date(),
     isRegistered: false,
     registrationCertificateUrl: null,
-    country: "",
-    countryOther: null,
+    businessOverviewUrl: null,
+    cr12Url: null,
+    auditedAccountsUrl: null,
+    taxComplianceUrl: null,
+    sector: undefined,
+    country: "ghana" as const, // Fix linter error - use valid enum value instead of empty string
     city: "",
     registeredCountries: "",
     description: "",
@@ -139,10 +201,21 @@ export const defaultBusinessInfo: BusinessInfoFormValues = {
     customerCountLastSixMonths: null,
     productionCapacityLastSixMonths: "",
     customerSegments: [],
+    targetCustomers: [],
     climateAdaptationContribution: "",
     climateExtremeImpact: "",
     currentChallenges: "",
     supportNeeded: "",
     additionalInformation: null,
+    funding: {
+      hasExternalFunding: false,
+      fundingSource: null,
+      fundingSourceOther: null,
+      fundingDate: null,
+      funderName: null,
+      amountUsd: null,
+      fundingInstrument: null,
+      fundingInstrumentOther: null,
+    },
   }
 }; 

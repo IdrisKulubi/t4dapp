@@ -15,17 +15,15 @@ const maxBirthYear = now.getFullYear() - 18;
 const minDate = new Date(minBirthYear, now.getMonth(), now.getDate());
 const maxDate = new Date(maxBirthYear, now.getMonth(), now.getDate());
 
-// Application submission schema
+// Application submission schema - updated to match new form schemas
 const applicationSubmissionSchema = z.object({
   personal: z.object({
     firstName: z.string().min(2).max(100),
     lastName: z.string().min(2).max(100),
     gender: z.enum(["male", "female", "other"]),
     dateOfBirth: z.date().min(minDate).max(maxDate),
-    citizenship: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania", "other"]),
-    citizenshipOther: z.string().optional().nullable(),
-    countryOfResidence: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania", "other"]),
-    residenceOther: z.string().optional().nullable(),
+    citizenship: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"]),
+    countryOfResidence: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"]),
     phoneNumber: z.string().min(8).max(20),
     email: z.string().email().max(100),
     highestEducation: z.enum([
@@ -41,8 +39,7 @@ const applicationSubmissionSchema = z.object({
     startDate: z.date(),
     isRegistered: z.boolean(),
     registrationCertificateUrl: z.string().url().max(500).optional().nullable(),
-    country: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania", "other"]),
-    countryOther: z.string().max(100).optional().nullable(),
+    country: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"]),
     city: z.string().min(2).max(100),
     registeredCountries: z.string(),
     description: z.string().min(100),
@@ -109,7 +106,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
     // TODO: Add userId once authentication is implemented
     const userId = randomUUID();
     
-    // Insert applicant information
+    // Insert applicant information - updated to not include "other" fields
     const newApplicant = {
       userId,
       firstName: validatedData.personal.firstName,
@@ -117,9 +114,9 @@ export async function submitApplication(formData: ApplicationSubmission) {
       gender: validatedData.personal.gender,
       dateOfBirth: validatedData.personal.dateOfBirth.toISOString().split('T')[0],
       citizenship: validatedData.personal.citizenship,
-      citizenshipOther: validatedData.personal.citizenshipOther,
+      citizenshipOther: null, // Set to null since we no longer support "other" option
       countryOfResidence: validatedData.personal.countryOfResidence,
-      residenceOther: validatedData.personal.residenceOther,
+      residenceOther: null, // Set to null since we no longer support "other" option
       phoneNumber: validatedData.personal.phoneNumber,
       email: validatedData.personal.email,
       highestEducation: validatedData.personal.highestEducation,
@@ -127,7 +124,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
     
     const [applicant] = await db.insert(applicants).values(newApplicant).returning();
     
-    // Insert business information
+    // Insert business information - updated to not include "other" fields
     const newBusiness = {
       applicantId: applicant.id,
       name: validatedData.business.name,
@@ -135,7 +132,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
       isRegistered: validatedData.business.isRegistered,
       registrationCertificateUrl: validatedData.business.registrationCertificateUrl,
       country: validatedData.business.country,
-      countryOther: validatedData.business.countryOther,
+      countryOther: null, // Set to null since we no longer support "other" option
       city: validatedData.business.city,
       registeredCountries: validatedData.business.registeredCountries,
       description: validatedData.business.description,
@@ -399,7 +396,6 @@ export async function getApplicationById(id: number) {
         id: applicationData.business.id,
         name: applicationData.business.name,
         country: applicationData.business.country,
-        countryOther: applicationData.business.countryOther,
         city: applicationData.business.city,
         startDate: applicationData.business.startDate,
         isRegistered: applicationData.business.isRegistered,
@@ -435,9 +431,7 @@ export async function getApplicationById(id: number) {
         gender: applicationData.business.applicant.gender,
         dateOfBirth: applicationData.business.applicant.dateOfBirth,
         citizenship: applicationData.business.applicant.citizenship,
-        citizenshipOther: applicationData.business.applicant.citizenshipOther,
         countryOfResidence: applicationData.business.applicant.countryOfResidence,
-        residenceOther: applicationData.business.applicant.residenceOther,
         phoneNumber: applicationData.business.applicant.phoneNumber,
         email: applicationData.business.applicant.email,
         highestEducation: applicationData.business.applicant.highestEducation,
@@ -809,7 +803,6 @@ export async function getAnalyticsData(filters: AnalyticsFilters = {}) {
       'nigeria': 'Nigeria',
       'rwanda': 'Rwanda',
       'tanzania': 'Tanzania',
-      'other': 'Other',
     };
 
     const countryDistribution = Object.entries(countryCounts).map(([country, count]) => ({

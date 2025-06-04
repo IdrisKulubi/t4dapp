@@ -32,8 +32,7 @@ export const countryEnum = pgEnum('country', [
   'kenya',
   'nigeria',
   'rwanda',
-  'tanzania',
-  'other'
+  'tanzania'
 ]);
 
 export const fundingSourceEnum = pgEnum('funding_source', [

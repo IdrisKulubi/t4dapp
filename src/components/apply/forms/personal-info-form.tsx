@@ -29,36 +29,11 @@ export interface PersonalInfoFormProps {
 
 export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
   
- 
-  
-  const [showOtherCitizenship, setShowOtherCitizenship] = useState(
-    form.getValues().personal?.citizenship === "other"
-  );
-  const [showOtherResidence, setShowOtherResidence] = useState(
-    form.getValues().personal?.countryOfResidence === "other"
-  );
-  
-  // Add this at the component level, with other state hooks
   const [dateOfBirthInput, setDateOfBirthInput] = useState(
     form.getValues().personal?.dateOfBirth 
       ? format(form.getValues().personal.dateOfBirth, "yyyy-MM-dd") 
       : ""
   );
-  
-  // Handle show/hide of other country fields
-  const handleCitizenshipChange = (value: string) => {
-    setShowOtherCitizenship(value === "other");
-    if (value !== "other") {
-      form.setValue("personal.citizenshipOther", null);
-    }
-  };
-  
-  const handleResidenceChange = (value: string) => {
-    setShowOtherResidence(value === "other");
-    if (value !== "other") {
-      form.setValue("personal.residenceOther", null);
-    }
-  };
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (data: any) => {
@@ -93,12 +68,12 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
     <div className="space-y-8">
       {/* Header Section */}
       <div className="text-center lg:text-left">
-        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-full mb-4">
+        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-3 rounded-full mb-4">
           <User className="h-6 w-6" />
           <h2 className="text-xl font-bold">Personal Information</h2>
         </div>
         <p className="text-gray-600 max-w-2xl">
-          Please provide your personal details for the application. All information will be kept confidential and secure.
+          Please provide your personal details for the InCountry YouthAdapt Challenge 2025. All information will be kept confidential and secure.
         </p>
       </div>
       
@@ -279,7 +254,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
           
           {/* Citizenship & Residence Section */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-600 to-teal-700 p-6">
+            <div className="bg-gradient-to-r from-teal-600 to-blue-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <MapPin className="h-6 w-6" />
                 <h3 className="text-xl font-semibold">Citizenship & Residence</h3>
@@ -287,7 +262,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Citizenship field */}
+              {/* Citizenship field - Remove Other option */}
               <FormField
                 control={form.control}
                 name="personal.citizenship"
@@ -295,10 +270,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                   <FormItem>
                     <FormLabel className="text-gray-900 font-medium">Country of Citizenship *</FormLabel>
                     <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        handleCitizenshipChange(value);
-                      }}
+                      onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -312,37 +284,17 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                         <SelectItem value="nigeria">Nigeria</SelectItem>
                         <SelectItem value="rwanda">Rwanda</SelectItem>
                         <SelectItem value="tanzania">Tanzania</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormDescription className="text-gray-600">
+                      This challenge focuses on the 5 participating countries. You must hold nationality from one of these countries.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               
-              {/* Other Citizenship field - conditional */}
-              {showOtherCitizenship && (
-                <FormField
-                  control={form.control}
-                  name="personal.citizenshipOther"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Specify Country of Citizenship *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Enter country name" 
-                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
-                          {...field}
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              
-              {/* Country of Residence field */}
+              {/* Country of Residence field - Remove Other option */}
               <FormField
                 control={form.control}
                 name="personal.countryOfResidence"
@@ -350,10 +302,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                   <FormItem>
                     <FormLabel className="text-gray-900 font-medium">Country of Residence *</FormLabel>
                     <Select 
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        handleResidenceChange(value);
-                      }}
+                      onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -367,35 +316,15 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                         <SelectItem value="nigeria">Nigeria</SelectItem>
                         <SelectItem value="rwanda">Rwanda</SelectItem>
                         <SelectItem value="tanzania">Tanzania</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormDescription className="text-gray-600">
+                      You must be currently residing in one of the participating countries.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
-              {/* Other Residence field - conditional */}
-              {showOtherResidence && (
-                <FormField
-                  control={form.control}
-                  name="personal.residenceOther"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Specify Country of Residence *</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Enter country name" 
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
-                          {...field}
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
             </div>
           </div>
           
@@ -475,7 +404,35 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
             </div>
           </div>
           
-         
+          {/* Data Protection Disclaimer */}
+          <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 w-5 h-5 mt-0.5">
+                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-900 mb-2">Data Protection Notice</h4>
+                <p className="text-sm text-blue-800 leading-relaxed">
+                  We are committed to protecting your personal information. We collect and use your data for the InCountry Youth Adapt Challenge 2025. 
+                  We will not share your data with third parties without your consent, except as required by law. We have implemented security measures 
+                  to protect your data from unauthorised access.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end pt-6">
+            <Button 
+              type="submit" 
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Continue to Business Information
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

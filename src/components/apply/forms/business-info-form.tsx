@@ -361,12 +361,12 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
     <div className="space-y-8">
       {/* Header Section */}
       <div className="text-center lg:text-left">
-        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-green-600 text-white px-6 py-3 rounded-full mb-4">
+        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-teal-600 text-white px-6 py-3 rounded-full mb-4">
           <Building2 className="h-6 w-6" />
           <h2 className="text-xl font-bold">Business Information</h2>
         </div>
         <p className="text-gray-600 max-w-2xl">
-          Please provide comprehensive details about your business operations, structure, and impact. This information helps us understand your business better.
+          Please provide comprehensive details about your business operations, structure, and impact for the InCountry YouthAdapt Challenge 2025.
         </p>
       </div>
       
@@ -613,7 +613,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
           
           {/* Location Section */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-600 to-teal-700 p-6">
+            <div className="bg-gradient-to-r from-teal-600 to-blue-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <MapPin className="h-6 w-6" />
                 <h3 className="text-xl font-semibold">Location</h3>
@@ -643,37 +643,15 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           <SelectItem value="nigeria">Nigeria</SelectItem>
                           <SelectItem value="rwanda">Rwanda</SelectItem>
                           <SelectItem value="tanzania">Tanzania</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormDescription className="text-gray-600">
-                        Primary country where your business operates
+                        Select the participating country where your business primarily operates
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
-                {form.watch("business.country") === "other" && (
-                  <FormField
-                    control={form.control}
-                    name="business.countryOther"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-gray-900 font-medium">Specify Country</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Enter country name" 
-                            {...field}
-                            value={field.value || ""}
-                            className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
                 
                 <FormField
                   control={form.control}
@@ -708,7 +686,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                       />
                     </FormControl>
                     <FormDescription className="text-gray-600">
-                      List all countries where your business is registered to operate (separate with commas)
+                      List all participating countries where your business is registered to operate (separate with commas)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

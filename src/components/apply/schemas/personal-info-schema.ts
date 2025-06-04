@@ -30,27 +30,13 @@ export const personalInfoSchema = z.object({
     .min(minDate, { message: "You must be 35 years or younger" })
     .max(maxDate, { message: "You must be at least 18 years old" }),
   
-  citizenship: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania", "other"], {
-    required_error: "Please select your country of citizenship",
+  citizenship: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"], {
+    required_error: "Please select your country of citizenship from the participating countries",
   }),
   
-  citizenshipOther: z
-    .string()
-    .min(2, { message: "Country name must be at least 2 characters" })
-    .max(100, { message: "Country name must be less than 100 characters" })
-    .optional()
-    .nullable(),
-  
-  countryOfResidence: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania", "other"], {
-    required_error: "Please select your country of residence",
+  countryOfResidence: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"], {
+    required_error: "Please select your country of residence from the participating countries",
   }),
-  
-  residenceOther: z
-    .string()
-    .min(2, { message: "Country name must be at least 2 characters" })
-    .max(100, { message: "Country name must be less than 100 characters" })
-    .optional()
-    .nullable(),
   
   phoneNumber: z
     .string()
@@ -68,24 +54,6 @@ export const personalInfoSchema = z.object({
       required_error: "Please select your highest level of education",
     }
   ),
-}).refine((data) => {
-  // If citizenship is "other", citizenshipOther must be provided
-  if (data.citizenship === "other" && (!data.citizenshipOther || data.citizenshipOther.trim().length < 2)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Please specify your country of citizenship",
-  path: ["citizenshipOther"],
-}).refine((data) => {
-  // If residence is "other", residenceOther must be provided
-  if (data.countryOfResidence === "other" && (!data.residenceOther || data.residenceOther.trim().length < 2)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Please specify your country of residence",
-  path: ["residenceOther"],
 });
 
 export type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>; 
