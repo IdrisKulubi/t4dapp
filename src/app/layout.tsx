@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Toaster } from "sonner";
 import { Header } from "@/components/Header";
+import { PasscodeProvider, PasscodeGuard } from "@/components/passcode";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,16 +31,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <Header />
-        <Toaster />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <main className="pt-20">{children}</main>
-        </ThemeProvider>
+        <PasscodeProvider>
+          <PasscodeGuard>
+            <Header />
+            <Toaster />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <main className="pt-20">{children}</main>
+            </ThemeProvider>
+          </PasscodeGuard>
+        </PasscodeProvider>
       </body>
     </html>
   );
