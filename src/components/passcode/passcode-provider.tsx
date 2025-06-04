@@ -29,7 +29,7 @@ export function PasscodeProvider({ children }: PasscodeProviderProps) {
 
   const authenticate = (passcode: string): boolean => {
     // Get the correct passcode from environment (fallback for development)
-    const correctPasscode = process.env.NEXT_PUBLIC_APP_PASSCODE || "7606";
+    const correctPasscode = process.env.NEXT_PUBLIC_APP_PASSCODE || "1309";
     
     if (passcode === correctPasscode) {
       setIsAuthenticated(true);
