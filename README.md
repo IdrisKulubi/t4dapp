@@ -1,8 +1,4 @@
-i will update the readme when done
 
-## Getting Started
-
-will be updated  keep it cool 
 ```bash
 npm run dev
 # or
