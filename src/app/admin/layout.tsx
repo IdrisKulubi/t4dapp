@@ -36,8 +36,8 @@ export default function AdminLayout({
                 </Link>
               </li>
               <li>
-                <Link href="/admin/settings" className="hover:underline">
-                  Settings
+                <Link href="/admin/scoring" className="hover:underline">
+                  Scoring
                 </Link>
               </li>
               <li>

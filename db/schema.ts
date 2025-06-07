@@ -141,7 +141,7 @@ export const verificationTokens = pgTable(
 
 export const applicants = pgTable('applicants', {
   id: serial('id').primaryKey(),
-  userId: uuid('user_id').notNull().unique(),
+  userId: text('user_id').notNull().unique(),
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   gender: genderEnum('gender').notNull(),
@@ -225,6 +225,7 @@ export const applications = pgTable('applications', {
 export const eligibilityResults = pgTable('eligibility_results', {
   id: serial('id').primaryKey(),
   applicationId: integer('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }).unique(),
+  scoringConfigId: integer('scoring_config_id'),  // Link to scoring configuration used
   isEligible: boolean('is_eligible').notNull(),
   ageEligible: boolean('age_eligible').notNull(),
   registrationEligible: boolean('registration_eligible').notNull(),
@@ -239,15 +240,79 @@ export const eligibilityResults = pgTable('eligibility_results', {
   managementCapacityScore: integer('management_capacity_score'),
   locationBonus: integer('location_bonus'),
   genderBonus: integer('gender_bonus'),
+  
+  // New dynamic scoring fields
+  customScores: text('custom_scores'), // JSON field for flexible scoring
+  
   totalScore: integer('total_score'),
   evaluationNotes: text('evaluation_notes'),
   evaluatedAt: timestamp('evaluated_at').defaultNow().notNull(),
-  evaluatedBy: uuid('evaluated_by'),
+  evaluatedBy: text('evaluated_by'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
 
+// New tables for configurable scoring system
+export const scoringConfigurations = pgTable('scoring_configurations', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 200 }).notNull(),
+  description: text('description'),
+  version: varchar('version', { length: 50 }).notNull().default('1.0'),
+  isActive: boolean('is_active').default(false),
+  isDefault: boolean('is_default').default(false),
+  totalMaxScore: integer('total_max_score').notNull().default(100),
+  passThreshold: integer('pass_threshold').notNull().default(60),
+  createdBy: text('created_by').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
 
+export const scoringCriteria = pgTable('scoring_criteria', {
+  id: serial('id').primaryKey(),
+  configId: integer('config_id').notNull().references(() => scoringConfigurations.id, { onDelete: 'cascade' }),
+  category: varchar('category', { length: 100 }).notNull(), // e.g., "Innovation and Climate Adaptation Focus"
+  name: varchar('name', { length: 200 }).notNull(), // e.g., "Demonstratable Climate Adaptation Benefits"
+  description: text('description'),
+  maxPoints: integer('max_points').notNull(),
+  weightage: decimal('weightage', { precision: 5, scale: 2 }), // Percentage weight in category
+  scoringLevels: text('scoring_levels'), // JSON: [{level: "Limited", points: 0, description: "..."}, ...]
+  evaluationType: varchar('evaluation_type', { length: 50 }).default('manual'), // 'manual', 'auto', 'hybrid'
+  sortOrder: integer('sort_order').default(0),
+  isRequired: boolean('is_required').default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+export const applicationScores = pgTable('application_scores', {
+  id: serial('id').primaryKey(),
+  applicationId: integer('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }),
+  criteriaId: integer('criteria_id').notNull().references(() => scoringCriteria.id, { onDelete: 'cascade' }),
+  configId: integer('config_id').notNull().references(() => scoringConfigurations.id, { onDelete: 'cascade' }),
+  score: integer('score').notNull(),
+  maxScore: integer('max_score').notNull(),
+  level: varchar('level', { length: 100 }), // e.g., "Strong Capacity", "Moderate", etc.
+  notes: text('notes'),
+  evaluatedBy: text('evaluated_by'),
+  evaluatedAt: timestamp('evaluated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+// Table to track re-evaluation history
+export const evaluationHistory = pgTable('evaluation_history', {
+  id: serial('id').primaryKey(),
+  applicationId: integer('application_id').notNull().references(() => applications.id, { onDelete: 'cascade' }),
+  previousConfigId: integer('previous_config_id'),
+  newConfigId: integer('new_config_id').notNull().references(() => scoringConfigurations.id),
+  previousTotalScore: integer('previous_total_score'),
+  newTotalScore: integer('new_total_score'),
+  previousIsEligible: boolean('previous_is_eligible'),
+  newIsEligible: boolean('new_is_eligible'),
+  changeReason: text('change_reason'),
+  evaluatedBy: text('evaluated_by').notNull(),
+  evaluatedAt: timestamp('evaluated_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+});
 
 // Relations
 export const applicantRelations = relations(applicants, ({ one, many }) => ({
@@ -306,5 +371,61 @@ export const userRelations = relations(users, ({ one, many }) => ({
     fields: [users.id],
     references: [applicants.userId]
   }),
-  evaluations: many(eligibilityResults, { relationName: "evaluator" })
+  evaluations: many(eligibilityResults, { relationName: "evaluator" }),
+  scoringConfigurations: many(scoringConfigurations),
+  applicationScores: many(applicationScores),
+  evaluationHistory: many(evaluationHistory)
+}));
+
+// New relations for scoring system
+export const scoringConfigurationsRelations = relations(scoringConfigurations, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [scoringConfigurations.createdBy],
+    references: [users.id]
+  }),
+  criteria: many(scoringCriteria),
+  applicationScores: many(applicationScores),
+  evaluationHistory: many(evaluationHistory)
+}));
+
+export const scoringCriteriaRelations = relations(scoringCriteria, ({ one, many }) => ({
+  configuration: one(scoringConfigurations, {
+    fields: [scoringCriteria.configId],
+    references: [scoringConfigurations.id]
+  }),
+  applicationScores: many(applicationScores)
+}));
+
+export const applicationScoresRelations = relations(applicationScores, ({ one }) => ({
+  application: one(applications, {
+    fields: [applicationScores.applicationId],
+    references: [applications.id]
+  }),
+  criteria: one(scoringCriteria, {
+    fields: [applicationScores.criteriaId],
+    references: [scoringCriteria.id]
+  }),
+  configuration: one(scoringConfigurations, {
+    fields: [applicationScores.configId],
+    references: [scoringConfigurations.id]
+  }),
+  evaluator: one(users, {
+    fields: [applicationScores.evaluatedBy],
+    references: [users.id]
+  })
+}));
+
+export const evaluationHistoryRelations = relations(evaluationHistory, ({ one }) => ({
+  application: one(applications, {
+    fields: [evaluationHistory.applicationId],
+    references: [applications.id]
+  }),
+  newConfiguration: one(scoringConfigurations, {
+    fields: [evaluationHistory.newConfigId],
+    references: [scoringConfigurations.id]
+  }),
+  evaluator: one(users, {
+    fields: [evaluationHistory.evaluatedBy],
+    references: [users.id]
+  })
 }));

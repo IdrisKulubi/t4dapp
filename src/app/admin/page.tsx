@@ -205,6 +205,20 @@ export default async function AdminDashboard() {
                 className="w-full justify-start h-12 border-purple-200 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200" 
                 asChild
               >
+                <Link href="/admin/scoring">
+                  <Settings className="h-5 w-5 mr-3 text-purple-600" />
+                  <div className="text-left">
+                    <div className="font-medium">Manage Scoring Criteria</div>
+                    <div className="text-xs text-gray-500">Configure evaluation metrics</div>
+                  </div>
+                </Link>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start h-12 border-purple-200 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200" 
+                asChild
+              >
                 <Link href="/admin/analytics">
                   <BarChart3 className="h-5 w-5 mr-3 text-purple-600" />
                   <div className="text-left">

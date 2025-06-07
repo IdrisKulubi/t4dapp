@@ -67,9 +67,6 @@ export function ApplicationForm() {
         email: "",
         phoneNumber: "",
         citizenship: undefined,
-        citizenshipOther: "",
-        countryOfResidence: undefined,
-        residenceOther: "",
         highestEducation: undefined,
       },
       business: {
@@ -81,7 +78,6 @@ export function ApplicationForm() {
         startDate: undefined,
         isRegistered: undefined,
         country: undefined,
-        countryOther: "",
         climateAdaptationContribution: "",
         productServiceDescription: "",
         climateExtremeImpact: "",

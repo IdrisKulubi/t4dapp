@@ -257,8 +257,8 @@ export default function ApplicationDetail({
                       <div><h3 className="text-sm font-medium">Phone</h3><p>{application.applicant.phoneNumber}</p></div>
                       <div><h3 className="text-sm font-medium">Gender</h3><p className="capitalize">{application.applicant.gender}</p></div>
                       <div><h3 className="text-sm font-medium">Date of Birth</h3><p>{application.applicant.dateOfBirth}</p></div>
-                      <div><h3 className="text-sm font-medium">Citizenship</h3><p className="capitalize">{application.applicant.citizenship === 'other' ? application.applicant.citizenshipOther : application.applicant.citizenship}</p></div>
-                      <div><h3 className="text-sm font-medium">Country of Residence</h3><p className="capitalize">{application.applicant.countryOfResidence === 'other' ? application.applicant.residenceOther : application.applicant.countryOfResidence}</p></div>
+                      <div><h3 className="text-sm font-medium">Citizenship</h3><p className="capitalize">{application.applicant.citizenship}</p></div>
+                      <div><h3 className="text-sm font-medium">Country of Residence</h3><p className="capitalize">{application.applicant.countryOfResidence}</p></div>
                       <div><h3 className="text-sm font-medium">Highest Education</h3><p className="capitalize">{application.applicant.highestEducation.replace(/_/g, ' ')}</p></div>
                     </div>
                   </CardContent>
@@ -281,7 +281,7 @@ export default function ApplicationDetail({
                           <Link href={application.business.registrationCertificateUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Certificate</Link>
                         </div>
                       )}
-                      <div><h3 className="text-sm font-medium">Country of Operation</h3><p className="capitalize">{application.business.country === 'other' ? application.business.countryOther : application.business.country}</p></div>
+                      <div><h3 className="text-sm font-medium">Country of Operation</h3><p className="capitalize">{application.business.country}</p></div>
                       <div><h3 className="text-sm font-medium">City</h3><p>{application.business.city}</p></div>
                       <div><h3 className="text-sm font-medium">Registered Countries (Other)</h3><p>{application.business.registeredCountries}</p></div>
                       <div><h3 className="text-sm font-medium">Revenue (Last 2 Years)</h3><p>${application.business.revenueLastTwoYears?.toLocaleString() ?? 'N/A'}</p></div>

@@ -217,17 +217,13 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
                         <div>
                           <p className="text-sm font-medium text-gray-500">Country of Citizenship</p>
                           <p className="mt-1 text-gray-900">
-                            {formValues.personal?.citizenship === "other" 
-                              ? formatValue(formValues.personal?.citizenshipOther)
-                              : formatValue(formValues.personal?.citizenship)}
+                            {formatValue(formValues.personal?.citizenship)}
                           </p>
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-500">Country of Residence</p>
                           <p className="mt-1 text-gray-900">
-                            {formValues.personal?.countryOfResidence === "other" 
-                              ? formatValue(formValues.personal?.residenceOther)
-                              : formatValue(formValues.personal?.countryOfResidence)}
+                            {formatValue(formValues.personal?.countryOfResidence)}
                           </p>
                         </div>
                         <div>
@@ -265,9 +261,7 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
                         <div>
                           <p className="text-sm font-medium text-gray-500">Country</p>
                           <p className="mt-1 text-gray-900">
-                            {formValues.business?.country === "other" 
-                              ? formatValue(formValues.business?.countryOther)
-                              : formatValue(formValues.business?.country)}
+                            {formatValue(formValues.business?.country)}
                           </p>
                         </div>
                         <div>
@@ -312,9 +306,7 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
                       <div>
                         <p className="text-sm font-medium text-gray-500">Primary Climate Challenge</p>
                         <p className="mt-1 text-gray-900">
-                          {formValues.adaptation?.primaryChallenge === "other" 
-                            ? formatValue(formValues.adaptation?.primaryChallengeOther)
-                            : formatValue(formValues.adaptation?.primaryChallenge)}
+                          {formatValue(formValues.adaptation?.primaryChallenge)}
                         </p>
                       </div>
                       
