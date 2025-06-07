@@ -170,7 +170,7 @@ export function Header() {
                   }}
                 >
                   <span className="hidden sm:inline">InCountry YouthAdapt Challenge 2025</span>
-                  <span className="sm:hidden">YouthAdapt 2025</span>
+                  <span className="sm:hidden">  InCountry YouthAdapt 2025</span>
                 </motion.h1>
                 <motion.div 
                   className="h-0.5 lg:h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center mt-1 lg:mt-2 rounded-full"
