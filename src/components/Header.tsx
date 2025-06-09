@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export function Header() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isScrolled, setIsScrolled] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
