@@ -149,7 +149,7 @@ export function CTASection() {
             className="mt-12 pt-8 border-t border-slate-700/50"
           >
             <p className="text-slate-400 text-sm mb-4">
-              Applications close on March 31, 2024
+              Applications close on July 31, 2025
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-500">
               <span>✓ No application fees</span>
