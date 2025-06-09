@@ -14,7 +14,7 @@ const features = [
   {
     icon: <GlobeAltIcon className="w-8 h-8" />,
     title: "Pan-African Focus",
-    description: "Supporting entrepreneurs from across the African continent with preference for focus countries.",
+    description: "Focused on 5 key African countries to maximize impact.",
     color: "emerald"
   },
   {
@@ -28,6 +28,12 @@ const features = [
     title: "Youth-Led Solutions",
     description: "Empowering young entrepreneurs aged 18-35 with the resources to scale their impact.",
     color: "emerald"
+  },
+  {
+    icon: <UserGroupIcon className="w-8 h-8" />,
+    title: "Dragon's Den Pitch Event",
+    description: "An exclusive opportunity to pitch your solution at a Dragon's Den style event in your country, gaining visibility and attracting potential investors.",
+    color: "blue"
   },
   {
     icon: <RocketLaunchIcon className="w-8 h-8" />,

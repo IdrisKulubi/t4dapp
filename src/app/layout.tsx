@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "InCountry YouthAdapt Challenge 2025",
+  title: "InCountryYouthADAPT Challenge 2025",
   description: "Supporting young climate innovators in Africa with $30,000 grants and business development support. Part of the Africa Adaptation Acceleration Program (AAAP) by GCA and AfDB.",
 };
 

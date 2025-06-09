@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     question: "Who is eligible to apply?",
-    answer: "Entrepreneurs aged 18-35 with legally registered businesses in African countries are eligible. Your business must have generated revenue for at least two years and focus on climate adaptation solutions in food security or infrastructure. Preference is given to applicants from Kenya, Tanzania, Rwanda, Ghana, and Uganda."
+    answer: "Entrepreneurs aged 18-35 with legally registered businesses in one of our 5 focus countries are eligible: Kenya, Tanzania, Rwanda, Ghana, and Nigeria. Your business must have generated revenue for at least two years and focus on climate adaptation solutions in food security or infrastructure."
   },
   {
     question: "What kind of support do selected participants receive?",
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     question: "How much funding is available?",
-    answer: "Funding amounts vary based on the stage and needs of your business. We provide grants ranging from $10,000 to $100,000, with additional investment opportunities available through our partner network. The exact amount depends on your business plan and growth potential."
+    answer: "We provide grants of up to $30,000. The exact amount depends on your business plan and growth potential. Additional investment opportunities may be available through our partner network."
   },
   {
     question: "What sectors do you focus on?",
@@ -28,10 +28,6 @@ const faqs = [
   {
     question: "How long is the program?",
     answer: "The YouthAdapt Challenge is a 12-month program with intensive support in the first 6 months, followed by continued mentorship and network access. The program includes workshops, one-on-one sessions, and milestone-based funding releases."
-  },
-  {
-    question: "Can I apply if my business is not in the focus countries?",
-    answer: "Yes! While we give preference to entrepreneurs from Kenya, Tanzania, Rwanda, Ghana, and Uganda, we welcome applications from across the African continent. Exceptional solutions from any African country will be considered."
   },
   {
     question: "What is the application process?",

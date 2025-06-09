@@ -32,7 +32,7 @@ export function HeroSection() {
               transition={{ delay: 0.2, duration: 0.6 }}
             >
               <span className="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full bg-gradient-to-r from-teal-500/20 to-blue-500/20 text-teal-300 border border-teal-500/30 backdrop-blur-sm">
-                🌍 #In-Country YouthADAPT
+                🌍 #InCountryYouthADAPT
               </span>
             </motion.div>
             
@@ -57,8 +57,8 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
-              Grab your chance for a <span className="text-teal-400 font-semibold">$30,000 grant</span> and other business support. 
-              The African Incountry Youth Adapt 2025 challenge is now accepting applications.
+              Grab your chance for <span className="text-teal-400 font-semibold">up to a $30,000 grant</span> and other business support. 
+              The InCountryYouthADAPT 2025 challenge is now accepting applications.
             </motion.p>
             
             <motion.div 
@@ -89,7 +89,7 @@ export function HeroSection() {
               transition={{ delay: 1, duration: 0.8 }}
             >
               <div className="text-center">
-                <div className="text-2xl font-bold text-teal-400">$30,000</div>
+                <div className="text-2xl font-bold text-teal-400">Up to $30,000</div>
                 <div className="text-sm text-slate-400">Grant Amount</div>
               </div>
               <div className="text-center">
@@ -97,7 +97,7 @@ export function HeroSection() {
                 <div className="text-sm text-slate-400">Focus Countries</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-teal-400">June 30</div>
+                <div className="text-2xl font-bold text-teal-400">July 31st</div>
                 <div className="text-sm text-slate-400">2025 Deadline</div>
               </div>
             </motion.div>

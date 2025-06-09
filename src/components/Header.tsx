@@ -6,19 +6,10 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Close mobile menu when clicking outside or on link
+  // Close mobile menu when clicking outside or on a link
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
   };
@@ -39,11 +30,7 @@ export function Header() {
   return (
     <>
       <motion.header 
-        className={`fixed top-0 w-full z-50 transition-all duration-500 ${
-          isScrolled 
-            ? "bg-white/95 backdrop-blur-xl shadow-xl border-b border-blue-100" 
-            : "bg-gradient-to-r from-blue-900/80 via-blue-800/70 to-teal-700/80 backdrop-blur-sm"
-        }`}
+        className={`fixed top-0 w-full z-50 transition-all duration-500 bg-white/95 backdrop-blur-xl shadow-xl border-b border-blue-100`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -63,11 +50,7 @@ export function Header() {
                 whileHover={{ scale: 1.1, y: -2 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <div className={`relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl transition-all duration-300 ${
-                  isScrolled 
-                    ? "bg-white shadow-md group-hover:shadow-lg" 
-                    : "bg-white/10 backdrop-blur-sm group-hover:bg-white/20"
-                }`}>
+                <div className={`relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl transition-all duration-300 bg-white shadow-md group-hover:shadow-lg`}>
                   <Image 
                     src="/images/GCA.svg" 
                     alt="Global Center on Adaptation" 
@@ -93,11 +76,7 @@ export function Header() {
                 whileHover={{ scale: 1.1, y: -2 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <div className={`relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl transition-all duration-300 ${
-                  isScrolled 
-                    ? "bg-white shadow-md group-hover:shadow-lg" 
-                    : "bg-white/10 backdrop-blur-sm group-hover:bg-white/20"
-                }`}>
+                <div className={`relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl transition-all duration-300 bg-white shadow-md group-hover:shadow-lg`}>
                   <Image 
                     src="/images/AfDB.png" 
                     alt="African Development Bank" 
@@ -123,11 +102,7 @@ export function Header() {
                 whileHover={{ scale: 1.1, y: -2 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
               >
-                <div className={`relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl transition-all duration-300 ${
-                  isScrolled 
-                    ? "bg-white shadow-md group-hover:shadow-lg" 
-                    : "bg-white/10 backdrop-blur-sm group-hover:bg-white/20"
-                }`}>
+                <div className={`relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl transition-all duration-300 bg-white shadow-md group-hover:shadow-lg`}>
                   <Image 
                     src="/images/KCIC.png" 
                     alt="Kenya Climate Innovation Center" 
@@ -157,11 +132,7 @@ export function Header() {
             >
               <Link href="/" className="group block" onClick={closeMobileMenu}>
                 <motion.h1 
-                  className={`text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold tracking-wide transition-all duration-500 ${
-                    isScrolled 
-                      ? "text-slate-800" 
-                      : "text-white"
-                  } group-hover:scale-105`}
+                  className={`text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold tracking-wide transition-all duration-500 text-slate-800 group-hover:scale-105`}
                   whileHover={{ 
                     background: "linear-gradient(135deg, #0ea5e9, #14b8a6)",
                     WebkitBackgroundClip: "text",
@@ -169,8 +140,8 @@ export function Header() {
                     backgroundClip: "text"
                   }}
                 >
-                  <span className="hidden sm:inline">InCountry YouthAdapt Challenge 2025</span>
-                  <span className="sm:hidden">  InCountry YouthAdapt 2025</span>
+                  <span className="hidden sm:inline">InCountryYouthADAPT Challenge 2025</span>
+                  <span className="sm:hidden">InCountryYouthADAPT 2025</span>
                 </motion.h1>
                 <motion.div 
                   className="h-0.5 lg:h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center mt-1 lg:mt-2 rounded-full"
@@ -189,11 +160,7 @@ export function Header() {
               <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                 <Link 
                   href="#features" 
-                  className={`text-sm font-medium transition-all duration-300 px-3 py-2 rounded-lg ${
-                    isScrolled 
-                      ? "text-slate-600 hover:text-blue-600 hover:bg-blue-50" 
-                      : "text-white/90 hover:text-teal-300 hover:bg-white/10"
-                  }`}
+                  className={`text-sm font-medium transition-all duration-300 px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50`}
                 >
                   Features
                 </Link>
@@ -202,11 +169,7 @@ export function Header() {
               <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2 }}>
                 <Link 
                   href="#eligibility" 
-                  className={`text-sm font-medium transition-all duration-300 px-3 py-2 rounded-lg ${
-                    isScrolled 
-                      ? "text-slate-600 hover:text-blue-600 hover:bg-blue-50" 
-                      : "text-white/90 hover:text-teal-300 hover:bg-white/10"
-                  }`}
+                  className={`text-sm font-medium transition-all duration-300 px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50`}
                 >
                   Eligibility
                 </Link>
@@ -219,11 +182,7 @@ export function Header() {
               >
                 <Link 
                   href="/apply" 
-                  className={`relative overflow-hidden px-6 py-3 rounded-full font-semibold text-sm transition-all duration-500 group ${
-                    isScrolled 
-                      ? "bg-gradient-to-r from-blue-600 to-teal-600 text-white hover:from-blue-700 hover:to-teal-700 shadow-lg hover:shadow-xl" 
-                      : "bg-white/20 text-white hover:bg-white hover:text-blue-700 backdrop-blur-sm border border-white/30 hover:border-white"
-                  }`}
+                  className={`relative overflow-hidden px-6 py-3 rounded-full font-semibold text-sm transition-all duration-500 group bg-gradient-to-r from-blue-600 to-teal-600 text-white hover:from-blue-700 hover:to-teal-700 shadow-lg hover:shadow-xl`}
                 >
                   <span className="relative z-10">Apply Today</span>
                   <motion.div
@@ -239,11 +198,7 @@ export function Header() {
             {/* Mobile Menu Button */}
             <motion.button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2 sm:p-3 rounded-xl transition-all duration-300 relative z-50 ${
-                isScrolled 
-                  ? "text-slate-600 hover:bg-blue-50 hover:text-blue-600" 
-                  : "text-white hover:bg-white/20"
-              } ${isMobileMenuOpen ? 'text-white' : ''}`}
+              className={`lg:hidden p-2 sm:p-3 rounded-xl transition-all duration-300 relative z-50 text-slate-600 hover:bg-blue-50 hover:text-blue-600 ${isMobileMenuOpen ? 'text-white' : ''}`}
               initial={{ opacity: 0, rotate: -90 }}
               animate={{ opacity: 1, rotate: 0 }}
               transition={{ delay: 0.9, duration: 0.8 }}
