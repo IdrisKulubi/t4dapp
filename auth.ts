@@ -4,7 +4,7 @@ import Spotify from "next-auth/providers/spotify";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
 import db from "./db/drizzle";
-import { users } from "./db/schema";
+import { users, userProfiles } from "./db/schema";
 
 declare module "next-auth" {
   interface Session {
@@ -50,9 +50,11 @@ export const {
     error: "/error",
   },
   callbacks: {
-    async jwt({ token, account }) {
-      if (account) {
+    async jwt({ token, account, user }) {
+      if (account && user) {
         token.provider = account.provider;
+        // Ensure user ID is preserved
+        token.sub = user.id;
       }
       return token;
     },
@@ -60,17 +62,33 @@ export const {
       if (session.user && token.sub) {
         session.user.id = token.sub;
         session.user.email = token.email as string;
+        
         try {
-          const profile = await db.select().from(users)
-            .where(eq(users.id, token.sub));
+          // Check if user exists in our custom users table
+          const user = await db.select().from(users)
+            .where(eq(users.id, token.sub))
+            .limit(1);
           
-          session.user.hasProfile = !!profile[0];
+          // Check if user has a profile
+          const profile = await db.query.userProfiles.findFirst({
+            where: eq(userProfiles.userId, token.sub)
+          });
+          
+          session.user.hasProfile = !!profile;
+          session.user.role = profile?.role || 'applicant';
+          session.user.profileCompleted = profile?.isCompleted || false;
         } catch (error) {
-          console.error("Profile check error:", error);
+          console.error("Session callback error:", error);
           session.user.hasProfile = false;
+          session.user.role = 'applicant';
+          session.user.profileCompleted = false;
         }
       }
       return session;
     },
+    async signIn({ user, account, profile }) {
+      // Allow sign in - profile will be created during application submission
+      return true;
+    }
   },
 });

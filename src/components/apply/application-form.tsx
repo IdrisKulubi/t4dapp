@@ -5,10 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle, Menu, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle, Menu, X, LogIn, Loader2 } from "lucide-react";
 import { PersonalInfoForm } from "./forms/personal-info-form";
 import { BusinessInfoForm } from "./forms/business-info-form";
 import { ClimateAdaptationForm } from "./forms/climate-adaptation-form";
@@ -26,6 +28,7 @@ import { defaultFinancialInfo } from "./schemas/financial-info-schema";
 import { defaultSupportNeeds } from "./schemas/support-needs-schema";
 import { SupportNeedsForm } from "./forms/support-needs-form";
 import { cn } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Application form steps
 const STEPS = [
@@ -49,12 +52,72 @@ const applicationFormSchema = z.object({
 export type ApplicationFormValues = z.infer<typeof applicationFormSchema>;
 
 export function ApplicationForm() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [activeStep, setActiveStep] = useState(STEPS[0].id);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 1024px)");
+  
+  // Authentication guard
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    
+    if (status === "unauthenticated") {
+      toast.error("You must be logged in to access the application form");
+      router.push("/login");
+      return;
+    }
+  }, [status, router]);
+  
+  // Show loading state while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <Card className="w-full max-w-md shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center p-8 space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <div className="text-center">
+              <p className="text-gray-900 font-medium">Verifying Authentication</p>
+              <p className="text-gray-600 text-sm">Please wait while we check your login status...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  // Show authentication required if not logged in
+  if (!session?.user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
+              <LogIn className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-bold text-gray-900">Authentication Required</CardTitle>
+              <CardDescription className="text-gray-600 mt-2">
+                You need to be logged in to access the application form
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push("/login")}
+              className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
