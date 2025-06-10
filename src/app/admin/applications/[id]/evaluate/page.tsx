@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getApplicationById, saveEvaluation } from "@/lib/actions/actions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -86,7 +87,7 @@ function CriterionScorer({ criterion, currentScore, onScoreChange, applicationDa
           title: "Management & Leadership Information",
           data: [
             { label: "Founder", value: `${applicant.firstName} ${applicant.lastName}` },
-            { label: "Education Level", value: applicant.highestEducation.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) },
+            { label: "Education Level", value: applicant.highestEducation.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()) },
             { label: "Age", value: `${new Date().getFullYear() - new Date(applicant.dateOfBirth).getFullYear()} years` },
             { label: "Business Experience", value: `${Math.floor((new Date().getTime() - new Date(business.startDate).getTime()) / (1000 * 60 * 60 * 24 * 365))} years running this business` },
             { label: "Team Size", value: `${business.employees.fullTimeTotal} full-time employees` },
@@ -259,7 +260,7 @@ export function ScoringModal({
             <div>
               <DialogTitle className="text-xl">{section.name}</DialogTitle>
               <DialogDescription className="mt-1">
-                Score each criterion based on the application details. Click "View Data" to see relevant applicant information.
+                Score each criterion based on the application details. Click &quot;View Data&quot; to see relevant applicant information.
               </DialogDescription>
             </div>
             <div className="text-right">

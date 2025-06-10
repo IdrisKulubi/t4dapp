@@ -16,6 +16,7 @@ interface SectionCardProps {
 
 export function SectionCard({ section, scores, onOpenModal, icon }: SectionCardProps) {
   // Calculate section totals
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sectionScores = section.criteria.map(criterion => (scores as any)[criterion.id] || 0);
   const currentTotal = sectionScores.reduce((sum, score) => sum + score, 0);
   const completedCriteria = sectionScores.filter(score => score > 0).length;
