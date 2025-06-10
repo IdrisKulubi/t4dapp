@@ -1,12 +1,12 @@
 "use server";
 
 import { z } from "zod";
-import { applications, businesses, applicants, businessTargetCustomers, businessFunding, eligibilityResults } from "../../../db/schema";
+import { applications, businesses, applicants, businessTargetCustomers, businessFunding, eligibilityResults, userProfiles } from "../../../db/schema";
 import { revalidatePath } from "next/cache";
 import db from "../../../db/drizzle";
 import { checkEligibility } from "./eligibility";
 import { eq, and, desc, count as drizzleCount, SQL, InferSelectModel, gte, lte } from "drizzle-orm";
-import { randomUUID } from 'crypto';
+import { auth } from "@/auth";
 
 // Calculate min and max dates for age validation (18-35 years)
 const now = new Date();
@@ -100,11 +100,59 @@ export async function submitApplication(formData: ApplicationSubmission) {
   try {
     console.log("🚀 Starting application submission process...");
     
+    // Get current user session
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        message: "User not authenticated. Please login to submit an application.",
+      };
+    }
+    
+    const userId = session.user.id;
+    console.log("📋 Submitting application for user:", userId);
+    
     // Validate form data
     const validatedData = applicationSubmissionSchema.parse(formData);
     
-    // TODO: Add userId once authentication is implemented
-    const userId = randomUUID();
+    // Check if user already has an application
+    const existingApplication = await db.query.applications.findFirst({
+      where: eq(applications.userId, userId)
+    });
+    
+    if (existingApplication) {
+      return {
+        success: false,
+        message: "You have already submitted an application. Multiple applications are not allowed.",
+      };
+    }
+    
+    // Create or update user profile from application data
+    try {
+      const existingProfile = await db.query.userProfiles.findFirst({
+        where: eq(userProfiles.userId, userId)
+      });
+      
+      if (!existingProfile) {
+        // Create new user profile
+        await db.insert(userProfiles).values({
+          userId,
+          firstName: validatedData.personal.firstName,
+          lastName: validatedData.personal.lastName,
+          email: validatedData.personal.email,
+          role: 'applicant',
+          phoneNumber: validatedData.personal.phoneNumber,
+          country: validatedData.personal.countryOfResidence,
+          isCompleted: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        console.log("✅ Created user profile for:", userId);
+      }
+    } catch (profileError) {
+      console.error("⚠️ Error creating user profile (continuing with application):", profileError);
+      // Continue with application submission even if profile creation fails
+    }
     
     // Insert applicant information - updated to not include "other" fields
     const newApplicant = {
@@ -123,6 +171,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
     };
     
     const [applicant] = await db.insert(applicants).values(newApplicant).returning();
+    console.log("✅ Created applicant record:", applicant.id);
     
     // Insert business information - updated to not include "other" fields
     const newBusiness = {
@@ -187,6 +236,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
     
     // Insert application and set status to 'submitted'
     const applicationData = {
+      userId: userId,
       businessId: business.id,
       status: 'submitted' as const,
       referralSource: validatedData.referralSource,

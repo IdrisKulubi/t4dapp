@@ -29,6 +29,20 @@
       "when": 1749102260522,
       "tag": "0003_violet_stardust",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1749503448408,
+      "tag": "0004_groovy_crystal",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1749531383729,
+      "tag": "0005_daffy_crusher_hogan",
+      "breakpoints": true
     }
   ]
 }

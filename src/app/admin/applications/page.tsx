@@ -26,8 +26,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getApplications } from "@/lib/actions/actions";
-import { Eye, FileText, Users, TrendingUp, CheckCircle, XCircle, Clock, Search, Filter } from "lucide-react";
+import { getApplicationsByStatus, getApplicationStatusStats } from "@/lib/actions/application-status";
+import { ApplicationStatusManager } from "@/components/admin/ApplicationStatusManager";
+import { EvaluatorAssignmentManager } from "@/components/admin/EvaluatorAssignmentManager";
+import { Eye, FileText, Users, TrendingUp, CheckCircle, XCircle, Clock, Search, Filter, Settings, UserCheck } from "lucide-react";
 import { use } from 'react';
 
 // Map status to badge color with modern styling
@@ -42,7 +46,7 @@ const statusColors: Record<string, string> = {
 export default function ApplicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; search?: string; page?: string }>;
+  searchParams: Promise<{ status?: string; search?: string; page?: string; tab?: string }>;
 }) {
   // Wait for searchParams to be available
   const params = use(searchParams);
@@ -51,6 +55,7 @@ export default function ApplicationsPage({
   const status = params.status || "all";
   const search = params.search || "";
   const page = parseInt(params.page || "1", 10);
+  const tab = params.tab || "list";
   const limit = 10; // Items per page
   
   // Fetch applications with filters
@@ -61,16 +66,30 @@ export default function ApplicationsPage({
     limit,
   }));
   
+  // Fetch status statistics for the new status management view
+  const statusStatsResult = use(getApplicationStatusStats());
+  const statusStats = statusStatsResult.success ? statusStatsResult.data : null;
+  
+  // Fetch applications for status management (all applications without pagination for bulk operations)
+  const allApplicationsResult = use(getApplicationsByStatus(undefined, 1, 100));
+  const allApplications = allApplicationsResult.success ? allApplicationsResult.data?.applications : [];
+  
   // Get applications or empty array if fetch failed
   const applications = result.success ? result.data : [];
   const pagination = result.success ? result.pagination : { total: 0, page: 1, limit: 10, pages: 1 };
 
   // Calculate statistics
   const stats = {
-    total: pagination?.total || 0,
-    submitted: applications?.filter(app => app.status === 'submitted').length || 0,
+    total: statusStats?.totalApplications || pagination?.total || 0,
+    submitted: statusStats?.submitted || applications?.filter(app => app.status === 'submitted').length || 0,
     eligible: applications?.filter(app => app.eligibilityResults.length > 0 && app.eligibilityResults[0].isEligible).length || 0,
-    underReview: applications?.filter(app => app.status === 'under_review').length || 0,
+    underReview: statusStats?.under_review || applications?.filter(app => app.status === 'under_review').length || 0,
+    shortlisted: statusStats?.shortlisted || 0,
+    scoring_phase: statusStats?.scoring_phase || 0,
+    dragons_den: statusStats?.dragons_den || 0,
+    finalist: statusStats?.finalist || 0,
+    approved: statusStats?.approved || 0,
+    rejected: statusStats?.rejected || 0,
   };
   
   return (
@@ -111,17 +130,15 @@ export default function ApplicationsPage({
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
+              <CardTitle className="text-sm font-medium">Total</CardTitle>
               <FileText className="h-4 w-4 text-blue-100" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-blue-100">
-                All applications in the system
-              </p>
+              <p className="text-xs text-blue-100">Applications</p>
             </CardContent>
           </Card>
 
@@ -132,41 +149,75 @@ export default function ApplicationsPage({
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.submitted}</div>
-              <p className="text-xs text-green-100">
-                Ready for review
-              </p>
+              <p className="text-xs text-green-100">Ready for review</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-yellow-500 to-yellow-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Under Review</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-100" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.underReview}</div>
+              <p className="text-xs text-yellow-100">Being evaluated</p>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Eligible</CardTitle>
+              <CardTitle className="text-sm font-medium">Shortlisted</CardTitle>
               <Users className="h-4 w-4 text-purple-100" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.eligible}</div>
-              <p className="text-xs text-purple-100">
-                Passed evaluation criteria
-              </p>
+              <div className="text-2xl font-bold">{stats.shortlisted}</div>
+              <p className="text-xs text-purple-100">Selected for scoring</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Scoring</CardTitle>
+              <Settings className="h-4 w-4 text-indigo-100" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.scoring_phase}</div>
+              <p className="text-xs text-indigo-100">Being scored</p>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Under Review</CardTitle>
-              <Clock className="h-4 w-4 text-orange-100" />
+              <CardTitle className="text-sm font-medium">Dragons Den</CardTitle>
+              <TrendingUp className="h-4 w-4 text-orange-100" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.underReview}</div>
-              <p className="text-xs text-orange-100">
-                Currently being evaluated
-              </p>
+              <div className="text-2xl font-bold">{stats.dragons_den}</div>
+              <p className="text-xs text-orange-100">Final pitch</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Filters Section */}
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+        {/* Main Content with Tabs */}
+        <Tabs defaultValue={tab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Application List
+            </TabsTrigger>
+            <TabsTrigger value="manage" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Status Management
+            </TabsTrigger>
+            <TabsTrigger value="assign" className="flex items-center gap-2">
+              <UserCheck className="h-4 w-4" />
+              Evaluator Assignment
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="list" className="space-y-6">
+            {/* Filters Section */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
@@ -397,6 +448,20 @@ export default function ApplicationsPage({
             )}
           </CardContent>
         </Card>
+          </TabsContent>
+
+          <TabsContent value="manage" className="space-y-6">
+            <ApplicationStatusManager 
+              applications={allApplications || []}
+            />
+          </TabsContent>
+
+          <TabsContent value="assign" className="space-y-6">
+            <EvaluatorAssignmentManager 
+              applications={allApplications || []}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

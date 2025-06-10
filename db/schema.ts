@@ -35,6 +35,14 @@ export const countryEnum = pgEnum('country', [
   'tanzania'
 ]);
 
+export const userRoleEnum = pgEnum('user_role', [
+  'applicant',
+  'admin',
+  'technical_reviewer',
+  'jury_member',
+  'dragons_den_judge'
+]);
+
 export const fundingSourceEnum = pgEnum('funding_source', [
   'high_net_worth_individual',
   'financial_institutions',
@@ -62,6 +70,10 @@ export const applicationStatusEnum = pgEnum('application_status', [
   'draft',
   'submitted',
   'under_review',
+  'shortlisted',
+  'scoring_phase',
+  'dragons_den',
+  'finalist',
   'approved',
   'rejected'
 ]);
@@ -84,7 +96,7 @@ export const users = pgTable(
     lastActive: timestamp("last_active").defaultNow().notNull(),
     isOnline: boolean("is_online").default(false),
     profilePhoto: text("profile_photo"),
-    phoneNumber: text("phone_number").notNull(),
+    phoneNumber: text("phone_number"),
   },
   (table) => ({
     emailIdx: index("user_email_idx").on(table.email),
@@ -92,6 +104,28 @@ export const users = pgTable(
     lastActiveIdx: index("user_last_active_idx").on(table.lastActive),
   })
 );
+
+// User Profiles table for extended user information
+export const userProfiles = pgTable('user_profiles', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
+  firstName: varchar('first_name', { length: 100 }).notNull(),
+  lastName: varchar('last_name', { length: 100 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  role: userRoleEnum('role').default('applicant').notNull(),
+  profileImage: text('profile_image'),
+  phoneNumber: varchar('phone_number', { length: 20 }),
+  country: varchar('country', { length: 100 }),
+  organization: varchar('organization', { length: 200 }),
+  bio: text('bio'),
+  isCompleted: boolean('is_completed').default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+}, (table) => ({
+  userIdIdx: index("user_profiles_user_id_idx").on(table.userId),
+  emailIdx: index("user_profiles_email_idx").on(table.email),
+  roleIdx: index("user_profiles_role_idx").on(table.role),
+}));
 
 // Auth.js tables
 export const accounts = pgTable(
@@ -213,6 +247,7 @@ export const businessFunding = pgTable('business_funding', {
 
 export const applications = pgTable('applications', {
   id: serial('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   businessId: integer('business_id').notNull().references(() => businesses.id, { onDelete: 'cascade' }),
   status: applicationStatusEnum('status').default('draft').notNull(),
   referralSource: varchar('referral_source', { length: 100 }),
@@ -367,6 +402,10 @@ export const eligibilityResultsRelations = relations(eligibilityResults, ({ one 
 }));
 
 export const userRelations = relations(users, ({ one, many }) => ({
+  userProfile: one(userProfiles, {
+    fields: [users.id],
+    references: [userProfiles.userId]
+  }),
   applicant: one(applicants, {
     fields: [users.id],
     references: [applicants.userId]
@@ -375,6 +414,13 @@ export const userRelations = relations(users, ({ one, many }) => ({
   scoringConfigurations: many(scoringConfigurations),
   applicationScores: many(applicationScores),
   evaluationHistory: many(evaluationHistory)
+}));
+
+export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [userProfiles.userId],
+    references: [users.id]
+  })
 }));
 
 // New relations for scoring system
