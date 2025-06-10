@@ -52,17 +52,23 @@ export async function requireAuth() {
 }
 
 export async function requireRole(allowedRoles: UserRole[]) {
-  const user = await getCurrentUser();
-  if (!user) {
-    redirect('/auth/login');
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized: User not logged in");
   }
 
-  const userProfile = await getUserProfile(user.id!);
+  const userProfile = await db.query.userProfiles.findFirst({
+    where: eq(userProfiles.userId, session.user.id)
+  });
+
+  // Admin users bypass role checks
+  if (userProfile?.role === 'admin') {
+    return;
+  }
+
   if (!userProfile || !allowedRoles.includes(userProfile.role as UserRole)) {
-    redirect('/unauthorized');
+    throw new Error("Forbidden: You do not have the required role");
   }
-
-  return { user, userProfile };
 }
 
 // User Profile Management
