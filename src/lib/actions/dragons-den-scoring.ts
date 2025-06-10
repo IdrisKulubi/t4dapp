@@ -20,13 +20,13 @@ export async function getDragonsDenApplications() {
       return { success: false, message: "Authentication required" };
     }
 
-    // Verify user is a Dragon's Den judge
+    // Verify user is a Dragon's Den judge or admin
     const userProfile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, session.user.id)
     });
 
-    if (!userProfile || userProfile.role !== 'dragons_den_judge') {
-      return { success: false, message: "Access denied. Dragons Den judge role required." };
+    if (!userProfile || (userProfile.role !== 'admin' && userProfile.role !== 'dragons_den_judge')) {
+      return { success: false, message: "Access denied. Dragons Den judge or Admin role required." };
     }
 
     // Get applications that have reached dragons_den status
@@ -46,16 +46,16 @@ export async function getDragonsDenApplications() {
         applicantGender: applicants.gender,
         applicantCitizenship: applicants.citizenship,
         applicantEducation: applicants.highestEducation,
-        presentationScore: sql<number>`COALESCE(SUM(CASE WHEN sc.category = 'Presentation' THEN as_dd.score ELSE 0 END), 0)`.as('presentationScore'),
-        maxPresentationScore: sql<number>`COALESCE(SUM(CASE WHEN sc.category = 'Presentation' THEN sc.maxPoints ELSE 0 END), 0)`.as('maxPresentationScore'),
-        previousScore: sql<number>`COALESCE(SUM(CASE WHEN sc.category != 'Presentation' THEN as_prev.score ELSE 0 END), 0)`.as('previousScore'),
-        maxPreviousScore: sql<number>`COALESCE(SUM(CASE WHEN sc.category != 'Presentation' THEN sc.maxPoints ELSE 0 END), 0)`.as('maxPreviousScore'),
+        presentationScore: sql<number>`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${applicationScores}.score ELSE 0 END), 0)`.as('presentationScore'),
+        maxPresentationScore: sql<number>`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${scoringCriteria}.max_points ELSE 0 END), 0)`.as('maxPresentationScore'),
+        previousScore: sql<number>`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category != 'Presentation' THEN ${applicationScores}.score ELSE 0 END), 0)`.as('previousScore'),
+        maxPreviousScore: sql<number>`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category != 'Presentation' THEN ${scoringCriteria}.max_points ELSE 0 END), 0)`.as('maxPreviousScore'),
         isEvaluated: sql<boolean>`EXISTS(
-          SELECT 1 FROM ${applicationScores} as_check 
-          JOIN ${scoringCriteria} sc_check ON as_check.criteriaId = sc_check.id 
-          WHERE as_check.applicationId = ${applications.id} 
+          SELECT 1 FROM application_scores as_check 
+          JOIN scoring_criteria sc_check ON as_check.criteria_id = sc_check.id 
+          WHERE as_check.application_id = ${applications.id} 
           AND sc_check.category = 'Presentation'
-          AND as_check.evaluatedBy = ${userProfile.userId}
+          AND as_check.evaluated_by = ${userProfile.userId}
           AND as_check.score > 0
         )`.as('isEvaluated')
       })
@@ -66,21 +66,14 @@ export async function getDragonsDenApplications() {
         eq(applicationScores.applicationId, applications.id),
         eq(applicationScores.evaluatedBy, userProfile.userId)
       ))
-      .leftJoin(scoringCriteria, and(
-        eq(sql`as_dd.criteriaId`, scoringCriteria.id),
-        eq(scoringCriteria.category, 'Presentation')
-      ))
-      .leftJoin(applicationScores, and(
-        eq(applicationScores.applicationId, applications.id),
-        eq(applicationScores.evaluatedBy, userProfile.userId)
-      ))
+      .leftJoin(scoringCriteria, eq(applicationScores.criteriaId, scoringCriteria.id))
       .where(eq(applications.status, 'dragons_den'))
       .groupBy(
         applications.id, applications.status, applications.createdAt,
         businesses.name, businesses.description, businesses.city, businesses.country, businesses.startDate,
         applicants.firstName, applicants.lastName, applicants.email, applicants.gender, applicants.citizenship, applicants.highestEducation
       )
-      .orderBy(desc(sql`previousScore + presentationScore`));
+      .orderBy(desc(sql`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${applicationScores}.score ELSE 0 END), 0) + COALESCE(SUM(CASE WHEN ${scoringCriteria}.category != 'Presentation' THEN ${applicationScores}.score ELSE 0 END), 0)`));
 
     return { 
       success: true, 
@@ -129,13 +122,13 @@ export async function getDragonsDenStats() {
       return { success: false, message: "Authentication required" };
     }
 
-    // Verify user is a Dragon's Den judge
+    // Verify user is a Dragon's Den judge or admin
     const userProfile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, session.user.id)
     });
 
-    if (!userProfile || userProfile.role !== 'dragons_den_judge') {
-      return { success: false, message: "Access denied" };
+    if (!userProfile || (userProfile.role !== 'admin' && userProfile.role !== 'dragons_den_judge')) {
+      return { success: false, message: "Access denied. Dragons Den judge or Admin role required." };
     }
 
     // Get statistics
@@ -143,23 +136,23 @@ export async function getDragonsDenStats() {
       .select({
         totalFinalists: sql<number>`COUNT(DISTINCT ${applications.id})`.as('totalFinalists'),
         evaluated: sql<number>`COUNT(DISTINCT CASE WHEN EXISTS(
-          SELECT 1 FROM ${applicationScores} as_check 
-          JOIN ${scoringCriteria} sc_check ON as_check.criteriaId = sc_check.id 
-          WHERE as_check.applicationId = ${applications.id} 
+          SELECT 1 FROM application_scores as_check 
+          JOIN scoring_criteria sc_check ON as_check.criteria_id = sc_check.id 
+          WHERE as_check.application_id = ${applications.id} 
           AND sc_check.category = 'Presentation'
-          AND as_check.evaluatedBy = ${userProfile.userId}
+          AND as_check.evaluated_by = ${userProfile.userId}
           AND as_check.score > 0
         ) THEN ${applications.id} END)`.as('evaluated'),
-        averageScore: sql<number>`COALESCE(AVG(CASE WHEN sc.category = 'Presentation' THEN as_score.score END), 0)`.as('averageScore'),
-        maxScore: sql<number>`COALESCE(MAX(sc.maxPoints), 0)`.as('maxScore'),
-        topScore: sql<number>`COALESCE(MAX(CASE WHEN sc.category = 'Presentation' THEN as_score.score END), 0)`.as('topScore')
+        averageScore: sql<number>`COALESCE(AVG(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${applicationScores}.score END), 0)`.as('averageScore'),
+        maxScore: sql<number>`(SELECT SUM(max_points) FROM scoring_criteria WHERE category = 'Presentation')`.as('maxScore'),
+        topScore: sql<number>`COALESCE(MAX(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${applicationScores}.score END), 0)`.as('topScore')
       })
       .from(applications)
       .leftJoin(applicationScores, and(
         eq(applicationScores.applicationId, applications.id),
         eq(applicationScores.evaluatedBy, userProfile.userId)
       ))
-      .leftJoin(scoringCriteria, eq(sql`as_score.criteriaId`, scoringCriteria.id))
+      .leftJoin(scoringCriteria, eq(applicationScores.criteriaId, scoringCriteria.id))
       .where(eq(applications.status, 'dragons_den'));
 
     const result = stats[0];
@@ -169,9 +162,9 @@ export async function getDragonsDenStats() {
       data: {
         totalFinalists: result.totalFinalists || 0,
         evaluated: result.evaluated || 0,
-        averageScore: result.averageScore || 0,
-        maxScore: result.maxScore || 100,
-        topScore: result.topScore || 0
+        averageScore: Number(result.averageScore) || 0,
+        maxScore: Number(result.maxScore) || 100,
+        topScore: Number(result.topScore) || 0
       }
     };
   } catch (error) {
@@ -188,13 +181,13 @@ export async function getDragonsDenCriteria(applicationId: string) {
       return { success: false, message: "Authentication required" };
     }
 
-    // Verify user is a Dragon's Den judge
+    // Verify user is a Dragon's Den judge or admin
     const userProfile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, session.user.id)
     });
 
-    if (!userProfile || userProfile.role !== 'dragons_den_judge') {
-      return { success: false, message: "Access denied" };
+    if (!userProfile || (userProfile.role !== 'admin' && userProfile.role !== 'dragons_den_judge')) {
+      return { success: false, message: "Access denied. Dragons Den judge or Admin role required." };
     }
 
     // Get Dragon's Den criteria and existing scores
@@ -244,13 +237,13 @@ export async function updateDragonsDenScores(
       return { success: false, message: "Authentication required" };
     }
 
-    // Verify user is a Dragon's Den judge
+    // Verify user is a Dragon's Den judge or admin
     const userProfile = await db.query.userProfiles.findFirst({
       where: eq(userProfiles.userId, session.user.id)
     });
 
-    if (!userProfile || userProfile.role !== 'dragons_den_judge') {
-      return { success: false, message: "Access denied. Dragons Den judge role required." };
+    if (!userProfile || (userProfile.role !== 'admin' && userProfile.role !== 'dragons_den_judge')) {
+      return { success: false, message: "Access denied. Dragons Den judge or Admin role required." };
     }
 
     // Verify application exists and is in dragons_den status
@@ -330,7 +323,7 @@ export async function getDragonsDenLeaderboard() {
     });
 
     if (!userProfile || !['dragons_den_judge', 'admin'].includes(userProfile.role)) {
-      return { success: false, message: "Access denied" };
+      return { success: false, message: "Access denied. Dragons Den judge or Admin role required." };
     }
 
     // Get comprehensive leaderboard
@@ -341,9 +334,9 @@ export async function getDragonsDenLeaderboard() {
         applicantName: sql<string>`CONCAT(${applicants.firstName}, ' ', ${applicants.lastName})`.as('applicantName'),
         country: businesses.country,
         totalScore: sql<number>`COALESCE(SUM(${applicationScores.score}), 0)`.as('totalScore'),
-        maxTotalScore: sql<number>`COALESCE(SUM(sc.maxPoints), 0)`.as('maxTotalScore'),
-        presentationScore: sql<number>`COALESCE(SUM(CASE WHEN sc.category = 'Presentation' THEN ${applicationScores.score} ELSE 0 END), 0)`.as('presentationScore'),
-        maxPresentationScore: sql<number>`COALESCE(SUM(CASE WHEN sc.category = 'Presentation' THEN sc.maxPoints ELSE 0 END), 0)`.as('maxPresentationScore'),
+        maxTotalScore: sql<number>`COALESCE(SUM(${scoringCriteria.maxPoints}), 0)`.as('maxTotalScore'),
+        presentationScore: sql<number>`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${applicationScores.score} ELSE 0 END), 0)`.as('presentationScore'),
+        maxPresentationScore: sql<number>`COALESCE(SUM(CASE WHEN ${scoringCriteria}.category = 'Presentation' THEN ${scoringCriteria.maxPoints} ELSE 0 END), 0)`.as('maxPresentationScore'),
         evaluationCount: sql<number>`COUNT(DISTINCT ${applicationScores.evaluatedBy})`.as('evaluationCount')
       })
       .from(applications)
@@ -353,7 +346,7 @@ export async function getDragonsDenLeaderboard() {
       .leftJoin(scoringCriteria, eq(applicationScores.criteriaId, scoringCriteria.id))
       .where(eq(applications.status, 'dragons_den'))
       .groupBy(applications.id, businesses.name, applicants.firstName, applicants.lastName, businesses.country)
-      .orderBy(desc(sql`totalScore`));
+      .orderBy(desc(sql`COALESCE(SUM(${applicationScores.score}), 0)`));
 
     return { 
       success: true, 

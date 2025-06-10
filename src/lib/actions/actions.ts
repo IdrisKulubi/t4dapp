@@ -529,14 +529,29 @@ export async function getApplicationById(id: number) {
 // Evaluation Action
 interface EvaluationData {
   applicationId: number;
-  marketPotentialScore: number;
-  innovationScore: number;
-  climateAdaptationScore: number;
-  jobCreationScore: number;
-  viabilityScore: number;
-  managementCapacityScore: number;
-  locationBonus: number;
-  genderBonus: number;
+  // Innovation and Climate Adaptation Focus (40 points)
+  climateAdaptationBenefits: number;
+  innovativeness: number;
+  scalabilityReplicability: number;
+  environmentalImpact: number;
+  socioeconomicGenderImpact: number;
+  // Business Viability (31 points)
+  entrepreneurshipManagement: number;
+  marketPotentialDemand: number;
+  financialManagement: number;
+  timeFrameFeasibility: number;
+  // Sectoral and Strategic Alignment (20 points)
+  foodSecurityRelevance: number;
+  gcaAlignment: number;
+  // Organizational Capacity and Partnerships (14 points)
+  humanResourcesInfrastructure: number;
+  technicalExpertise: number;
+  experienceTrackRecord: number;
+  governanceManagement: number;
+  genderInclusionManagement: number;
+  riskManagementStrategy: number;
+  partnershipsCollaborations: number;
+  // Total and notes
   totalScore: number;
   evaluationNotes: string | null;
 }
@@ -556,14 +571,15 @@ export async function saveEvaluation(data: EvaluationData) {
     
     const evaluationPayload = {
         applicationId: data.applicationId,
-        marketPotentialScore: data.marketPotentialScore,
-        innovationScore: data.innovationScore,
-        climateAdaptationScore: data.climateAdaptationScore,
-        jobCreationScore: data.jobCreationScore,
-        viabilityScore: data.viabilityScore,
-        managementCapacityScore: data.managementCapacityScore,
-        locationBonus: data.locationBonus,
-        genderBonus: data.genderBonus,
+        // Map new scoring structure to existing database fields for backward compatibility
+        marketPotentialScore: data.marketPotentialDemand,
+        innovationScore: data.innovativeness,
+        climateAdaptationScore: data.climateAdaptationBenefits,
+        jobCreationScore: data.socioeconomicGenderImpact,
+        viabilityScore: data.financialManagement,
+        managementCapacityScore: data.entrepreneurshipManagement,
+        locationBonus: data.foodSecurityRelevance,
+        genderBonus: data.genderInclusionManagement,
         totalScore: data.totalScore,
         evaluationNotes: data.evaluationNotes,
         evaluatedAt: new Date(),

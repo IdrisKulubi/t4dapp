@@ -31,8 +31,11 @@ export async function getMyAssignedApplications() {
       where: eq(userProfiles.userId, session.user.id)
     });
 
-    if (!userProfile || !['technical_reviewer', 'jury_member', 'dragons_den_judge'].includes(userProfile.role)) {
-      return { success: false, error: "Evaluator access required" };
+    if (!userProfile || 
+        (userProfile.role !== 'admin' && 
+         !['technical_reviewer', 'jury_member', 'dragons_den_judge'].includes(userProfile.role))
+    ) {
+      return { success: false, error: "Access denied. You do not have the required permissions." };
     }
 
     // Get assigned applications with scores
@@ -115,8 +118,11 @@ export async function updateApplicationScores(updates: ScoreUpdate[]) {
       where: eq(userProfiles.userId, session.user.id)
     });
 
-    if (!userProfile || !['technical_reviewer', 'jury_member', 'dragons_den_judge'].includes(userProfile.role)) {
-      return { success: false, error: "Evaluator access required" };
+    if (!userProfile || 
+        (userProfile.role !== 'admin' && 
+         !['technical_reviewer', 'jury_member', 'dragons_den_judge'].includes(userProfile.role))
+    ) {
+      return { success: false, error: "Access denied. You do not have the required permissions." };
     }
 
     // Update each score

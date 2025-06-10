@@ -27,7 +27,7 @@ export async function getAnalyticsDashboardData() {
     });
 
     if (!userProfile || userProfile.role !== 'admin') {
-      return { success: false, message: "Admin access required" };
+      return { success: false, error: "Admin access required" };
     }
 
     // Get basic statistics
@@ -144,7 +144,7 @@ export async function getScoringAnalytics() {
     });
 
     if (!userProfile || userProfile.role !== 'admin') {
-      return { success: false, message: "Admin access required" };
+      return { success: false, error: "Admin access required" };
     }
 
     // Get scoring analytics by criteria
@@ -239,7 +239,7 @@ export async function getEvaluatorPerformance() {
     });
 
     if (!userProfile || userProfile.role !== 'admin') {
-      return { success: false, message: "Admin access required" };
+      return { success: false, error: "Admin access required" };
     }
 
     // Get evaluator performance statistics based on applicationScores
@@ -307,7 +307,7 @@ export async function getTrendsData(days = 30) {
     });
 
     if (!userProfile || userProfile.role !== 'admin') {
-      return { success: false, message: "Admin access required" };
+      return { success: false, error: "Admin access required" };
     }
 
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
