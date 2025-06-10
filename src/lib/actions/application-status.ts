@@ -58,7 +58,12 @@ export async function updateApplicationStatus(applicationId: number, status: App
         isEligible: status === 'shortlisted' || status === 'scoring_phase' || status === 'dragons_den' || status === 'finalist' || status === 'approved',
         totalScore: null,
         evaluationNotes: `Status changed to ${status}: ${notes}`,
-        evaluatedBy: session.user.id
+        evaluatedBy: session.user.id,
+        ageEligible: false,
+        registrationEligible: false,
+        revenueEligible: false,
+        businessPlanEligible: false,
+        impactEligible: false,
       });
     }
 
@@ -109,7 +114,12 @@ export async function bulkUpdateApplicationStatus(updates: ApplicationStatusUpda
           isEligible: update.status === 'shortlisted' || update.status === 'scoring_phase' || update.status === 'dragons_den' || update.status === 'finalist' || update.status === 'approved',
           totalScore: null,
           evaluationNotes: `Status changed to ${update.status}: ${update.notes}`,
-          evaluatedBy: session.user.id
+          evaluatedBy: session.user.id,
+          ageEligible: false,
+          registrationEligible: false,
+          revenueEligible: false,
+          businessPlanEligible: false,
+          impactEligible: false,
         });
       }
     }
@@ -269,7 +279,12 @@ export async function shortlistApplications(applicationIds: number[], notes?: st
       isEligible: true,
       totalScore: null,
       evaluationNotes: notes ? `Shortlisted: ${notes}` : 'Application shortlisted for further evaluation',
-      evaluatedBy: session.user.id
+      evaluatedBy: session.user.id,
+      ageEligible: false,
+      registrationEligible: false,
+      revenueEligible: false,
+      businessPlanEligible: false,
+      impactEligible: false,
     }));
 
     await db.insert(eligibilityResults).values(eligibilityInserts);
@@ -322,7 +337,12 @@ export async function moveToScoringPhase(applicationIds: number[], notes?: strin
       isEligible: true,
       totalScore: null,
       evaluationNotes: notes ? `Moved to scoring phase: ${notes}` : 'Application moved to scoring phase',
-      evaluatedBy: session.user.id
+      evaluatedBy: session.user.id,
+      ageEligible: false,
+      registrationEligible: false,
+      revenueEligible: false,
+      businessPlanEligible: false,
+      impactEligible: false,
     }));
 
     await db.insert(eligibilityResults).values(eligibilityInserts);

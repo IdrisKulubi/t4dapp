@@ -79,6 +79,7 @@ export function ScoringInterface({ assignment }: ScoringInterfaceProps) {
         toast.error(result.error || "Failed to save scores");
       }
     } catch (error) {
+      console.error("Error saving scores:", error);
       toast.error("An error occurred while saving scores");
     } finally {
       setIsSaving(false);

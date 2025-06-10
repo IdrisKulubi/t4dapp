@@ -426,6 +426,7 @@ export async function getEvaluatorAssignments(evaluatorId: string) {
         evaluatedAt: assignment.evaluatedAt
       });
       return acc;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, {} as Record<number, any>);
 
     return { success: true, data: Object.values(groupedAssignments) };
