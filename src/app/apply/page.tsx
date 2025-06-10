@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ApplicationForm } from "@/components/apply/application-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,7 +48,7 @@ export default async function ApplyPage() {
               </Link>
               
               <p className="text-center text-sm text-gray-500">
-                Don't have an account? The login page will help you create one with Google.
+                Don&apos;t have an account? The login page will help you create one with Google.
               </p>
             </div>
           </CardContent>

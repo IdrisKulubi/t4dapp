@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use server";
 
-import db from "../../../db/drizzle";
-import { applicationScores, applications, userProfiles } from "../../../db/schema";
+import db from "@/db/drizzle";
+import { applicationScores, userProfiles } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { auth } from "../../../auth";
+import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
 export interface ScoreUpdate {
@@ -82,6 +84,7 @@ export async function getMyAssignedApplications() {
       acc[appId].maxTotalScore += assignment.maxScore;
       
       return acc;
+
     }, {} as Record<number, any>);
 
     // Calculate completion percentages

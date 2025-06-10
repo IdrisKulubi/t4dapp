@@ -188,7 +188,7 @@ export default function ApplicationsPage({
 
           <Card className="border-0 shadow-lg bg-gradient-to-br from-orange-500 to-orange-600 text-white">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Dragon's Den</CardTitle>
+              <CardTitle className="text-sm font-medium">Dragons Den</CardTitle>
               <TrendingUp className="h-4 w-4 text-orange-100" />
             </CardHeader>
             <CardContent>
@@ -453,14 +453,12 @@ export default function ApplicationsPage({
           <TabsContent value="manage" className="space-y-6">
             <ApplicationStatusManager 
               applications={allApplications || []}
-              onRefresh={() => window.location.reload()}
             />
           </TabsContent>
 
           <TabsContent value="assign" className="space-y-6">
             <EvaluatorAssignmentManager 
               applications={allApplications || []}
-              onRefresh={() => window.location.reload()}
             />
           </TabsContent>
         </Tabs>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +40,6 @@ interface Application {
 
 interface EvaluatorAssignmentManagerProps {
   applications: Application[];
-  onRefresh?: () => void;
 }
 
 const roleConfig = {
@@ -66,12 +66,13 @@ const roleConfig = {
   }
 };
 
-export function EvaluatorAssignmentManager({ applications, onRefresh }: EvaluatorAssignmentManagerProps) {
+export function EvaluatorAssignmentManager({ applications }: EvaluatorAssignmentManagerProps) {
   const [selectedApplications, setSelectedApplications] = useState<number[]>([]);
   const [selectedRole, setSelectedRole] = useState<'technical_reviewer' | 'jury_member' | 'dragons_den_judge'>('technical_reviewer');
   const [evaluatorsPerApplication, setEvaluatorsPerApplication] = useState(2);
   const [isPending, startTransition] = useTransition();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
 
   // Filter applications by status for the selected role
   const eligibleApplications = applications.filter(app => 
@@ -113,7 +114,7 @@ export function EvaluatorAssignmentManager({ applications, onRefresh }: Evaluato
         );
         setSelectedApplications([]);
         setIsDialogOpen(false);
-        onRefresh?.();
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to assign applications");
       }
@@ -167,6 +168,7 @@ export function EvaluatorAssignmentManager({ applications, onRefresh }: Evaluato
                       ? 'ring-2 ring-blue-500 bg-white shadow-lg' 
                       : 'hover:shadow-md hover:bg-gray-50'
                   }`}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onClick={() => setSelectedRole(role as any)}
                 >
                   <CardContent className="p-4">

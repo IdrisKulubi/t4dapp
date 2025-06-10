@@ -1,9 +1,9 @@
 "use server";
 
-import db from "../../../db/drizzle";
-import { userProfiles, applications, applicationScores, scoringConfigurations } from "../../../db/schema";
-import { eq, and, inArray, sql, notInArray } from "drizzle-orm";
-import { auth } from "../../../auth";
+import db from "@/db/drizzle";
+import { userProfiles, applications, applicationScores, scoringConfigurations } from "@/db/schema";
+import { eq, and, inArray, sql } from "drizzle-orm";
+import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 
 export interface EvaluatorAssignment {
@@ -289,7 +289,6 @@ export async function autoAssignApplications(
     }
 
     // Create assignments using round-robin
-    const assignments: EvaluatorAssignment[] = [];
     
     for (const applicationId of applicationIds) {
       // Select evaluators for this application

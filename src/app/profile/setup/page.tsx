@@ -32,7 +32,7 @@ export default async function ProfileSetupPage() {
           <div>
             <CardTitle className="text-2xl font-bold text-gray-900">Welcome to InCountryYouthADAPT!</CardTitle>
             <CardDescription className="text-gray-600 mt-2">
-              Let's set up your profile to get you ready for the application process
+              Let&apos;s set up your profile to get you ready for the application process
             </CardDescription>
           </div>
         </CardHeader>
@@ -46,7 +46,7 @@ export default async function ProfileSetupPage() {
                   Authentication Successful
                 </p>
                 <p className="text-sm text-green-700 mt-1">
-                  You're logged in as {session.user.email}
+                  You&apos;re logged in as {session.user.email}
                 </p>
               </div>
             </div>

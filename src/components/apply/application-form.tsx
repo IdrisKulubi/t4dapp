@@ -60,65 +60,7 @@ export function ApplicationForm() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isMobile = useMediaQuery("(max-width: 1024px)");
-  
-  // Authentication guard
-  useEffect(() => {
-    if (status === "loading") return; // Still loading
-    
-    if (status === "unauthenticated") {
-      toast.error("You must be logged in to access the application form");
-      router.push("/login");
-      return;
-    }
-  }, [status, router]);
-  
-  // Show loading state while checking authentication
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
-        <Card className="w-full max-w-md shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center justify-center p-8 space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <div className="text-center">
-              <p className="text-gray-900 font-medium">Verifying Authentication</p>
-              <p className="text-gray-600 text-sm">Please wait while we check your login status...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-  
-  // Show authentication required if not logged in
-  if (!session?.user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
-              <LogIn className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">Authentication Required</CardTitle>
-              <CardDescription className="text-gray-600 mt-2">
-                You need to be logged in to access the application form
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              onClick={() => router.push("/login")}
-              className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Go to Login
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-  
+
   const form = useForm<ApplicationFormValues>({
     resolver: zodResolver(applicationFormSchema),
     defaultValues: {
@@ -204,6 +146,69 @@ export function ApplicationForm() {
     const progressPercentage = ((currentIndex) / (STEPS.length - 1)) * 100;
     setProgress(progressPercentage);
   }, [activeStep]);
+  
+  // Authentication guard
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    
+    if (status === "unauthenticated") {
+      toast.error("You must be logged in to access the application form");
+      router.push("/login");
+      return;
+    }
+    
+    if (session?.user?.email && !form.getValues('personal.email')) {
+        form.setValue('personal.email', session.user.email);
+    }
+
+  }, [status, router, session, form]);
+  
+  // Show loading state while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <Card className="w-full max-w-md shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <CardContent className="flex flex-col items-center justify-center p-8 space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <div className="text-center">
+              <p className="text-gray-900 font-medium">Verifying Authentication</p>
+              <p className="text-gray-600 text-sm">Please wait while we check your login status...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  // Show authentication required if not logged in
+  if (!session?.user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-4">
+            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
+              <LogIn className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl font-bold text-gray-900">Authentication Required</CardTitle>
+              <CardDescription className="text-gray-600 mt-2">
+                You need to be logged in to access the application form
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              onClick={() => router.push("/login")}
+              className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Go to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const goToStep = (stepId: string) => {
     if (activeStep === stepId) return;
@@ -360,7 +365,6 @@ export function ApplicationForm() {
             </div>
           </div>
           
-          {/* Mobile Progress Bar */}
           <div className="px-4 pb-3">
             <Progress value={progress} className="h-2 bg-gray-200">
               <div 
@@ -378,7 +382,6 @@ export function ApplicationForm() {
           "fixed inset-y-0 left-0 z-30 w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
           isMobile ? (sidebarOpen ? "translate-x-0" : "-translate-x-full") : ""
         )}>
-          {/* Desktop Header */}
           {!isMobile && (
             <div className="p-6 border-b border-slate-700">
               <div className="flex items-center gap-3 mb-4">
@@ -391,7 +394,6 @@ export function ApplicationForm() {
                 </div>
               </div>
               
-              {/* Desktop Progress */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-slate-300">Progress</span>
@@ -407,7 +409,6 @@ export function ApplicationForm() {
             </div>
           )}
 
-          {/* Steps Navigation */}
           <div className="p-6 space-y-2">
             <h2 className="text-slate-400 text-sm font-medium uppercase tracking-wider mb-4">
               Application Steps
@@ -480,7 +481,6 @@ export function ApplicationForm() {
             })}
           </div>
 
-          {/* Footer Info */}
           <div className="mt-auto p-6 border-t border-slate-700">
             <div className="bg-slate-800/50 rounded-lg p-4">
               <h3 className="text-white font-medium mb-2">Need Help?</h3>
@@ -491,7 +491,6 @@ export function ApplicationForm() {
           </div>
         </div>
 
-        {/* Mobile Overlay */}
         {isMobile && sidebarOpen && (
           <div 
             className="fixed inset-0 bg-black/50 z-20 lg:hidden"
@@ -499,9 +498,7 @@ export function ApplicationForm() {
           />
         )}
 
-        {/* Main Content */}
         <div className="flex-1 flex flex-col min-h-screen">
-          {/* Desktop Header */}
           {!isMobile && (
             <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
               <div className="px-6 lg:px-8 py-6">
@@ -527,7 +524,6 @@ export function ApplicationForm() {
             </header>
           )}
 
-          {/* Form Content */}
           <main className="flex-1 overflow-y-auto">
             <div className="max-w-4xl mx-auto p-4 lg:p-8">
               <Tabs value={activeStep} className="w-full">
@@ -580,7 +576,6 @@ export function ApplicationForm() {
                 </div>
               </Tabs>
 
-              {/* Navigation Buttons - Now visible on all screen sizes */}
               <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-700 p-4 mt-8 rounded-lg text-gray-950">
                 <div className="flex justify-between gap-3 max-w-md mx-auto lg:max-w-none text-gray-950">
                   <Button

@@ -6,7 +6,6 @@ import { revalidatePath } from "next/cache";
 import db from "../../../db/drizzle";
 import { checkEligibility } from "./eligibility";
 import { eq, and, desc, count as drizzleCount, SQL, InferSelectModel, gte, lte } from "drizzle-orm";
-import { randomUUID } from 'crypto';
 import { auth } from "@/auth";
 
 // Calculate min and max dates for age validation (18-35 years)

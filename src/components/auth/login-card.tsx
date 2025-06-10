@@ -189,7 +189,7 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
                 July 31st, 2025
               </p>
               <p className="text-xs text-blue-600">
-                Don't miss your chance to apply!
+                Don&apos;t miss your chance to apply
               </p>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { users, userProfiles, applications } from "@/db/schema";
+import {  userProfiles, applications } from "@/db/schema";
 import { eq, and, like, or, desc, count } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -194,7 +194,6 @@ export async function completeUserProfile() {
 // Admin functions
 export async function updateUserRole(userId: string, role: UserRole) {
   try {
-    const { userProfile } = await requireRole(['admin']);
 
     const [updatedProfile] = await db
       .update(userProfiles)

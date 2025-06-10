@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +47,6 @@ interface Application {
 
 interface ApplicationStatusManagerProps {
   applications: Application[];
-  onRefresh?: () => void;
 }
 
 const statusConfig = {
@@ -61,12 +61,13 @@ const statusConfig = {
   rejected: { label: "Rejected", color: "bg-red-100 text-red-800", icon: X }
 };
 
-export function ApplicationStatusManager({ applications, onRefresh }: ApplicationStatusManagerProps) {
+export function ApplicationStatusManager({ applications }: ApplicationStatusManagerProps) {
   const [selectedApplications, setSelectedApplications] = useState<number[]>([]);
   const [bulkStatus, setBulkStatus] = useState<ApplicationStatus | "">("");
   const [bulkNotes, setBulkNotes] = useState("");
   const [isPending, startTransition] = useTransition();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const router = useRouter();
 
   const handleSelectApplication = (applicationId: number, checked: boolean) => {
     if (checked) {
@@ -89,7 +90,7 @@ export function ApplicationStatusManager({ applications, onRefresh }: Applicatio
       const result = await updateApplicationStatus(applicationId, status);
       if (result.success) {
         toast.success(`Application status updated to ${statusConfig[status].label}`);
-        onRefresh?.();
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to update status");
       }
@@ -116,7 +117,7 @@ export function ApplicationStatusManager({ applications, onRefresh }: Applicatio
         setBulkStatus("");
         setBulkNotes("");
         setIsDialogOpen(false);
-        onRefresh?.();
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to update statuses");
       }
@@ -136,7 +137,7 @@ export function ApplicationStatusManager({ applications, onRefresh }: Applicatio
         setSelectedApplications([]);
         setBulkNotes("");
         setIsDialogOpen(false);
-        onRefresh?.();
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to shortlist applications");
       }
@@ -156,7 +157,7 @@ export function ApplicationStatusManager({ applications, onRefresh }: Applicatio
         setSelectedApplications([]);
         setBulkNotes("");
         setIsDialogOpen(false);
-        onRefresh?.();
+        router.refresh();
       } else {
         toast.error(result.error || "Failed to move applications to scoring phase");
       }
