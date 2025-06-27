@@ -6,18 +6,15 @@ import Image from "next/image";
 const partners = [
   { 
     name: "Global Center on Adaptation", 
-    logo: "/images/GCA.svg",
-    description: "Leading global climate adaptation initiatives"
+    logo: "/images/GCA.svg"
   },
   { 
     name: "African Development Bank", 
-    logo: "/images/AfDB.png",
-    description: "Financing Africa's development"
+    logo: "/images/AfDB.png"
   },
   { 
     name: "Kenya Climate Innovation Center", 
-    logo: "/images/KCIC.png",
-    description: "Driving climate innovation in Kenya"
+    logo: "/images/KCIC.png"
   },
 ];
 
@@ -127,30 +124,9 @@ export function PartnerLogosSection() {
                       />
                     </div>
                   </motion.div>
+                 
                   
-                  {/* Partner Info */}
-                  <div className="text-center">
-                    <h3 className="text-lg font-bold text-slate-800 mb-3 group-hover:text-blue-700 transition-colors duration-300">
-                      {partner.name}
-                    </h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      {partner.description}
-                    </p>
-                  </div>
-                  
-                  {/* Decorative element */}
-                  <motion.div 
-                    className="absolute top-6 right-6 w-4 h-4 bg-gradient-to-r from-blue-400 to-teal-400 rounded-full opacity-60"
-                    animate={{ 
-                      scale: [1, 1.2, 1],
-                      opacity: [0.6, 0.8, 0.6]
-                    }}
-                    transition={{ 
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
+                 
                 </div>
               </div>
               
@@ -160,39 +136,7 @@ export function PartnerLogosSection() {
           ))}
         </motion.div>
 
-        {/* Bottom CTA Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.9 }}
-          className="text-center mt-16"
-        >
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="w-6 h-6"
-            >
-              <svg fill="currentColor" viewBox="0 0 20 20" className="w-full h-full">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            </motion.div>
-            <span className="font-semibold">Trusted by Leading Organizations</span>
-            <motion.div
-              className="w-2 h-2 bg-white rounded-full"
-              animate={{ 
-                scale: [1, 1.5, 1],
-                opacity: [1, 0.5, 1]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </div>
-        </motion.div>
+
       </div>
     </section>
   );

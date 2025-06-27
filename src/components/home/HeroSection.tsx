@@ -57,8 +57,7 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
-              Grab your chance for <span className="text-teal-400 font-semibold">up to a $30,000 grant</span> and other business support. 
-              The InCountryYouthADAPT 2025 challenge is now accepting applications.
+             The In-country YouthADAPT challenge 2025 is part of the Africa Adaptation Acceleration Program, a joint initiative between the Global Center on Adaptation and the African Development Bank
             </motion.p>
             
             <motion.div 
@@ -141,28 +140,8 @@ export function HeroSection() {
                 />
               </motion.div>
               
-              {/* Floating Badge */}
-              <motion.div 
-                className="absolute top-20 right-10 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg backdrop-blur-sm"
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-                🚀 Apply Now
-              </motion.div>
+             
               
-              {/* Africa Map Accent */}
-              <motion.div 
-                className="absolute bottom-10 left-10 w-32 h-32 opacity-60"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              >
-                <Image
-                  src="/images/africa-map.svg"
-                  alt="Africa Map"
-                  fill
-                  className="object-contain filter brightness-0 invert"
-                />
-              </motion.div>
             </div>
           </motion.div>
         </div>

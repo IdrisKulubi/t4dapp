@@ -158,42 +158,7 @@ export function FAQSection() {
           ))}
         </motion.div>
         
-        {/* Contact CTA */}
-        <motion.div 
-          className="mt-16 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <div className="max-w-2xl mx-auto p-8 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl border border-emerald-200">
-            <h3 className="text-2xl font-bold text-slate-800 mb-4">
-              Still Have Questions?
-            </h3>
-            <p className="text-slate-600 mb-6">
-              Our team is here to help! Reach out to us directly and we&apos;ll get back to you within 24 hours.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.a
-                href="mailto:info@youthadapt.org"
-                className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-blue-600 text-white font-semibold hover:from-emerald-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Email Us
-              </motion.a>
-              {/* TO DO: Add contact form  later*/}
-              <motion.a
-                href="/"
-                className="inline-flex items-center px-6 py-3 rounded-full border-2 border-emerald-600 text-emerald-700 font-semibold hover:bg-emerald-50 transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Contact Form
-              </motion.a>
-            </div>
-          </div>
-        </motion.div>
+       
       </div>
     </section>
   );

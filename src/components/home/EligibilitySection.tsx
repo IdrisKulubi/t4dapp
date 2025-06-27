@@ -7,8 +7,11 @@ import {
   BuildingOfficeIcon,
   CurrencyDollarIcon,
   DocumentTextIcon,
-  ChartBarIcon
+  ChartBarIcon,
+  MapPinIcon,
+  StarIcon
 } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 const eligibilityCriteria = [
   {
@@ -41,6 +44,14 @@ const eligibilityCriteria = [
     description: "Business must demonstrate direct impact in food security or infrastructure.",
     color: "emerald"
   }
+];
+
+const priorityCountries = [
+  { name: "Kenya", code: "kenya", flag: "/images/flags/kenya.png" },
+  { name: "Tanzania", code: "tanzania", flag: "/images/flags/tanzania.png" },
+  { name: "Rwanda", code: "rwanda", flag: "/images/flags/rwanda.png" },
+  { name: "Ghana", code: "ghana", flag: "/images/flags/ghana.png" },
+  { name: "Nigeria", code: "nigeria", flag: "/images/flags/nigeria.png" }
 ];
 
 const fadeIn = {
@@ -97,7 +108,7 @@ export function EligibilitySection() {
             
             <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
               We&apos;re looking for innovative solutions that build resilience to climate change impacts. 
-              Here&apos;s what you need to qualify for the YouthAdapt Challenge.
+              Here&apos;s what you need to qualify, with priority given to entrepreneurs from our focus countries.
             </p>
           </motion.div>
 
@@ -143,6 +154,81 @@ export function EligibilitySection() {
                 </div>
               </motion.div>
             ))}
+          </motion.div>
+          
+          {/* Priority Regions Section */}
+          <motion.div 
+            className="mt-16"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+          >
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-3 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 text-yellow-300 px-6 py-3 rounded-full mb-6 border border-yellow-500/30">
+                <StarIcon className="h-6 w-6" />
+                <span className="font-semibold">Priority Regions</span>
+              </div>
+              
+              <h3 className="text-3xl font-bold text-white mb-4">
+                <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                  Focus Countries
+                </span>
+              </h3>
+              
+              <p className="text-slate-300 max-w-3xl mx-auto leading-relaxed">
+                While applications are welcome from across Africa, preference will be given to entrepreneurs 
+                from these strategic countries driving climate innovation.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              {priorityCountries.map((country, index) => (
+                <motion.div
+                  key={country.code}
+                  className="group relative"
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: 0.4 + (index * 0.1),
+                    ease: "easeOut"
+                  }}
+                  whileHover={{ y: -8, scale: 1.05 }}
+                >
+                  <div className="relative p-6 bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden text-center">
+                    {/* Background Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    {/* Priority Star */}
+                    <div className="absolute top-3 right-3 w-6 h-6 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center">
+                      <StarIcon className="w-3 h-3 text-white" />
+                    </div>
+                    
+                    {/* Flag */}
+                    <div className="relative w-12 h-12 mx-auto mb-4 rounded-full overflow-hidden border-2 border-slate-600 group-hover:border-yellow-500/50 transition-colors duration-300">
+                      <Image
+                        src={country.flag}
+                        alt={`${country.name} flag`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    
+                    {/* Country Name */}
+                    <h4 className="text-white font-semibold group-hover:text-yellow-300 transition-colors duration-300">
+                      {country.name}
+                    </h4>
+                    
+                    {/* Hover Effect */}
+                    <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-yellow-500 to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            
+          
           </motion.div>
           
           {/* Additional Info */}

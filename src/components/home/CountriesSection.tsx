@@ -129,33 +129,7 @@ export function CountriesSection() {
           ))}
         </motion.div>
         
-        {/* Additional Info */}
-        <motion.div 
-          className="mt-16 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <div className="max-w-3xl mx-auto p-8 bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl border border-slate-200">
-            <h3 className="text-xl font-bold text-slate-800 mb-4">
-              From Other African Countries?
-            </h3>
-            <p className="text-slate-600 mb-6">
-              We welcome applications from entrepreneurs across the entire African continent. 
-              These focus countries represent our priority regions, but exceptional solutions 
-              from any African country will be considered.
-            </p>
-            <motion.a
-              href="#eligibility"
-              className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-semibold hover:from-blue-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Check Eligibility Requirements
-            </motion.a>
-          </div>
-        </motion.div>
+      
       </div>
     </section>
   );

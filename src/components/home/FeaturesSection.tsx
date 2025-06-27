@@ -2,55 +2,42 @@
 
 import { motion } from "framer-motion";
 import { 
-  GlobeAltIcon, 
   LightBulbIcon,
   UserGroupIcon,
   RocketLaunchIcon,
-  ShieldCheckIcon,
+  TrophyIcon,
   CurrencyDollarIcon
 } from "@heroicons/react/24/outline";
 
 const features = [
   {
-    icon: <GlobeAltIcon className="w-8 h-8" />,
-    title: "Pan-African Focus",
-    description: "Focused on 5 key African countries to maximize impact.",
-    color: "emerald"
-  },
-  {
     icon: <LightBulbIcon className="w-8 h-8" />,
     title: "Innovation Support",
-    description: "Funding and mentorship for climate adaptation solutions that address local challenges.",
+    description: "Up to $30,000 in funding plus dedicated mentorship from industry experts to develop and scale your climate solution.",
     color: "blue"
   },
   {
     icon: <UserGroupIcon className="w-8 h-8" />,
-    title: "Youth-Led Solutions",
-    description: "Empowering young entrepreneurs aged 18-35 with the resources to scale their impact.",
-    color: "emerald"
-  },
-  {
-    icon: <UserGroupIcon className="w-8 h-8" />,
     title: "Dragon's Den Pitch Event",
-    description: "An exclusive opportunity to pitch your solution at a Dragon's Den style event in your country, gaining visibility and attracting potential investors.",
+    description: "Exclusive platform to present your solution to investors, partners, and stakeholders in a high-visibility national event.",
     color: "blue"
   },
   {
     icon: <RocketLaunchIcon className="w-8 h-8" />,
     title: "Accelerated Growth",
-    description: "Fast-track your startup with our comprehensive acceleration program and network.",
+    description: "12-month comprehensive program with workshops, technical assistance, and milestone-based support to fast-track your growth.",
     color: "blue"
   },
   {
-    icon: <ShieldCheckIcon className="w-8 h-8" />,
-    title: "Proven Impact",
-    description: "Join a community of successful entrepreneurs making measurable climate impact.",
+    icon: <TrophyIcon className="w-8 h-8" />,
+    title: "Networking Opportunities",
+    description: "Access to exclusive investor networks, partnership opportunities, and connections with fellow climate entrepreneurs across Africa.",
     color: "emerald"
   },
   {
     icon: <CurrencyDollarIcon className="w-8 h-8" />,
-    title: "Financial Support",
-    description: "Access funding opportunities and investment connections to scale your solution.",
+    title: "Investment Connections",
+    description: "Direct access to our partner investor network and opportunities for follow-on funding to scale your impact.",
     color: "blue"
   }
 ];
@@ -96,21 +83,21 @@ export function FeaturesSection() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-200">
-              Why Choose YouthAdapt
+              Winner Benefits
             </span>
           </motion.div>
           
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-              Empowering Africa&apos;s
+              Benefits for
             </span>
             <br />
-            <span className="text-slate-800">Climate Innovators</span>
+            <span className="text-slate-800">Winning Enterprises</span>
           </h2>
           
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            The YouthAdapt Challenge identifies and accelerates promising youth-led solutions 
-            for climate adaptation across Africa, providing the support you need to scale your impact.
+            Selected enterprises receive comprehensive support designed to accelerate growth, 
+            expand networks, and maximize climate impact across Africa.
           </p>
         </motion.div>
 
