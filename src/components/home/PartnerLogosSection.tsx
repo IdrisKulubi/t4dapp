@@ -120,29 +120,7 @@ export function PartnerLogosSection() {
           ))}
         </motion.div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mt-16"
-        >
-          <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
-            Join this transformative initiative and become part of Africa&apos;s largest climate adaptation program.
-          </p>
-          <motion.a
-            href="#features"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white font-semibold rounded-full hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>Explore Benefits</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </motion.a>
-        </motion.div>
+       
       </div>
     </section>
   );

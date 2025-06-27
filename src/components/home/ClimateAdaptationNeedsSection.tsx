@@ -8,7 +8,6 @@ import {
   Rabbit, 
   Smartphone, 
   Users,
-  Target,
   AlertTriangle,
   ExternalLink,
   FileText
@@ -66,11 +65,10 @@ export function ClimateAdaptationNeedsSection() {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white px-8 py-4 rounded-full mb-6">
-            <Target className="h-8 w-8" />
             <h2 className="text-2xl font-bold">Climate Adaptation Needs</h2>
           </div>
           <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-            <span className="font-semibold text-[#00D0AB]">🌍 Core to the YouthADAPT Challenge</span>
+            <span className="font-semibold text-[#00D0AB]">Core to the YouthADAPT Challenge</span>
           </p>
           <p className="text-lg text-gray-600 max-w-5xl mx-auto mt-4 leading-relaxed">
             The YouthADAPT Challenge is rooted in identifying and addressing critical climate adaptation needs across Africa. 
@@ -128,7 +126,7 @@ export function ClimateAdaptationNeedsSection() {
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
               Explore our comprehensive documentation on climate adaptation needs and potential solutions 
-              for food security and resilient infrastructure across Africa.
+              for food security and resilient infrastructure across the eligible countries.
             </p>
             <a
               href="https://cfg6261wt2.ufs.sh/f/e4b8ICxUXin8OQi6uWsmBwkUf8KguJpDHR164NqvSjTAQE5O"
@@ -136,7 +134,7 @@ export function ClimateAdaptationNeedsSection() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] text-white px-8 py-4 rounded-full font-semibold hover:from-[#0B5FBA]/90 hover:to-[#00D0AB]/90 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
             >
-              <span>Read Detailed Documentation</span>
+              <span>Read the Needs Assessment Report</span>
               <ExternalLink className="h-5 w-5" />
             </a>
           </div>
