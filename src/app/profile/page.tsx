@@ -188,16 +188,25 @@ export default async function ProfilePage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3 bg-white/10  text-black shadow-sm">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3 bg-gray-50 rounded-lg p-1 mb-6">
+            <TabsTrigger 
+              value="overview" 
+              className="flex items-center gap-2 text-gray-900 font-semibold data-[state=active]:bg-white data-[state=active]:text-[#0B5FBA] data-[state=active]:shadow-sm hover:text-[#0B5FBA] transition-all duration-200 px-4 py-3 rounded-md"
+            >
               <User className="h-4 w-4" />
               Overview
             </TabsTrigger>
-            <TabsTrigger value="application" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="application" 
+              className="flex items-center gap-2 text-gray-900 font-semibold data-[state=active]:bg-white data-[state=active]:text-[#0B5FBA] data-[state=active]:shadow-sm hover:text-[#0B5FBA] transition-all duration-200 px-4 py-3 rounded-md"
+            >
               <FileText className="h-4 w-4" />
               Application
             </TabsTrigger>
-            <TabsTrigger value="progress" className="flex items-center gap-2">
+            <TabsTrigger 
+              value="progress" 
+              className="flex items-center gap-2 text-gray-900 font-semibold data-[state=active]:bg-white data-[state=active]:text-[#0B5FBA] data-[state=active]:shadow-sm hover:text-[#0B5FBA] transition-all duration-200 px-4 py-3 rounded-md"
+            >
               <TrendingUp className="h-4 w-4" />
               Progress
             </TabsTrigger>

@@ -2,20 +2,15 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getCurrentUserProfile } from "@/lib/actions/user.actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Separator } from "@/components/ui/separator";
 import { 
   User, 
   Mail, 
   Phone, 
   MapPin, 
-  Building, 
-  Camera,
-  Save,
   ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
