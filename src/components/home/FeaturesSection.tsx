@@ -154,7 +154,6 @@ export function FeaturesSection() {
                     </p>
                   </div>
                   
-                  {/* Hover Effect */}
                   
                 </div>
               </motion.div>
@@ -162,24 +161,7 @@ export function FeaturesSection() {
           })}
         </motion.div>
         
-        {/* Bottom CTA */}
-        <motion.div 
-          className="text-center mt-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
-          <p className="text-slate-600 mb-6">Ready to join the next generation of climate innovators?</p>
-          <motion.a
-            href="#eligibility"
-            className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white font-semibold hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Learn About Eligibility
-          </motion.a>
-        </motion.div>
+      
       </div>
     </section>
   );

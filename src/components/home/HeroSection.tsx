@@ -80,24 +80,34 @@ export function HeroSection() {
              
             </motion.div>
             
-            {/* Stats */}
+            {/* Climate Adaptation Call */}
             <motion.div 
-              className="grid grid-cols-3 gap-8 pt-8 border-t border-slate-700/50"
+              className="pt-8 border-t border-slate-700/50"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1, duration: 0.8 }}
             >
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#00D0AB]">Up to $30,000</div>
-                <div className="text-sm text-slate-400">Grant Amount</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#0B5FBA]">5</div>
-                <div className="text-sm text-slate-400">Focus Countries</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-[#00D0AB]">July 31st</div>
-                <div className="text-sm text-slate-400">2025 Deadline</div>
+              <div className="bg-gradient-to-r from-[#00D0AB]/10 to-[#0B5FBA]/10 rounded-2xl p-6 border border-[#00D0AB]/20 backdrop-blur-sm">
+                <h3 className="text-xl font-bold text-[#00D0AB] mb-4">
+                  We're calling for innovative solutions that address:
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-[#00D0AB] rounded-full"></div>
+                    <span className="text-slate-200 font-medium">Climate Risks & Hazards</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-[#0B5FBA] rounded-full"></div>
+                    <span className="text-slate-200 font-medium">Adaptation Needs</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-2 h-2 bg-[#00D0AB] rounded-full"></div>
+                    <span className="text-slate-200 font-medium">Resilience Building</span>
+                  </div>
+                </div>
+                <p className="text-slate-300 mt-4 text-sm leading-relaxed">
+                  Join Africa's next generation of climate innovators creating sustainable solutions for adaptation and resilience across the continent.
+                </p>
               </div>
             </motion.div>
           </motion.div>
@@ -132,14 +142,14 @@ export function HeroSection() {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#0B5FBA]/20 to-transparent z-10"></div>
                 <Image
-                  src="/images/hero2.jpg"
+                  src="/images/hero3.jpg"
                   alt="Climate adaptation solutions in action"
                   fill
                   className="object-cover"
                   priority
                 />
               </motion.div>
-              
+                
              
               
             </div>
