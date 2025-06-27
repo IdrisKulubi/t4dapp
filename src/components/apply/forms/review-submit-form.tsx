@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { LoaderCircle } from "lucide-react";
 import { submitApplication } from "@/lib/actions/actions";
+import { safeToDate } from "@/lib/utils";
+import { generateApplicationDocx } from "@/lib/docx-generator";
 import { ApplicationFormValues } from "../application-form";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, FileText, Building, Leaf, DollarSign, HandHeart, Shield, User, Download } from "lucide-react";
@@ -30,28 +32,23 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
   
   const formValues = form.getValues();
   
-  // Download application as PDF/JSON
-  const downloadApplication = () => {
-    const applicationData = {
-      ...formValues,
-      metadata: {
-        downloadedAt: new Date().toISOString(),
-        status: "review_stage",
-      }
-    };
-
-    const dataStr = JSON.stringify(applicationData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `youth-adapt-application-preview-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    
-    toast.success("Application preview downloaded successfully!");
+  // Download application as DOCX
+  const downloadApplication = async () => {
+    try {
+      const applicantName = `${formValues.personal?.firstName || 'Unknown'} ${formValues.personal?.lastName || 'User'}`;
+      const submissionDate = new Date();
+      
+      await generateApplicationDocx({
+        formData: formValues,
+        applicantName,
+        submissionDate
+      });
+      
+      toast.success("Application document downloaded successfully!");
+    } catch (error) {
+      console.error("Error generating document:", error);
+      toast.error("Failed to generate document. Please try again.");
+    }
   };
   
   const handleSubmit = async (data: ApplicationFormValues) => {
@@ -61,6 +58,24 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
     console.log("📝 Form state:", form.formState);
     console.log("❌ Form errors:", form.formState.errors);
     console.log("✅ Form is valid:", form.formState.isValid);
+    
+    // Log the raw date values
+    console.log("🗓️ Raw dateOfBirth:", data.personal.dateOfBirth, typeof data.personal.dateOfBirth);
+    console.log("🗓️ Raw startDate:", data.business.startDate, typeof data.business.startDate);
+    console.log("🗓️ Raw fundingDate:", data.business.funding?.fundingDate, typeof data.business.funding?.fundingDate);
+
+    // Pre-submission validation and fixing
+    if (!data.personal.dateOfBirth) {
+      console.log("❌ Missing dateOfBirth, setting default");
+      toast.error("Date of birth is required. Please go back and set your date of birth.");
+      return;
+    }
+
+    if (!data.business.startDate) {
+      console.log("❌ Missing startDate, setting default");
+      toast.error("Business start date is required. Please go back and set your business start date.");
+      return;
+    }
     
     if (!termsAccepted || !updatesAccepted) {
       console.log("❌ Terms not accepted, stopping submission");
@@ -96,21 +111,30 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
         return text;
       };
       
+      // Safe date conversion helper
+      const convertToDate = (value: unknown): Date => {
+        if (!value) return new Date();
+        if (value instanceof Date) {
+          return isNaN(value.getTime()) ? new Date() : value;
+        }
+        if (typeof value === 'string') {
+          const date = new Date(value);
+          return isNaN(date.getTime()) ? new Date() : date;
+        }
+        return new Date();
+      };
+      
       // Transform the data to match the expected schema
       const submissionData = {
         personal: {
           ...data.personal,
-          // Convert dateOfBirth string to Date object if it's a string
-          dateOfBirth: typeof data.personal.dateOfBirth === 'string' 
-            ? new Date(data.personal.dateOfBirth) 
-            : data.personal.dateOfBirth,
+          // Safely convert dateOfBirth to Date object
+          dateOfBirth: convertToDate(data.personal.dateOfBirth),
         },
         business: {
           name: data.business.name,
-          // Convert startDate string to Date object if it's a string
-          startDate: typeof data.business.startDate === 'string' 
-            ? new Date(data.business.startDate) 
-            : data.business.startDate,
+          // Safely convert startDate to Date object
+          startDate: convertToDate(data.business.startDate),
           isRegistered: data.business.isRegistered,
           registrationCertificateUrl: data.business.registrationCertificateUrl,
           country: data.business.country,
@@ -149,9 +173,7 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
             fundingSourceOther: data.business.funding?.fundingSourceOther || null,
             // Convert fundingDate string to Date object if it exists and is a string
             fundingDate: data.business.funding?.fundingDate 
-              ? (typeof data.business.funding.fundingDate === 'string' 
-                  ? new Date(data.business.funding.fundingDate) 
-                  : data.business.funding.fundingDate)
+              ? convertToDate(data.business.funding.fundingDate)
               : null,
             funderName: data.business.funding?.funderName || null,
             amountUsd: data.business.funding?.amountUsd || null,
@@ -186,6 +208,21 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       if (!submissionData.business.city || submissionData.business.city.length < 2) {
         console.log("❌ City validation failed");
         toast.error("City must be at least 2 characters");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate dates
+      if (!submissionData.personal.dateOfBirth || isNaN(submissionData.personal.dateOfBirth.getTime())) {
+        console.log("❌ Date of birth validation failed");
+        toast.error("Please enter a valid date of birth");
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (!submissionData.business.startDate || isNaN(submissionData.business.startDate.getTime())) {
+        console.log("❌ Business start date validation failed");
+        toast.error("Please enter a valid business start date");
         setIsSubmitting(false);
         return;
       }
@@ -261,7 +298,7 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
             className="border-blue-200 text-blue-700 "
           >
             <Download className="h-4 w-4 mr-2" />
-            Download Application Preview
+            Download as Word Document
           </Button>
         </div>
       </div>
@@ -269,7 +306,47 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit, (errors) => {
           console.log("❌ Form validation errors:", errors);
-          toast.error("Please fill all required fields correctly. " + errors.toString());
+          
+          // Format error messages for display
+          const errorMessages: string[] = [];
+          
+          // Check personal errors
+          if (errors.personal) {
+            Object.entries(errors.personal).forEach(([field, error]) => {
+              if (error && typeof error === 'object' && 'message' in error) {
+                errorMessages.push(`Personal: ${field} - ${error.message}`);
+              }
+            });
+          }
+          
+          // Check business errors
+          if (errors.business) {
+            Object.entries(errors.business).forEach(([field, error]) => {
+              if (error && typeof error === 'object' && 'message' in error) {
+                errorMessages.push(`Business: ${field} - ${error.message}`);
+              }
+            });
+          }
+          
+          // Check other sections
+          ['adaptation', 'financial', 'support'].forEach(section => {
+            if (errors[section as keyof typeof errors]) {
+              const sectionErrors = errors[section as keyof typeof errors];
+              if (sectionErrors && typeof sectionErrors === 'object') {
+                Object.entries(sectionErrors).forEach(([field, error]) => {
+                  if (error && typeof error === 'object' && 'message' in error) {
+                    errorMessages.push(`${section}: ${field} - ${(error as { message: string }).message}`);
+                  }
+                });
+              }
+            }
+          });
+          
+          const errorMessage = errorMessages.length > 0 
+            ? `Please fix these errors:\n${errorMessages.slice(0, 5).join('\n')}${errorMessages.length > 5 ? `\n... and ${errorMessages.length - 5} more` : ''}`
+            : "Please fill all required fields correctly.";
+            
+          toast.error(errorMessage);
         })} className="space-y-8">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
