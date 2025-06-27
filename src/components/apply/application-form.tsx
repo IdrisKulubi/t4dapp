@@ -41,7 +41,7 @@ import { defaultClimateAdaptation } from "./schemas/climate-adaptation-schema";
 import { defaultFinancialInfo } from "./schemas/financial-info-schema";
 import { defaultSupportNeeds } from "./schemas/support-needs-schema";
 import { SupportNeedsForm } from "./forms/support-needs-form";
-import { cn } from "@/lib/utils";
+import { cn, safeToDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
@@ -175,7 +175,34 @@ export function ApplicationForm() {
       if (draft) {
         const parsedDraft = JSON.parse(draft);
         if (parsedDraft.formData) {
-          form.reset(parsedDraft.formData);
+          // Convert date strings back to Date objects using safe conversion
+          const formData = { ...parsedDraft.formData };
+          
+          // Handle dateOfBirth conversion
+          if (formData.personal?.dateOfBirth) {
+            const convertedDate = safeToDate(formData.personal.dateOfBirth);
+            if (convertedDate) {
+              formData.personal.dateOfBirth = convertedDate;
+            }
+          }
+          
+          // Handle business startDate conversion
+          if (formData.business?.startDate) {
+            const convertedDate = safeToDate(formData.business.startDate);
+            if (convertedDate) {
+              formData.business.startDate = convertedDate;
+            }
+          }
+          
+          // Handle funding date conversion
+          if (formData.business?.funding?.fundingDate) {
+            const convertedDate = safeToDate(formData.business.funding.fundingDate);
+            if (convertedDate) {
+              formData.business.funding.fundingDate = convertedDate;
+            }
+          }
+          
+          form.reset(formData);
           setActiveStep(parsedDraft.currentStep || STEPS[0].id);
           setCompletedSteps(parsedDraft.completedSteps || []);
           setLastSaved(new Date(parsedDraft.timestamp));

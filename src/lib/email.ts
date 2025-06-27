@@ -1,12 +1,21 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import { VerificationCodeEmail } from '@/components/emails/verification-code-email';
+import { ApplicationSubmissionEmail } from '@/components/emails/application-submission-email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export interface SendVerificationCodeParams {
   to: string;
   verificationCode: string;
+}
+
+export interface SendApplicationSubmissionEmailParams {
+  to: string;
+  applicantName: string;
+  applicationId: string;
+  businessName: string;
+  submissionDate: string;
 }
 
 export async function sendVerificationCode({
@@ -36,6 +45,43 @@ export async function sendVerificationCode({
     return { success: true, data };
   } catch (error) {
     console.error('Error sending verification email:', error);
+    throw error;
+  }
+}
+
+export async function sendApplicationSubmissionEmail({
+  to,
+  applicantName,
+  applicationId,
+  businessName,
+  submissionDate,
+}: SendApplicationSubmissionEmailParams) {
+  try {
+    const emailHtml = await render(
+      ApplicationSubmissionEmail({
+        applicantName,
+        applicationId,
+        businessName,
+        submissionDate,
+        userEmail: to,
+      })
+    );
+
+    const { data, error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'YouthADAPT <noreply@yourdomain.com>',
+      to: [to],
+      subject: '🎉 Application Submitted Successfully - YouthADAPT Challenge',
+      html: emailHtml,
+    });
+
+    if (error) {
+      console.error('Error sending application submission email:', error);
+      throw new Error('Failed to send application submission email');
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error sending application submission email:', error);
     throw error;
   }
 }
