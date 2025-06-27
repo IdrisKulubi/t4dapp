@@ -95,13 +95,13 @@ export function EligibilitySection() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/20 to-blue-500/20 text-emerald-300 text-sm font-semibold mb-6 border border-emerald-500/30">
+              <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-[#00D0AB]/20 to-[#0B5FBA]/20 text-[#00D0AB] text-sm font-semibold mb-6 border border-[#00D0AB]/30">
                 Eligibility Criteria
               </span>
             </motion.div>
             
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-emerald-400 to-blue-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] bg-clip-text text-transparent">
                 Who Can Apply?
               </span>
             </h2>
@@ -112,48 +112,69 @@ export function EligibilitySection() {
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
             variants={staggerContainer}
             className="grid grid-cols-1 md:grid-cols-2 gap-6"
           >
-            {eligibilityCriteria.map((criteria, index) => (
-              <motion.div
-                key={index}
-                className="group relative"
-                variants={fadeIn}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.2 }}
-              >
-                <div className="relative p-6 bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 hover:border-emerald-500/30 transition-all duration-300 overflow-hidden">
-                  {/* Background Gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-br from-${criteria.color}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                  
-                  <div className="relative flex gap-4">
-                    {/* Icon */}
+            {eligibilityCriteria.map((criteria, index) => {
+              const isGcaBlue = criteria.color === "blue";
+              const isGcaGreen = criteria.color === "emerald";
+              
+              return (
+                <motion.div
+                  key={index}
+                  className="group relative"
+                  variants={fadeIn}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="relative p-6 bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/50 hover:border-[#00D0AB]/30 transition-all duration-300 overflow-hidden">
+                    {/* Background Gradient */}
                     <div className={`
-                      shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-${criteria.color}-500/20 to-${criteria.color}-600/20 flex items-center justify-center border border-${criteria.color}-500/30 group-hover:scale-110 transition-transform duration-300
-                    `}>
-                      <div className={`text-${criteria.color}-400`}>
-                        {criteria.icon}
+                      absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                      ${isGcaBlue ? 'bg-gradient-to-br from-[#0B5FBA]/5 to-transparent' : ''}
+                      ${isGcaGreen ? 'bg-gradient-to-br from-[#00D0AB]/5 to-transparent' : ''}
+                    `}></div>
+                    
+                    <div className="relative flex gap-4">
+                      {/* Icon */}
+                      <div className={`
+                        shrink-0 w-12 h-12 rounded-xl flex items-center justify-center border group-hover:scale-110 transition-transform duration-300
+                        ${isGcaBlue ? 'bg-gradient-to-br from-[#0B5FBA]/20 to-[#0B5FBA]/20 border-[#0B5FBA]/30' : ''}
+                        ${isGcaGreen ? 'bg-gradient-to-br from-[#00D0AB]/20 to-[#00D0AB]/20 border-[#00D0AB]/30' : ''}
+                      `}>
+                        <div className={`
+                          ${isGcaBlue ? 'text-[#0B5FBA]' : ''}
+                          ${isGcaGreen ? 'text-[#00D0AB]' : ''}
+                        `}>
+                          {criteria.icon}
+                        </div>
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold mb-2 text-white group-hover:text-[#00D0AB] transition-colors">
+                          {criteria.title}
+                        </h3>
+                        <p className="text-slate-400 leading-relaxed">
+                          {criteria.description}
+                        </p>
                       </div>
                     </div>
                     
-                    {/* Content */}
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold mb-2 text-white group-hover:text-emerald-300 transition-colors">
-                        {criteria.title}
-                      </h3>
-                      <p className="text-slate-400 leading-relaxed">
-                        {criteria.description}
-                      </p>
-                    </div>
+                    {/* Hover Effect */}
+                    <div className={`
+                      absolute bottom-0 left-0 w-full h-0.5 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left
+                      ${isGcaBlue ? 'bg-gradient-to-r from-[#0B5FBA] to-[#0B5FBA]/80' : ''}
+                      ${isGcaGreen ? 'bg-gradient-to-r from-[#00D0AB] to-[#00D0AB]/80' : ''}
+                    `}></div>
                   </div>
-                  
-                  {/* Hover Effect */}
-                  <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-${criteria.color}-500 to-${criteria.color}-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`}></div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </motion.div>
           
           {/* Priority Regions Section */}
@@ -228,19 +249,18 @@ export function EligibilitySection() {
               ))}
             </div>
             
-          
           </motion.div>
           
-          {/* Additional Info */}
+          {/* CTA Section */}
           <motion.div 
-            className="mt-16 p-8 bg-gradient-to-r from-emerald-900/20 to-blue-900/20 rounded-2xl border border-emerald-500/20 backdrop-blur-sm"
+            className="mt-20"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.5, duration: 0.6 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
           >
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-[#00D0AB] to-[#0B5FBA] rounded-full flex items-center justify-center mx-auto mb-6">
                 <DocumentCheckIcon className="w-8 h-8 text-white" />
               </div>
               
@@ -255,7 +275,7 @@ export function EligibilitySection() {
               
               <motion.a
                 href="/apply"
-                className="inline-flex items-center px-8 py-4 rounded-full bg-gradient-to-r from-emerald-600 to-blue-600 text-white font-semibold hover:from-emerald-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center px-8 py-4 rounded-full bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white font-semibold hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

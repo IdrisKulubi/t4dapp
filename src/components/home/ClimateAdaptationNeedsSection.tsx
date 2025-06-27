@@ -9,7 +9,9 @@ import {
   Smartphone, 
   Users,
   Target,
-  AlertTriangle
+  AlertTriangle,
+  ExternalLink,
+  FileText
 } from "lucide-react";
 
 const adaptationNeeds = [
@@ -17,7 +19,7 @@ const adaptationNeeds = [
     icon: Droplets,
     title: "Drought and Water Scarcity",
     description: "Resilient irrigation systems, water harvesting techniques, and efficient water management.",
-    color: "from-blue-600 to-cyan-600"
+    color: "from-[#0B5FBA] to-cyan-600"
   },
   {
     icon: Thermometer,
@@ -29,7 +31,7 @@ const adaptationNeeds = [
     icon: CloudRain,
     title: "Flooding and Stormwater Management",
     description: "Smart flood response systems, green infrastructure (e.g., rain gardens, wetlands), and permeable pavements.",
-    color: "from-indigo-600 to-blue-600"
+    color: "from-indigo-600 to-[#0B5FBA]"
   },
   {
     icon: Wheat,
@@ -41,7 +43,7 @@ const adaptationNeeds = [
     icon: Rabbit,
     title: "Livestock and Crop Resilience",
     description: "Heat- and disease-tolerant breeds, sustainable rangeland practices, and CSA (Climate-Smart Agriculture).",
-    color: "from-green-600 to-emerald-600"
+    color: "from-[#00D0AB] to-emerald-600"
   },
   {
     icon: Smartphone,
@@ -63,12 +65,12 @@ export function ClimateAdaptationNeedsSection() {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-4 rounded-full mb-6">
+          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white px-8 py-4 rounded-full mb-6">
             <Target className="h-8 w-8" />
             <h2 className="text-2xl font-bold">Climate Adaptation Needs</h2>
           </div>
           <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-            <span className="font-semibold text-green-700">🌍 Core to the YouthADAPT Challenge</span>
+            <span className="font-semibold text-[#00D0AB]">🌍 Core to the YouthADAPT Challenge</span>
           </p>
           <p className="text-lg text-gray-600 max-w-5xl mx-auto mt-4 leading-relaxed">
             The YouthADAPT Challenge is rooted in identifying and addressing critical climate adaptation needs across Africa. 
@@ -115,6 +117,29 @@ export function ClimateAdaptationNeedsSection() {
               </div>
             );
           })}
+        </div>
+
+        {/* Read More Section */}
+        <div className="mt-16 text-center">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-2xl mx-auto">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <FileText className="h-8 w-8 text-[#0B5FBA]" />
+              <h3 className="text-xl font-bold text-gray-800">Want to Learn More?</h3>
+            </div>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              Explore our comprehensive documentation on climate adaptation needs and potential solutions 
+              for food security and resilient infrastructure across Africa.
+            </p>
+            <a
+              href="https://cfg6261wt2.ufs.sh/f/e4b8ICxUXin8OQi6uWsmBwkUf8KguJpDHR164NqvSjTAQE5O"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] text-white px-8 py-4 rounded-full font-semibold hover:from-[#0B5FBA]/90 hover:to-[#00D0AB]/90 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+            >
+              <span>Read Detailed Documentation</span>
+              <ExternalLink className="h-5 w-5" />
+            </a>
+          </div>
         </div>
 
        

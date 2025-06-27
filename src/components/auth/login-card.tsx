@@ -78,16 +78,16 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
           <div className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-teal-600 flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0B5FBA] to-[#00D0AB] flex items-center justify-center shadow-lg">
                   <Globe className="h-10 w-10 text-white" />
                 </div>
-                <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-md animate-pulse">
+                <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full bg-gradient-to-br from-[#00D0AB] to-[#0B5FBA] flex items-center justify-center shadow-md animate-pulse">
                   <Leaf className="h-4 w-4 text-white" />
                 </div>
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] bg-clip-text text-transparent">
                 InCountryYouthADAPT
               </h1>
               <h2 className="text-xl font-semibold text-gray-800">
@@ -100,28 +100,28 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
           </div>
 
           {/* Features highlight */}
-          <div className="grid grid-cols-2 gap-4 py-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#0B5FBA]/10 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[#0B5FBA]" />
               </div>
               <span>Up to $30,000</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
-                <Users className="h-4 w-4 text-teal-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#00D0AB]/10 flex items-center justify-center">
+                <Users className="h-4 w-4 text-[#00D0AB]" />
               </div>
               <span>5 Countries</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                <Globe className="h-4 w-4 text-green-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#00D0AB]/10 flex items-center justify-center">
+                <Globe className="h-4 w-4 text-[#00D0AB]" />
               </div>
               <span>Climate Focus</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Leaf className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#0B5FBA]/10 flex items-center justify-center">
+                <Leaf className="h-4 w-4 text-[#0B5FBA]" />
               </div>
               <span>Youth-Led</span>
             </div>

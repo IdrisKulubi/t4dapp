@@ -135,7 +135,7 @@ export function Header() {
                 <motion.h1 
                   className={`text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold tracking-wide transition-all duration-500 text-slate-800 group-hover:scale-105`}
                   whileHover={{ 
-                    background: "linear-gradient(135deg, #0ea5e9, #14b8a6)",
+                    background: "linear-gradient(135deg, #0B5FBA, #00D0AB)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text"
@@ -145,7 +145,7 @@ export function Header() {
                   <span className="sm:hidden">InCountryYouthADAPT 2025</span>
                 </motion.h1>
                 <motion.div 
-                  className="h-0.5 lg:h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center mt-1 lg:mt-2 rounded-full"
+                  className="h-0.5 lg:h-1 bg-gradient-to-r from-[#0B5FBA] via-[#00D0AB] to-[#0B5FBA] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center mt-1 lg:mt-2 rounded-full"
                   whileHover={{ scale: 1.05 }}
                 />
               </Link>
