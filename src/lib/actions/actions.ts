@@ -7,6 +7,7 @@ import db from "../../../db/drizzle";
 import { checkEligibility } from "./eligibility";
 import { eq, and, desc, count as drizzleCount, SQL, InferSelectModel, gte, lte } from "drizzle-orm";
 import { auth } from "@/auth";
+import { sendApplicationSubmissionEmail } from "@/lib/email";
 
 // Calculate min and max dates for age validation (18-35 years)
 const now = new Date();
@@ -248,6 +249,25 @@ export async function submitApplication(formData: ApplicationSubmission) {
     
     // Run eligibility check algorithm
     const eligibilityResult = await checkEligibility(application.id);
+    
+    // Send application submission confirmation email
+    try {
+      await sendApplicationSubmissionEmail({
+        to: validatedData.personal.email,
+        applicantName: `${validatedData.personal.firstName} ${validatedData.personal.lastName}`,
+        applicationId: application.id.toString(),
+        businessName: validatedData.business.name,
+        submissionDate: new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }),
+      });
+      console.log("✅ Application submission email sent successfully");
+    } catch (emailError) {
+      console.error("⚠️ Failed to send application submission email:", emailError);
+      // Don't fail the entire submission if email fails
+    }
     
     revalidatePath("/apply");
     
