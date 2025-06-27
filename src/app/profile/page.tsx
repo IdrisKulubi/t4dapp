@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getCurrentUserProfile } from "@/lib/actions/user.actions";
 import { getUserApplication } from "@/lib/actions/actions";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -21,15 +21,15 @@ import {
   FileText,
   Award,
   Settings,
-  Download,
   ExternalLink,
   TrendingUp,
-  Users,
-  Globe,
+  
+
   Briefcase,
   GraduationCap,
   Heart,
-  Edit
+  Edit,
+  Globe
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
@@ -188,7 +188,7 @@ export default async function ProfilePage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3 bg-white/10  text-black shadow-sm">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Overview
@@ -201,10 +201,7 @@ export default async function ProfilePage() {
               <TrendingUp className="h-4 w-4" />
               Progress
             </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Settings
-            </TabsTrigger>
+           
           </TabsList>
 
           {/* Overview Tab */}
@@ -506,7 +503,7 @@ export default async function ProfilePage() {
                           { status: 'scoring_phase', label: 'Scoring Phase', completed: ['scoring_phase', 'dragons_den', 'finalist', 'approved'].includes(application.status) },
                           { status: 'dragons_den', label: 'Dragon\'s Den', completed: ['dragons_den', 'finalist', 'approved'].includes(application.status) },
                           { status: 'finalist', label: 'Finalist', completed: ['finalist', 'approved'].includes(application.status) },
-                          { status: 'approved', label: 'Approved', completed: application.status === 'approved' }
+                          { status: 'approved', label: 'Selected', completed: application.status === 'approved' }
                         ].map((step, index) => (
                           <div key={step.status} className="flex items-center gap-3">
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
@@ -589,62 +586,6 @@ export default async function ProfilePage() {
             </div>
           </TabsContent>
 
-          {/* Settings Tab */}
-          <TabsContent value="settings" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-gray-600" />
-                    Profile Settings
-                  </CardTitle>
-                  <CardDescription>
-                    Manage your profile information and preferences
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <Link href="/profile/edit">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Profile Information
-                    </Link>
-                  </Button>
-                  
-                  {application && (
-                    <Button variant="outline" className="w-full justify-start">
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Application Data
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-600" />
-                    Support & Resources
-                  </CardTitle>
-                  <CardDescription>
-                    Get help and access useful resources
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <Link href="/">
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      YouthADAPT Homepage
-                    </Link>
-                  </Button>
-                  
-                  <Button variant="outline" className="w-full justify-start">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Contact Support
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </div>

@@ -106,12 +106,7 @@ export function Header() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.7, duration: 0.8 }}
             >
-              <Link 
-                href="#features" 
-                className="text-sm font-medium px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50"
-              >
-                Features
-              </Link>
+              
               
               <Link 
                 href="#eligibility" 
