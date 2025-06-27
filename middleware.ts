@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
 // Add home page to public routes
-const publicRoutes = ["/", "/login", "/no-access"];
+const publicRoutes = ["/", "/login", "/signup", "/no-access"];
 
 // Routes that require authentication
 const protectedRoutes = ["/apply", "/profile", "/admin", "/dashboard"];

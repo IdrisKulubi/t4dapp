@@ -1,8 +1,10 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import Google from "next-auth/providers/google";
 import Spotify from "next-auth/providers/spotify";
+import Credentials from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
+import bcrypt from "bcryptjs";
 import db from "./db/drizzle";
 import { users, userProfiles } from "./db/schema";
 
@@ -25,6 +27,68 @@ export const {
   signOut,
 } = NextAuth({
   providers: [
+    Credentials({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        try {
+          const user = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, credentials.email as string))
+            .limit(1);
+
+          if (user.length === 0) {
+            return null;
+          }
+
+          const foundUser = user[0];
+
+          // Check if user has a password (for email/password auth)
+          if (!foundUser.password) {
+            return null;
+          }
+
+          // Check if email is verified
+          if (!foundUser.emailVerified) {
+            return null;
+          }
+
+          // Verify password
+          const isValidPassword = await bcrypt.compare(
+            credentials.password as string,
+            foundUser.password
+          );
+
+          if (!isValidPassword) {
+            return null;
+          }
+
+          // Update last active
+          await db
+            .update(users)
+            .set({ lastActive: new Date() })
+            .where(eq(users.id, foundUser.id));
+
+          return {
+            id: foundUser.id,
+            email: foundUser.email,
+            name: foundUser.name,
+            image: foundUser.image,
+          };
+        } catch (error) {
+          console.error("Error during authentication:", error);
+          return null;
+        }
+      },
+    }),
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
