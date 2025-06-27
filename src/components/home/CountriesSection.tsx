@@ -76,7 +76,7 @@ export function CountriesSection() {
           variants={staggerContainer}
           className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 max-w-5xl mx-auto"
         >
-          {countries.map((country, index) => (
+          {countries.map((country) => (
             <motion.div
               key={country.code}
               className="group relative"

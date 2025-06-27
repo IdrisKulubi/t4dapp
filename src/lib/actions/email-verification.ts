@@ -1,6 +1,6 @@
 "use server";
 
-import { eq, and, gte } from "drizzle-orm";
+import { eq, and, gte, sql, lt } from "drizzle-orm";
 import db from "@/db/drizzle";
 import { emailVerificationCodes, users } from "@/db/schema";
 import { sendVerificationCode, generateVerificationCode } from "@/lib/email";
@@ -42,7 +42,7 @@ export async function sendVerificationCodeAction(email: string) {
       .where(
         and(
           eq(emailVerificationCodes.email, validatedEmail.email),
-          gte(new Date(), emailVerificationCodes.expiresAt)
+          lt(emailVerificationCodes.expiresAt, new Date())
         )
       );
 
@@ -142,7 +142,7 @@ export async function verifyCodeAndCreateAccount({
       await db
         .update(emailVerificationCodes)
         .set({ 
-          attempts: emailVerificationCodes.attempts + 1 
+          attempts: sql`${emailVerificationCodes.attempts} + 1`
         })
         .where(
           and(
@@ -158,7 +158,7 @@ export async function verifyCodeAndCreateAccount({
     }
 
     // Check if too many attempts
-    if (verificationRecord[0].attempts >= 3) {
+    if (verificationRecord[0]?.attempts && verificationRecord[0].attempts >= 3) {
       return {
         success: false,
         error: "Too many failed attempts. Please request a new verification code.",

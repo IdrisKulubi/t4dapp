@@ -22,7 +22,7 @@ export async function sendVerificationCode({
     );
 
     const { data, error } = await resend.emails.send({
-      from: ' youthADAPT <veryfy@strathspace.com>',
+      from: process.env.EMAIL_FROM || 'youthADAPT <veryfy@strathspace.com>',
       to: [to],
       subject: 'Your YouthADAPT Challenge Verification Code',
       html: emailHtml,

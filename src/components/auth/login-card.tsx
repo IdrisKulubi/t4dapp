@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -214,7 +213,7 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
           {/* Sign up link */}
           <div className="text-center pt-4 border-t border-gray-100">
             <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href={`/signup${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
                 className="font-medium text-[#0B5FBA] hover:text-[#0A4A9A] transition-colors"

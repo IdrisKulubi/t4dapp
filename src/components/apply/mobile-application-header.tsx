@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +9,7 @@ import {
   Clock, 
   Save, 
   Home,
-  ArrowLeft,
-  CheckCircle2 
+ 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -171,7 +169,6 @@ interface MobileQuickActionsProps {
 }
 
 export function MobileQuickActions({
-  onGoHome,
   onSaveDraft,
   isAutoSaving,
 }: MobileQuickActionsProps) {

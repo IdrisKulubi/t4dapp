@@ -471,7 +471,7 @@ export default async function ProfilePage() {
                   <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No Application Found</h3>
                   <p className="text-gray-600 mb-6">
-                    You haven't submitted an application yet. Start your YouthADAPT journey today!
+                    You haven&apos;t submitted an application yet. Start your YouthADAPT journey today!
                   </p>
                   <Button asChild className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
                     <Link href="/apply">
@@ -560,9 +560,9 @@ export default async function ProfilePage() {
                       
                       {application.status === 'submitted' && (
                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                          <h4 className="font-medium text-yellow-900 mb-2">What's Next?</h4>
+                          <h4 className="font-medium text-yellow-900 mb-2">What&apos;s Next?</h4>
                           <p className="text-sm text-yellow-800">
-                            Our team will review your application within 2-3 weeks. You'll receive email updates on your progress.
+                            Our team will review your application within 2-3 weeks. You&apos;ll receive email updates on your progress.
                           </p>
                         </div>
                       )}
@@ -571,7 +571,7 @@ export default async function ProfilePage() {
                         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                           <h4 className="font-medium text-purple-900 mb-2">Congratulations!</h4>
                           <p className="text-sm text-purple-800">
-                            You've been shortlisted! Prepare for the detailed evaluation phase. Check your email for next steps.
+                            You&apos;ve been shortlisted Prepare for the detailed evaluation phase. Check your email for next steps.
                           </p>
                         </div>
                       )}

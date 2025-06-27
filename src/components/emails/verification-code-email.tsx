@@ -4,7 +4,7 @@ import {
   Head,
   Heading,
   Html,
-  Img,
+  
   Link,
   Preview,
   Section,
@@ -40,11 +40,11 @@ export const VerificationCodeEmail = ({
           </Section>
           
           <Text style={paragraph}>
-            This verification code will expire in <strong>10 minutes</strong>. If you didn't request this code, please ignore this email.
+            This verification code will expire in <strong>10 minutes</strong>. If you didn&apos;t request this code, please ignore this email.
           </Text>
           
           <Text style={paragraph}>
-            The YouthADAPT Challenge is a unique opportunity for young entrepreneurs across Africa to showcase their climate adaptation solutions. We're excited to have you join us!
+            The YouthADAPT Challenge is a unique opportunity for young entrepreneurs across Africa to showcase their climate adaptation solutions. We&apos;re excited to have you join us!
           </Text>
           
           <Section style={footer}>
@@ -80,15 +80,6 @@ const container = {
   margin: '0 auto',
   padding: '20px 0 48px',
   maxWidth: '560px',
-};
-
-const logoSection = {
-  padding: '20px 0',
-  textAlign: 'center' as const,
-};
-
-const logo = {
-  margin: '0 auto',
 };
 
 const content = {

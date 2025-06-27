@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle, CircleDot, ChevronRight, Clock } from "lucide-react";
+import { CheckCircle2, ChevronRight, Clock } from "lucide-react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";

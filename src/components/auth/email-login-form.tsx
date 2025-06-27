@@ -38,6 +38,7 @@ export function EmailLoginForm({ callbackUrl }: EmailLoginFormProps) {
         window.location.href = callbackUrl || "/apply";
       }
     } catch (error) {
+      console.error("Login error:", error);
       setError("An error occurred. Please try again.");
     } finally {
       setIsLoading(false);

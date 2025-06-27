@@ -3,9 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Menu, X, Clock, Save, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
+import { Menu, X, Clock, Save } from "lucide-react";
 
 interface MobileNavProps {
   currentStepLabel: string;

@@ -12,20 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { 
   ChevronLeft, 
-  ChevronRight, 
-  FileText, 
   CheckCircle2, 
-  Circle, 
-  Menu, 
+  
   X, 
-  LogIn, 
+  
   Loader2, 
   Save, 
-  Download,
   Clock,
-  AlertCircle,
   ArrowRight,
-  Home
+  Home,
+  Menu,
+  FileText,
+  Download
 } from "lucide-react";
 import { PersonalInfoForm } from "./forms/personal-info-form";
 import { BusinessInfoForm } from "./forms/business-info-form";
@@ -44,7 +42,6 @@ import { defaultFinancialInfo } from "./schemas/financial-info-schema";
 import { defaultSupportNeeds } from "./schemas/support-needs-schema";
 import { SupportNeedsForm } from "./forms/support-needs-form";
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 

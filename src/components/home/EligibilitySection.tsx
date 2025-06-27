@@ -8,7 +8,6 @@ import {
   CurrencyDollarIcon,
   DocumentTextIcon,
   ChartBarIcon,
-  MapPinIcon,
   StarIcon
 } from "@heroicons/react/24/outline";
 import Image from "next/image";

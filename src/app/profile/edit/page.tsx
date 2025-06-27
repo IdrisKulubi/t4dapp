@@ -141,7 +141,7 @@ export default async function ProfileEditPage() {
                     />
                   </div>
                   <p className="text-sm text-gray-500">
-                    Email cannot be changed as it's linked to your authentication
+                    Email cannot be changed as it&apos;s linked to your authentication
                   </p>
                 </div>
 

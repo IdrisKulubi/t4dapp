@@ -18,7 +18,6 @@ import {
 import { User, LogOut, Settings, FileText, LogIn } from "lucide-react";
 
 export function Header() {
-  const [isScrolled, setIsScrolled] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { data: session, status } = useSession();
 

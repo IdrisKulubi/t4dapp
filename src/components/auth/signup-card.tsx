@@ -24,15 +24,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { sendVerificationCodeAction, verifyCodeAndCreateAccount, resendVerificationCode } from "@/lib/actions/email-verification";
-
 interface SignupCardProps {
   callbackUrl?: string;
-  message?: string;
 }
 
 type SignupStep = "email" | "verification" | "success";
 
-export function SignupCard({ callbackUrl, message }: SignupCardProps) {
+export function SignupCard({ callbackUrl }: SignupCardProps) {
   const [step, setStep] = useState<SignupStep>("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -93,6 +91,7 @@ export function SignupCard({ callbackUrl, message }: SignupCardProps) {
         setError(result.error || "Failed to send verification code");
       }
     } catch (error) {
+      console.error("Signup error:", error);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -135,6 +134,7 @@ export function SignupCard({ callbackUrl, message }: SignupCardProps) {
         setError(result.error || "Failed to verify code");
       }
     } catch (error) {
+      console.error("Signup error:", error);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -153,9 +153,12 @@ export function SignupCard({ callbackUrl, message }: SignupCardProps) {
         setSuccess("New verification code sent!");
         startTimer();
       } else {
-        setError(result.error || "Failed to resend verification code");
+
+        setError(result.error  || "Failed to resend verification code");
+        console.error("Signup error:", result.error);
       }
     } catch (error) {
+      console.error("Signup error:", error);
       setError("Failed to resend verification code");
     } finally {
       setIsLoading(false);
@@ -393,7 +396,7 @@ export function SignupCard({ callbackUrl, message }: SignupCardProps) {
 
                 <div className="text-center space-y-3">
                   <p className="text-sm text-gray-600">
-                    Didn't receive the code?
+                    Didn&apos;t receive the code?
                   </p>
                   <Button
                     type="button"
@@ -439,7 +442,7 @@ export function SignupCard({ callbackUrl, message }: SignupCardProps) {
                 <div className="space-y-2">
                   <h3 className="text-xl font-semibold text-gray-900">Account Created!</h3>
                   <p className="text-gray-600">
-                    You're being redirected to the application portal...
+                    You&apos;re being redirected to the application portal...
                   </p>
                 </div>
                 <div className="flex items-center justify-center">
