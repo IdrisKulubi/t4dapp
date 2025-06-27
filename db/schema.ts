@@ -86,8 +86,9 @@ export const users = pgTable(
   "user",
   {
     id: text("id").primaryKey(), 
-    name: text("name").notNull(),
+    name: text("name"),
     email: text("email").notNull().unique(),
+    password: text("password"), // For email/password authentication
     role: text("role").$type<"user" | "admin">().default("user"),
     emailVerified: timestamp("emailVerified"),
     image: text("image"),
@@ -169,6 +170,25 @@ export const verificationTokens = pgTable(
   },
   (vt) => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  })
+);
+
+// Email verification codes table for custom email verification
+export const emailVerificationCodes = pgTable(
+  "email_verification_codes",
+  {
+    id: serial("id").primaryKey(),
+    email: text("email").notNull(),
+    code: text("code").notNull(),
+    expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+    isUsed: boolean("is_used").default(false),
+    attempts: integer("attempts").default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    emailIdx: index("email_verification_codes_email_idx").on(table.email),
+    codeIdx: index("email_verification_codes_code_idx").on(table.code),
+    expiresAtIdx: index("email_verification_codes_expires_at_idx").on(table.expiresAt),
   })
 );
 

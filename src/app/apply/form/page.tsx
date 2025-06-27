@@ -1,11 +1,11 @@
 import { auth } from "@/auth";
+import { ApplicationForm } from "@/components/apply/application-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
-export default async function ApplyPage() {
+export default async function ApplicationFormPage() {
   // Check if user is authenticated
   const session = await auth();
   
@@ -21,24 +21,11 @@ export default async function ApplyPage() {
             <div>
               <CardTitle className="text-2xl font-bold text-gray-900">Login Required</CardTitle>
               <CardDescription className="text-gray-600 mt-2">
-                You must be logged in to submit an application for the InCountryYouthADAPT Challenge
+                You must be logged in to access the application form
               </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>Why do I need to login?</strong><br />
-                We require authentication to:
-              </p>
-              <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc list-inside">
-                <li>Secure your application data</li>
-                <li>Track your application status</li>
-                <li>Send you important updates</li>
-                <li>Prevent duplicate submissions</li>
-              </ul>
-            </div>
-            
             <div className="space-y-3">
               <Link href="/login" className="w-full">
                 <Button className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg">
@@ -57,6 +44,6 @@ export default async function ApplyPage() {
     );
   }
   
-  // User is authenticated - redirect to preparation page
-  redirect('/apply/prepare');
+  // User is authenticated - show application form
+  return <ApplicationForm />;
 } 

@@ -2,56 +2,43 @@
 
 import { motion } from "framer-motion";
 import { 
-  GlobeAltIcon, 
   LightBulbIcon,
   UserGroupIcon,
   RocketLaunchIcon,
-  ShieldCheckIcon,
+  TrophyIcon,
   CurrencyDollarIcon
 } from "@heroicons/react/24/outline";
 
 const features = [
   {
-    icon: <GlobeAltIcon className="w-8 h-8" />,
-    title: "Pan-African Focus",
-    description: "Focused on 5 key African countries to maximize impact.",
-    color: "emerald"
-  },
-  {
     icon: <LightBulbIcon className="w-8 h-8" />,
     title: "Innovation Support",
-    description: "Funding and mentorship for climate adaptation solutions that address local challenges.",
-    color: "blue"
-  },
-  {
-    icon: <UserGroupIcon className="w-8 h-8" />,
-    title: "Youth-Led Solutions",
-    description: "Empowering young entrepreneurs aged 18-35 with the resources to scale their impact.",
-    color: "emerald"
+    description: "Up to $30,000 in funding plus dedicated mentorship from industry experts to develop and scale your climate solution.",
+    color: "gca-blue"
   },
   {
     icon: <UserGroupIcon className="w-8 h-8" />,
     title: "Dragon's Den Pitch Event",
-    description: "An exclusive opportunity to pitch your solution at a Dragon's Den style event in your country, gaining visibility and attracting potential investors.",
-    color: "blue"
+    description: "Exclusive platform to present your solution to investors, partners, and stakeholders in a high-visibility national event.",
+    color: "gca-blue"
   },
   {
     icon: <RocketLaunchIcon className="w-8 h-8" />,
     title: "Accelerated Growth",
-    description: "Fast-track your startup with our comprehensive acceleration program and network.",
-    color: "blue"
+    description: "12-month comprehensive program with workshops, technical assistance, and milestone-based support to fast-track your growth.",
+    color: "gca-blue"
   },
   {
-    icon: <ShieldCheckIcon className="w-8 h-8" />,
-    title: "Proven Impact",
-    description: "Join a community of successful entrepreneurs making measurable climate impact.",
-    color: "emerald"
+    icon: <TrophyIcon className="w-8 h-8" />,
+    title: "Networking Opportunities",
+    description: "Access to exclusive investor networks, partnership opportunities, and connections with fellow climate entrepreneurs across Africa.",
+    color: "gca-green"
   },
   {
     icon: <CurrencyDollarIcon className="w-8 h-8" />,
-    title: "Financial Support",
-    description: "Access funding opportunities and investment connections to scale your solution.",
-    color: "blue"
+    title: "Investment Connections",
+    description: "Direct access to our partner investor network and opportunities for follow-on funding to scale your impact.",
+    color: "gca-blue"
   }
 ];
 
@@ -76,14 +63,14 @@ const staggerContainer = {
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="py-24 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-b from-white to-slate-50 relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-[#0B5FBA]/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#00D0AB]/5 rounded-full blur-3xl"></div>
       
       <div className="container mx-auto px-4 relative z-10">
         <motion.div 
-          className="max-w-4xl mx-auto text-center mb-20"
+          className="max-w-4xl mx-auto text-center mb-16"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
@@ -95,22 +82,20 @@ export function FeaturesSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-emerald-100 to-blue-100 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-200">
-              Why Choose YouthAdapt
+            <span className="inline-block px-4 py-2 rounded-full bg-gradient-to-r from-[#0B5FBA]/10 to-[#00D0AB]/10 text-[#0B5FBA] text-sm font-semibold mb-6 border border-[#0B5FBA]/20">
+              Program Benefits
             </span>
           </motion.div>
           
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-              Empowering Africa&apos;s
+            <span className="bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] bg-clip-text text-transparent">
+              What You&apos;ll Get
             </span>
-            <br />
-            <span className="text-slate-800">Climate Innovators</span>
           </h2>
           
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            The YouthAdapt Challenge identifies and accelerates promising youth-led solutions 
-            for climate adaptation across Africa, providing the support you need to scale your impact.
+            The YouthADAPT Challenge offers comprehensive support to transform your climate innovation 
+            from concept to market-ready solution with measurable impact.
           </p>
         </motion.div>
 
@@ -121,44 +106,60 @@ export function FeaturesSection() {
           viewport={{ once: true, margin: "-50px" }}
           variants={staggerContainer}
         >
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              className="group relative"
-              variants={fadeIn}
-              whileHover={{ y: -8 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className={`
-                relative p-8 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 hover:border-${feature.color}-200 overflow-hidden
-              `}>
-                {/* Background Gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br from-${feature.color}-50/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                
-                {/* Icon */}
+          {features.map((feature, index) => {
+            const isGcaBlue = feature.color === "gca-blue";
+            const isGcaGreen = feature.color === "gca-green";
+            
+            return (
+              <motion.div
+                key={index}
+                className="group relative"
+                variants={fadeIn}
+                whileHover={{ y: -8 }}
+                transition={{ duration: 0.3 }}
+              >
                 <div className={`
-                  relative w-16 h-16 rounded-xl bg-gradient-to-br from-${feature.color}-100 to-${feature.color}-200 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300
+                  relative p-8 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 overflow-hidden
+                  ${isGcaBlue ? 'hover:border-[#0B5FBA]/20' : ''}
+                  ${isGcaGreen ? 'hover:border-[#00D0AB]/20' : ''}
                 `}>
-                  <div className={`text-${feature.color}-600`}>
-                    {feature.icon}
+                  {/* Background Gradient */}
+                  <div className={`
+                    absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                    ${isGcaBlue ? 'bg-gradient-to-br from-[#0B5FBA]/5 to-transparent' : ''}
+                    ${isGcaGreen ? 'bg-gradient-to-br from-[#00D0AB]/5 to-transparent' : ''}
+                  `}></div>
+                  
+                  {/* Icon */}
+                  <div className={`
+                    relative w-16 h-16 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300
+                    ${isGcaBlue ? 'bg-gradient-to-br from-[#0B5FBA]/10 to-[#0B5FBA]/20' : ''}
+                    ${isGcaGreen ? 'bg-gradient-to-br from-[#00D0AB]/10 to-[#00D0AB]/20' : ''}
+                  `}>
+                    <div className={`
+                      ${isGcaBlue ? 'text-[#0B5FBA]' : ''}
+                      ${isGcaGreen ? 'text-[#00D0AB]' : ''}
+                    `}>
+                      {feature.icon}
+                    </div>
                   </div>
+                  
+                  {/* Content */}
+                  <div className="relative">
+                    <h3 className="text-xl font-bold mb-3 text-slate-800 group-hover:text-slate-900">
+                      {feature.title}
+                    </h3>
+                    <p className="text-slate-600 leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                  
+                  {/* Hover Effect */}
+                  
                 </div>
-                
-                {/* Content */}
-                <div className="relative">
-                  <h3 className="text-xl font-bold mb-3 text-slate-800 group-hover:text-slate-900">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-                
-                {/* Hover Effect */}
-                <div className={`absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-${feature.color}-500 to-${feature.color}-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`}></div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </motion.div>
         
         {/* Bottom CTA */}
@@ -172,7 +173,7 @@ export function FeaturesSection() {
           <p className="text-slate-600 mb-6">Ready to join the next generation of climate innovators?</p>
           <motion.a
             href="#eligibility"
-            className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-blue-600 text-white font-semibold hover:from-emerald-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white font-semibold hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

@@ -9,13 +9,41 @@ export const climateAdaptationSchema = z.object({
       .min(50, { message: "Description must be at least 50 characters" })
       .max(2000, { message: "Description must not exceed 2000 characters" }),
     
-    // Primary Climate Challenge Addressed
-    primaryChallenge: z.enum(["drought", "flood", "heatwave", "storm", "sealevel", "other"], {
+    // Primary Climate Challenge Addressed - Expanded with comprehensive climate risks, hazards, and adaptation needs
+    primaryChallenge: z.enum([
+      // Core YouthADAPT Adaptation Needs
+      "drought_water_scarcity", 
+      "heat_stress_rising_temperatures", 
+      "flooding_stormwater", 
+      "post_harvest_losses", 
+      "livestock_crop_resilience", 
+      "climate_information_access", 
+      "inclusive_adaptation",
+      
+      // Additional Climate Risks & Hazards
+      "extreme_weather_events",
+      "sea_level_rise_coastal_erosion",
+      "desertification_land_degradation",
+      "biodiversity_ecosystem_loss",
+      "vector_borne_diseases",
+      "food_insecurity_malnutrition",
+      "water_quality_contamination",
+      "infrastructure_vulnerability",
+      "energy_security_access",
+      "migration_displacement",
+      "economic_climate_impacts",
+      "agricultural_productivity_decline",
+      "urban_heat_island_effects",
+      "wildfire_risk_management",
+      "climate_induced_conflicts",
+      
+      "other"
+    ], {
       required_error: "Please select a primary climate challenge",
     }),
     primaryChallengeOther: z.string().optional().nullable(),
     
-    // Secondary Climate Challenges
+    // Secondary Climate Challenges - Updated with YouthADAPT specific needs
     secondaryChallenges: z.array(z.string()).optional(),
     
     // Target Beneficiaries
@@ -69,7 +97,7 @@ export const defaultClimateAdaptation: ClimateAdaptationFormValues = {
   adaptation: {
     solutionTitle: "",
     solutionDescription: "",
-    primaryChallenge: "drought" as const,
+    primaryChallenge: "drought_water_scarcity" as const,
     primaryChallengeOther: null,
     secondaryChallenges: [],
     targetBeneficiaries: "",

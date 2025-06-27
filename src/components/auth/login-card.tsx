@@ -2,8 +2,11 @@
 
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { Leaf, Globe, Zap, Users, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { EmailLoginForm } from "./email-login-form";
 
 interface LoginCardProps {
   callbackUrl?: string;
@@ -78,16 +81,16 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
           <div className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-600 to-teal-600 flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#0B5FBA] to-[#00D0AB] flex items-center justify-center shadow-lg">
                   <Globe className="h-10 w-10 text-white" />
                 </div>
-                <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center shadow-md animate-pulse">
+                <div className="absolute -right-2 -top-2 w-8 h-8 rounded-full bg-gradient-to-br from-[#00D0AB] to-[#0B5FBA] flex items-center justify-center shadow-md animate-pulse">
                   <Leaf className="h-4 w-4 text-white" />
                 </div>
               </div>
             </div>
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] bg-clip-text text-transparent">
                 InCountryYouthADAPT
               </h1>
               <h2 className="text-xl font-semibold text-gray-800">
@@ -100,28 +103,28 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
           </div>
 
           {/* Features highlight */}
-          <div className="grid grid-cols-2 gap-4 py-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Zap className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#0B5FBA]/10 flex items-center justify-center">
+                <Zap className="h-4 w-4 text-[#0B5FBA]" />
               </div>
               <span>Up to $30,000</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
-                <Users className="h-4 w-4 text-teal-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#00D0AB]/10 flex items-center justify-center">
+                <Users className="h-4 w-4 text-[#00D0AB]" />
               </div>
               <span>5 Countries</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
-                <Globe className="h-4 w-4 text-green-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#00D0AB]/10 flex items-center justify-center">
+                <Globe className="h-4 w-4 text-[#00D0AB]" />
               </div>
               <span>Climate Focus</span>
             </div>
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
-                <Leaf className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 rounded-lg bg-[#0B5FBA]/10 flex items-center justify-center">
+                <Leaf className="h-4 w-4 text-[#0B5FBA]" />
               </div>
               <span>Youth-Led</span>
             </div>
@@ -134,49 +137,62 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
                 {callbackUrl === "/apply" ? "Continue to Application" : "Ready to Apply?"}
               </h3>
               <p className="text-sm text-gray-600">
-                Sign in with Google to {callbackUrl === "/apply" ? "access the application form" : "start your application"}
+                Choose your preferred sign-in method
               </p>
             </div>
             
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                signIn("google", { callbackUrl: callbackUrl || "/apply" });
-              }}
-              className="space-y-4"
-            >
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 transition-all duration-300 text-white font-medium py-6 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
-                <svg
-                  className="mr-3 h-6 w-6"
-                  aria-hidden="true"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                Continue with Google
-              </Button>
+            <Tabs defaultValue="google" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="google">Google</TabsTrigger>
+                <TabsTrigger value="email">Email</TabsTrigger>
+              </TabsList>
               
-              <div className="text-center">
-                <p className="text-xs text-gray-500 leading-relaxed">
-                  Secure authentication powered by Google 🔒
-                </p>
-              </div>
-            </form>
+              <TabsContent value="google" className="space-y-4 mt-4">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    signIn("google", { callbackUrl: callbackUrl || "/apply" });
+                  }}
+                  className="space-y-4"
+                >
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 transition-all duration-300 text-white font-medium py-6 text-lg shadow-lg hover:shadow-xl transform hover:scale-[1.02]">
+                    <svg
+                      className="mr-3 h-6 w-6"
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                    Continue with Google
+                  </Button>
+                  
+                  <div className="text-center">
+                    <p className="text-xs text-gray-500 leading-relaxed">
+                      Secure authentication powered by Google 🔒
+                    </p>
+                  </div>
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="email" className="mt-4">
+                <EmailLoginForm callbackUrl={callbackUrl} />
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Information section */}
@@ -194,22 +210,23 @@ export function LoginCard({ callbackUrl, message }: LoginCardProps) {
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="text-center text-xs text-gray-500 space-y-1">
-            <p>By continuing, you agree to our</p>
-            <p className="space-x-1">
-              <span className="text-blue-600 hover:underline cursor-pointer">
-                Terms of Service
-              </span>
-              <span>and</span>
-              <span className="text-blue-600 hover:underline cursor-pointer">
-                Privacy Policy
-              </span>
+          {/* Sign up link */}
+          <div className="text-center pt-4 border-t border-gray-100">
+            <p className="text-sm text-gray-600">
+              Don&apos;t have an account?{" "}
+              <Link
+                href={`/signup${callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""}`}
+                className="font-medium text-[#0B5FBA] hover:text-[#0A4A9A] transition-colors"
+              >
+                Create one here
+              </Link>
             </p>
-            <p className="text-gray-400 mt-2">
-              🌍 Powered by GCA & AfDB
+            <p className="text-xs text-gray-500 mt-2">
+              Sign up with email verification
             </p>
           </div>
+
+          
         </div>
       </motion.div>
     </div>

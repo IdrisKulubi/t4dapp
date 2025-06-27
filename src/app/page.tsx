@@ -3,6 +3,7 @@
 import { HeroSection } from "@/components/home/HeroSection";
 import { PartnerLogosSection } from "@/components/home/PartnerLogosSection";
 import { FeaturesSection } from "@/components/home/FeaturesSection";
+import { ClimateAdaptationNeedsSection } from "@/components/home/ClimateAdaptationNeedsSection";
 import { EligibilitySection } from "@/components/home/EligibilitySection";
 import { CountriesSection } from "@/components/home/CountriesSection";
 import { FAQSection } from "@/components/home/FAQSection";
@@ -19,6 +20,9 @@ export default function Home() {
 
       {/* Features Section */}
       <FeaturesSection />
+
+      {/* Climate Adaptation Needs Section */}
+      <ClimateAdaptationNeedsSection />
 
       {/* Eligibility Section */}
       <EligibilitySection />

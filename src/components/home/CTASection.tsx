@@ -25,25 +25,25 @@ const staggerContainer = {
 
 export function CTASection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-emerald-900 via-slate-900 to-blue-900 relative overflow-hidden">
+    <section className="py-24 bg-gradient-to-br from-[#00D0AB]/20 via-slate-900 to-[#0B5FBA]/20 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[url('/images/grid-pattern.svg')] opacity-10"></div>
-      <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-[#00D0AB]/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#0B5FBA]/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       
       {/* Floating Elements */}
       <motion.div 
-        className="absolute top-20 right-20 w-4 h-4 bg-emerald-400 rounded-full"
+        className="absolute top-20 right-20 w-4 h-4 bg-[#00D0AB] rounded-full"
         animate={{ y: [0, -20, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div 
-        className="absolute bottom-32 left-16 w-6 h-6 bg-blue-400 rounded-full"
+        className="absolute bottom-32 left-16 w-6 h-6 bg-[#0B5FBA] rounded-full"
         animate={{ y: [0, -15, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
       />
       <motion.div 
-        className="absolute top-1/2 left-10 w-3 h-3 bg-emerald-300 rounded-full"
+        className="absolute top-1/2 left-10 w-3 h-3 bg-[#00D0AB]/80 rounded-full"
         animate={{ y: [0, -25, 0] }}
         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       />
@@ -61,7 +61,7 @@ export function CTASection() {
             variants={fadeIn}
             className="flex justify-center mb-8"
           >
-            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-blue-500 rounded-full flex items-center justify-center shadow-2xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-[#00D0AB] to-[#0B5FBA] rounded-full flex items-center justify-center shadow-2xl">
               <SparklesIcon className="w-10 h-10 text-white" />
             </div>
           </motion.div>
@@ -71,7 +71,7 @@ export function CTASection() {
             variants={fadeIn}
             className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
           >
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#00D0AB] via-green-300 to-[#0B5FBA] bg-clip-text text-transparent">
               Ready to Transform
             </span>
             <br />
@@ -96,15 +96,15 @@ export function CTASection() {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-3xl mx-auto"
           >
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-emerald-400 mb-2">$2M+</div>
+              <div className="text-3xl md:text-4xl font-bold text-[#00D0AB] mb-2">$2M+</div>
               <div className="text-slate-400">Available Funding</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">12 Months</div>
+              <div className="text-3xl md:text-4xl font-bold text-[#0B5FBA] mb-2">12 Months</div>
               <div className="text-slate-400">Program Duration</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-emerald-400 mb-2">50+</div>
+              <div className="text-3xl md:text-4xl font-bold text-[#00D0AB] mb-2">50+</div>
               <div className="text-slate-400">Countries Eligible</div>
             </div>
           </motion.div>
@@ -120,13 +120,13 @@ export function CTASection() {
             >
               <Link 
                 href="/apply" 
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-emerald-500/25 transition-all duration-300 overflow-hidden"
+                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-[#00D0AB]/25 transition-all duration-300 overflow-hidden"
               >
                 <span className="relative z-10">Start Your Application</span>
                 <ArrowRightIcon className="w-6 h-6 group-hover:translate-x-1 transition-transform relative z-10" />
                 
                 {/* Animated background */}
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#00D0AB]/80 to-[#0B5FBA]/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Link>
             </motion.div>
             
@@ -136,7 +136,7 @@ export function CTASection() {
             >
               <a 
                 href="#features" 
-                className="inline-flex items-center gap-3 px-8 py-4 border-2 border-slate-600 text-slate-300 hover:border-emerald-500/50 hover:text-emerald-300 font-semibold text-lg rounded-full backdrop-blur-sm transition-all duration-300"
+                className="inline-flex items-center gap-3 px-8 py-4 border-2 border-slate-600 text-slate-300 hover:border-[#00D0AB]/50 hover:text-[#00D0AB] font-semibold text-lg rounded-full backdrop-blur-sm transition-all duration-300"
               >
                 Learn More
               </a>
