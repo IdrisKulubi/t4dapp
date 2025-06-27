@@ -1245,4 +1245,111 @@ export async function exportAnalyticsData(filters: AnalyticsFilters = {}) {
       error: "Failed to export analytics data",
     };
   }
+}
+
+/**
+ * Get the current user's application with all related data
+ */
+export async function getUserApplication() {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "User not authenticated",
+      };
+    }
+
+    const applicationData = await db.query.applications.findFirst({
+      where: (apps, { eq }) => eq(apps.userId, session.user.id),
+      with: {
+        business: {
+          with: {
+            applicant: true,
+            funding: true,
+            targetCustomers: true,
+          },
+        },
+        eligibilityResults: {
+          orderBy: (results, { desc }) => [desc(results.evaluatedAt)],
+          limit: 1,
+        },
+      },
+    });
+
+    if (!applicationData) {
+      return {
+        success: false,
+        error: "No application found for this user",
+      };
+    }
+
+    // Structure the data for the profile page
+    const structuredData = {
+      id: applicationData.id,
+      status: applicationData.status,
+      submittedAt: applicationData.submittedAt?.toISOString() ?? null,
+      referralSource: applicationData.referralSource,
+      referralSourceOther: applicationData.referralSourceOther,
+      business: {
+        id: applicationData.business.id,
+        name: applicationData.business.name,
+        country: applicationData.business.country,
+        city: applicationData.business.city,
+        startDate: applicationData.business.startDate,
+        isRegistered: applicationData.business.isRegistered,
+        registrationCertificateUrl: applicationData.business.registrationCertificateUrl,
+        registeredCountries: applicationData.business.registeredCountries,
+        description: applicationData.business.description,
+        problemSolved: applicationData.business.problemSolved,
+        revenueLastTwoYears: applicationData.business.revenueLastTwoYears,
+        employees: {
+          fullTimeTotal: applicationData.business.fullTimeEmployeesTotal,
+          fullTimeMale: applicationData.business.fullTimeEmployeesMale,
+          fullTimeFemale: applicationData.business.fullTimeEmployeesFemale,
+          partTimeMale: applicationData.business.partTimeEmployeesMale,
+          partTimeFemale: applicationData.business.partTimeEmployeesFemale,
+        },
+        climateAdaptationContribution: applicationData.business.climateAdaptationContribution,
+        productServiceDescription: applicationData.business.productServiceDescription,
+        climateExtremeImpact: applicationData.business.climateExtremeImpact,
+        unitPrice: applicationData.business.unitPrice,
+        customerCountLastSixMonths: applicationData.business.customerCountLastSixMonths,
+        productionCapacityLastSixMonths: applicationData.business.productionCapacityLastSixMonths,
+        currentChallenges: applicationData.business.currentChallenges,
+        supportNeeded: applicationData.business.supportNeeded,
+        additionalInformation: applicationData.business.additionalInformation,
+        funding: applicationData.business.funding,
+        targetCustomers: applicationData.business.targetCustomers.map(tc => tc.customerSegment),
+      },
+      applicant: {
+        id: applicationData.business.applicant.id,
+        userId: applicationData.business.applicant.userId,
+        firstName: applicationData.business.applicant.firstName,
+        lastName: applicationData.business.applicant.lastName,
+        gender: applicationData.business.applicant.gender,
+        dateOfBirth: applicationData.business.applicant.dateOfBirth,
+        citizenship: applicationData.business.applicant.citizenship,
+        citizenshipOther: applicationData.business.applicant.citizenshipOther,
+        countryOfResidence: applicationData.business.applicant.countryOfResidence,
+        residenceOther: applicationData.business.applicant.residenceOther,
+        phoneNumber: applicationData.business.applicant.phoneNumber,
+        email: applicationData.business.applicant.email,
+        highestEducation: applicationData.business.applicant.highestEducation,
+      },
+      eligibilityResult: applicationData.eligibilityResults[0] || null,
+    };
+
+    return {
+      success: true,
+      data: structuredData,
+    };
+
+  } catch (error) {
+    console.error("Error fetching user application:", error);
+    return {
+      success: false,
+      error: "Failed to fetch application",
+    };
+  }
 } 

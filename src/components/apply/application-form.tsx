@@ -10,7 +10,23 @@ import { useRouter } from "next/navigation";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle, Menu, X, LogIn, Loader2, Save, Download } from "lucide-react";
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  FileText, 
+  CheckCircle2, 
+  Circle, 
+  Menu, 
+  X, 
+  LogIn, 
+  Loader2, 
+  Save, 
+  Download,
+  Clock,
+  AlertCircle,
+  ArrowRight,
+  Home
+} from "lucide-react";
 import { PersonalInfoForm } from "./forms/personal-info-form";
 import { BusinessInfoForm } from "./forms/business-info-form";
 import { ClimateAdaptationForm } from "./forms/climate-adaptation-form";
@@ -29,15 +45,65 @@ import { defaultSupportNeeds } from "./schemas/support-needs-schema";
 import { SupportNeedsForm } from "./forms/support-needs-form";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
-// Application form steps
+// Application form steps with enhanced metadata
 const STEPS = [
-  { id: "personal", label: "Personal Info", schema: personalInfoSchema, description: "Your basic details and contact information" },
-  { id: "business", label: "Business Info", schema: businessInfoSchema, description: "Tell us about your business" },
-  { id: "adaptation", label: "Climate Adaptation", schema: climateAdaptationSchema, description: "How your business addresses climate challenges" },
-  { id: "financial", label: "Financial Info", schema: financialInfoSchema, description: "Financial details and funding needs" },
-  { id: "support", label: "Support Needs", schema: supportNeedsSchema, description: "The support you're looking for" },
-  { id: "review", label: "Review & Submit", schema: z.object({}).optional(), description: "Review your application before submitting" },
+  { 
+    id: "personal", 
+    label: "Personal Details", 
+    shortLabel: "Personal",
+    schema: personalInfoSchema, 
+    description: "Your basic information and contact details",
+    estimatedTime: "5 min",
+    icon: "👤"
+  },
+  { 
+    id: "business", 
+    label: "Business Information", 
+    shortLabel: "Business",
+    schema: businessInfoSchema, 
+    description: "Tell us about your business and operations",
+    estimatedTime: "15 min",
+    icon: "🏢"
+  },
+  { 
+    id: "adaptation", 
+    label: "Climate Solution", 
+    shortLabel: "Solution",
+    schema: climateAdaptationSchema, 
+    description: "Your climate adaptation solution details",
+    estimatedTime: "20 min",
+    icon: "🌍"
+  },
+  { 
+    id: "financial", 
+    label: "Financial Details", 
+    shortLabel: "Financial",
+    schema: financialInfoSchema, 
+    description: "Revenue, funding needs, and financial projections",
+    estimatedTime: "10 min",
+    icon: "💰"
+  },
+  { 
+    id: "support", 
+    label: "Support Needs", 
+    shortLabel: "Support",
+    schema: supportNeedsSchema, 
+    description: "Mentorship and resources you need",
+    estimatedTime: "10 min",
+    icon: "🤝"
+  },
+  { 
+    id: "review", 
+    label: "Review & Submit", 
+    shortLabel: "Review",
+    schema: z.object({}).optional(), 
+    description: "Final review before submission",
+    estimatedTime: "5 min",
+    icon: "✅"
+  },
 ];
 
 // Combined form schema
@@ -98,72 +164,47 @@ export function ApplicationForm() {
         customerSegments: [],
         registeredCountries: "",
       },
-      adaptation: {
-        ...defaultClimateAdaptation.adaptation,
-        solutionTitle: "",
-        solutionDescription: "",
-        primaryChallenge: undefined,
-        primaryChallengeOther: "",
-        secondaryChallenges: [],
-        targetBeneficiaries: "",
-        estimatedBeneficiariesCount: null,
-        technologyDescription: "",
-        innovationDescription: "",
-        implementationApproach: "",
-        scalingStrategy: "",
-        measurableImpact: "",
-      },
-      financial: {
-        ...defaultFinancialInfo.financial,
-        annualRevenue: null,
-        revenueGrowthRate: null,
-        profitMargin: null,
-        previousFunding: undefined,
-        previousFundingSources: [],
-        previousFundingAmount: null,
-        requestedFundingAmount: undefined,
-        fundingUse: "",
-        revenueModel: "",
-        costStructure: "",
-        pathToSustainability: "",
-        financialChallenges: "",
-      },
-      support: {
-        ...defaultSupportNeeds.support,
-        supportTypes: [],
-        supportTypesOther: "",
-        mentorshipNeeds: "",
-        preferredMentorExpertise: [],
-        trainingNeeds: "",
-        preferredTrainingFormat: undefined,
-        networkingNeeds: "",
-        desiredNetworkingConnections: [],
-        resourcesNeeded: "",
-        expectedBusinessImpact: "",
-        expectedEnvironmentalImpact: "",
-      },
+      adaptation: defaultClimateAdaptation.adaptation,
+      financial: defaultFinancialInfo.financial,
+      support: defaultSupportNeeds.support,
     },
     mode: "onChange",
   });
 
-  // Auto-save functionality
-  const saveDraft = useCallback(async () => {
+  // Load draft from localStorage
+  const loadDraft = useCallback(() => {
+    try {
+      const draft = localStorage.getItem(DRAFT_SAVE_KEY);
+      if (draft) {
+        const parsedDraft = JSON.parse(draft);
+        if (parsedDraft.formData) {
+          form.reset(parsedDraft.formData);
+          setActiveStep(parsedDraft.currentStep || STEPS[0].id);
+          setCompletedSteps(parsedDraft.completedSteps || []);
+          setLastSaved(new Date(parsedDraft.timestamp));
+          toast.success("Draft loaded successfully!", {
+            description: "Your previous progress has been restored.",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading draft:", error);
+    }
+  }, [form]);
+
+  // Save draft to localStorage
+  const saveDraft = useCallback(() => {
     try {
       setIsAutoSaving(true);
       const formData = form.getValues();
-      
-      // Save to localStorage
-      localStorage.setItem(DRAFT_SAVE_KEY, JSON.stringify({
-        data: formData,
-        timestamp: new Date().toISOString(),
-        activeStep,
+      const draftData = {
+        formData,
+        currentStep: activeStep,
         completedSteps,
-      }));
-      
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem(DRAFT_SAVE_KEY, JSON.stringify(draftData));
       setLastSaved(new Date());
-      
-      // No toast notification for auto-save to avoid spam
-      // The floating indicator will show the status
     } catch (error) {
       console.error("Error saving draft:", error);
     } finally {
@@ -171,41 +212,10 @@ export function ApplicationForm() {
     }
   }, [form, activeStep, completedSteps]);
 
-  // Load draft on component mount
+  // Load draft on mount
   useEffect(() => {
-    try {
-      const savedDraft = localStorage.getItem(DRAFT_SAVE_KEY);
-      if (savedDraft) {
-        const parsed = JSON.parse(savedDraft);
-        if (parsed.data) {
-          form.reset(parsed.data);
-          setActiveStep(parsed.activeStep || STEPS[0].id);
-          setCompletedSteps(parsed.completedSteps || []);
-          setLastSaved(new Date(parsed.timestamp));
-          
-          toast.info("Draft loaded from previous session", {
-            duration: 3000,
-            action: {
-              label: "Clear Draft",
-              onClick: () => {
-                localStorage.removeItem(DRAFT_SAVE_KEY);
-                window.location.reload();
-              },
-            },
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error loading draft:", error);
-      localStorage.removeItem(DRAFT_SAVE_KEY);
-    }
-  }, [form]);
-
-  // Auto-save every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(saveDraft, 30000);
-    return () => clearInterval(interval);
-  }, [saveDraft]);
+    loadDraft();
+  }, [loadDraft]);
 
   // Save draft when form data changes (debounced)
   useEffect(() => {
@@ -216,14 +226,6 @@ export function ApplicationForm() {
     return () => subscription.unsubscribe();
   }, [form, saveDraft]);
 
-  // Scroll to top function
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
   // Calculate progress
   useEffect(() => {
     const currentIndex = STEPS.findIndex((step) => step.id === activeStep);
@@ -233,10 +235,10 @@ export function ApplicationForm() {
   
   // Authentication guard
   useEffect(() => {
-    if (status === "loading") return; // Still loading
+    if (status === "loading") return;
     
     if (status === "unauthenticated") {
-      toast.error("You must be logged in to access the application formmmm");
+      toast.error("You must be logged in to access the application form");
       router.push("/login");
       return;
     }
@@ -244,7 +246,6 @@ export function ApplicationForm() {
     if (session?.user?.email && !form.getValues('personal.email')) {
         form.setValue('personal.email', session.user.email);
     }
-
   }, [status, router, session, form]);
 
   // Clear draft after successful submission
@@ -256,13 +257,13 @@ export function ApplicationForm() {
   // Manual save draft function
   const handleSaveDraft = () => {
     saveDraft();
-    toast.success("Draft saved manually!", {
+    toast.success("Draft saved!", {
+      description: "Your progress has been saved.",
       duration: 2000,
-      position: "bottom-right",
     });
   };
 
-  // Download application as PDF/JSON
+  // Download application as JSON
   const downloadApplication = () => {
     const formData = form.getValues();
     const applicationData = {
@@ -288,70 +289,44 @@ export function ApplicationForm() {
     toast.success("Application downloaded successfully!");
   };
 
-  // Show authentication required if not logged in
-  if (!session?.user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-          <CardHeader className="text-center space-y-4">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-600 to-green-600 rounded-full flex items-center justify-center">
-              <LogIn className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">Authentication Required</CardTitle>
-              <CardDescription className="text-gray-600 mt-2">
-                You need to be logged in to access the application form
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              onClick={() => router.push("/login")}
-              className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              Go to Login
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const goToStep = (stepId: string) => {
     if (activeStep === stepId) return;
     
-    // Check if we're trying to navigate forward
     const currentIndex = STEPS.findIndex((step) => step.id === activeStep);
     const targetIndex = STEPS.findIndex((step) => step.id === stepId);
     
     if (targetIndex > currentIndex) {
-      // Validate current step before moving forward
       validateCurrentStep(() => {
         setIsAnimating(true);
-        setSidebarOpen(false); // Close sidebar on mobile after selection
+        setSidebarOpen(false);
         setTimeout(() => {
           setActiveStep(stepId);
           setIsAnimating(false);
-          scrollToTop(); // Scroll to top after step change
-        }, 300);
+          scrollToTop();
+        }, 200);
       });
     } else {
-      // Always allow moving backward
       setIsAnimating(true);
-      setSidebarOpen(false); // Close sidebar on mobile after selection
+      setSidebarOpen(false);
       setTimeout(() => {
         setActiveStep(stepId);
         setIsAnimating(false);
-        scrollToTop(); // Scroll to top after step change
-      }, 300);
+        scrollToTop();
+      }, 200);
     }
   };
   
   const validateCurrentStep = (onSuccess: () => void) => {
     const currentStep = STEPS.find((step) => step.id === activeStep);
     if (!currentStep || !currentStep.schema || currentStep.id === 'review') {
-        // If no schema for the step or it's the review step, just succeed
         if (!completedSteps.includes(activeStep) && currentStep?.id !== 'review') {
           setCompletedSteps([...completedSteps, activeStep]);
         }
@@ -359,7 +334,6 @@ export function ApplicationForm() {
         return;
     }
 
-    // Get the data for the current step - properly handle nested structure
     const allFormData = form.getValues();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let currentStepData: any;
@@ -379,14 +353,11 @@ export function ApplicationForm() {
     }
 
     try {
-        // Determine the correct schema to use for validation
         let schemaToUse: z.ZodTypeAny;
 
         if (activeStep === 'personal') {
-          // For personal step, use the personalInfoSchema directly
           schemaToUse = currentStep.schema;
         } else {
-          // For other steps, extract the nested schema part
           if (currentStep.schema instanceof z.ZodObject && currentStep.schema.shape && activeStep in currentStep.schema.shape) {
             schemaToUse = currentStep.schema.shape[activeStep as keyof typeof currentStep.schema.shape];
           } else {
@@ -394,14 +365,12 @@ export function ApplicationForm() {
           }
         }
         
-        // Validate the current step's data
         const validationResult = schemaToUse.safeParse(currentStepData);
 
         if (!validationResult.success) {
           console.error(`Validation failed for step '${activeStep}':`, validationResult.error.errors);
           toast.error("Please fill all required fields correctly before proceeding.");
           
-          // Trigger validation on the form to show errors
           if (activeStep === 'personal') {
             form.trigger('personal');
           } else {
@@ -410,12 +379,11 @@ export function ApplicationForm() {
           return;
         }
 
-        // Mark step as completed if not already
         if (!completedSteps.includes(activeStep)) {
           setCompletedSteps([...completedSteps, activeStep]);
         }
 
-        onSuccess(); // Validation successful, proceed
+        onSuccess();
 
     } catch (error) {
         console.error(`Unexpected error during validation for step '${activeStep}':`, error);
@@ -431,8 +399,8 @@ export function ApplicationForm() {
         setTimeout(() => {
           setActiveStep(STEPS[currentIndex + 1].id);
           setIsAnimating(false);
-          scrollToTop(); // Scroll to top after step change
-        }, 300);
+          scrollToTop();
+        }, 200);
       });
     }
   };
@@ -444,86 +412,76 @@ export function ApplicationForm() {
       setTimeout(() => {
         setActiveStep(STEPS[currentIndex - 1].id);
         setIsAnimating(false);
-        scrollToTop(); // Scroll to top after step change
-      }, 300);
+        scrollToTop();
+      }, 200);
     }
   };
 
   const currentStepData = STEPS.find((step) => step.id === activeStep);
+  const currentStepIndex = STEPS.findIndex((step) => step.id === activeStep);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/30 to-green-50">
-      {/* Floating Auto-save Indicator */}
-      <div className={cn(
-        "fixed z-50 transition-all duration-300",
-        isMobile ? "top-20 right-4" : "top-4 right-4"
-      )}>
-        <div className={cn(
-          "flex items-center gap-2 px-3 py-2 rounded-full shadow-lg border transition-all duration-300 backdrop-blur-sm",
-          isAutoSaving 
-            ? "bg-blue-50/90 border-blue-200 text-blue-700" 
-            : lastSaved 
-            ? "bg-green-50/90 border-green-200 text-green-700"
-            : "bg-gray-50/90 border-gray-200 text-gray-600"
-        )}>
-          {isAutoSaving ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>
-                Saving...
-              </span>
-            </>
-          ) : lastSaved ? (
-            <>
-              <CheckCircle2 className="h-4 w-4" />
-              <span className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>
-                {isMobile 
-                  ? `Saved ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                  : `Auto-saved ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                }
-              </span>
-            </>
-          ) : (
-            <>
-              <Circle className="h-4 w-4" />
-              <span className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>
-                Not saved
-              </span>
-            </>
-          )}
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <p className="text-gray-600">Loading application...</p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       {/* Mobile Header */}
       {isMobile && (
-        <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2"
-              >
-                {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">Application Form</h1>
-                <p className="text-sm text-gray-600">YouthAdapt Challenge</p>
+        <div className="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="p-2"
+                >
+                  {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </Button>
+                <div>
+                  <h1 className="font-semibold text-gray-900 text-sm">
+                    {currentStepData?.shortLabel}
+                  </h1>
+                  <p className="text-xs text-gray-500">
+                    Step {currentStepIndex + 1} of {STEPS.length}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs">
+                  <Clock className="h-3 w-3 mr-1" />
+                  {currentStepData?.estimatedTime}
+                </Badge>
+                <Button
+                  onClick={handleSaveDraft}
+                  variant="ghost"
+                  size="sm"
+                  disabled={isAutoSaving}
+                  className="p-2"
+                >
+                  <Save className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{Math.round(progress)}%</p>
-              <p className="text-xs text-gray-500">Complete</p>
+            
+            {/* Progress Bar */}
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                <span>Progress</span>
+                <span>{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-2" />
             </div>
-          </div>
-          
-          <div className="px-4 pb-3">
-            <Progress value={progress} className="h-2 bg-gray-200">
-              <div 
-                className="h-full bg-gradient-to-r from-green-500 to-blue-500 transition-all duration-300 ease-out rounded-full"
-                style={{ width: `${progress}%` }}
-              />
-            </Progress>
           </div>
         </div>
       )}
@@ -531,48 +489,47 @@ export function ApplicationForm() {
       <div className="flex min-h-screen">
         {/* Sidebar */}
         <div className={cn(
-          "fixed inset-y-0 left-0 z-30 w-80 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0",
-          isMobile ? (sidebarOpen ? "translate-x-0" : "-translate-x-full") : ""
+          "bg-white/80 backdrop-blur-sm border-r border-gray-200 transition-all duration-300 ease-in-out",
+          isMobile 
+            ? sidebarOpen 
+              ? "fixed inset-y-0 left-0 z-40 w-80 shadow-xl" 
+              : "fixed -left-80 w-80 z-40"
+            : "w-80 relative"
         )}>
+          {/* Desktop Header */}
           {!isMobile && (
-            <div className="p-6 border-b border-slate-700">
+            <div className="p-6 border-b border-gray-200">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg">
-                  <FileText className="h-6 w-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-white">Application Form</h1>
-                  <p className="text-slate-300 text-sm">YouthAdapt Challenge Program</p>
+                  <h1 className="text-lg font-bold text-gray-900">Application Form</h1>
+                  <p className="text-sm text-gray-500">YouthADAPT Challenge</p>
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300">Progress</span>
-                  <span className="text-white font-medium">{Math.round(progress)}%</span>
+              {/* Progress Overview */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Overall Progress</span>
+                  <span className="font-medium text-gray-900">{Math.round(progress)}%</span>
                 </div>
-                <Progress value={progress} className="h-3 bg-slate-700">
-                  <div 
-                    className="h-full bg-gradient-to-r from-green-400 to-blue-400 transition-all duration-500 ease-out rounded-full"
-                    style={{ width: `${progress}%` }}
-                  />
-                </Progress>
-              </div>
-
-              {/* Auto-save info */}
-              <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
-                <div className="text-xs text-slate-300 text-center">
-                  <Save className="h-3 w-3 inline mr-1" />
-                  <span>Auto-save enabled</span>
+                <Progress value={progress} className="h-2" />
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>{completedSteps.length} of {STEPS.length} steps completed</span>
+                  <span>{currentStepData?.estimatedTime} remaining</span>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="p-6 space-y-2">
-            <h2 className="text-slate-400 text-sm font-medium uppercase tracking-wider mb-4">
+          {/* Steps Navigation */}
+          <div className="p-4 lg:p-6 space-y-2 overflow-y-auto">
+            <h2 className="text-xs font-medium uppercase tracking-wider text-gray-500 mb-4">
               Application Steps
             </h2>
+            
             {STEPS.map((step, index) => {
               const isActive = activeStep === step.id;
               const isCompleted = completedSteps.includes(step.id);
@@ -586,54 +543,75 @@ export function ApplicationForm() {
                   className={cn(
                     "w-full text-left p-4 rounded-xl transition-all duration-200 group",
                     isActive 
-                      ? "bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-400/30" 
+                      ? "bg-gradient-to-r from-blue-500/10 to-green-500/10 border-2 border-blue-500/30 shadow-sm" 
                       : isCompleted
-                      ? "bg-slate-800/50 hover:bg-slate-700/50 border border-slate-600"
+                      ? "bg-green-50 hover:bg-green-100 border border-green-200"
                       : isClickable
-                      ? "bg-slate-800/30 hover:bg-slate-700/50 border border-slate-700"
-                      : "bg-slate-800/20 border border-slate-700/50 cursor-not-allowed opacity-50"
+                      ? "bg-gray-50 hover:bg-gray-100 border border-gray-200"
+                      : "bg-gray-50/50 border border-gray-100 cursor-not-allowed opacity-50"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn(
-                      "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium",
+                      "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg",
                       isActive
-                        ? "bg-gradient-to-r from-green-500 to-blue-500 text-white"
+                        ? "bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-sm"
                         : isCompleted
                         ? "bg-green-500 text-white"
                         : isClickable
-                        ? "bg-slate-600 text-slate-300"
-                        : "bg-slate-700 text-slate-500"
+                        ? "bg-gray-200 text-gray-600"
+                        : "bg-gray-100 text-gray-400"
                     )}>
                       {isCompleted ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : isActive ? (
-                        <Circle className="h-4 w-4 fill-current" />
+                        <CheckCircle2 className="h-5 w-5" />
                       ) : (
-                        index + 1
+                        <span className="text-sm">{step.icon}</span>
                       )}
                     </div>
+                    
                     <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className={cn(
+                          "font-medium text-sm",
+                          isActive 
+                            ? "text-gray-900" 
+                            : isCompleted
+                            ? "text-green-800"
+                            : isClickable
+                            ? "text-gray-700"
+                            : "text-gray-400"
+                        )}>
+                          {step.label}
+                        </p>
+                        
+                        {isActive && (
+                          <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-700">
+                            Current
+                          </Badge>
+                        )}
+                      </div>
+                      
                       <p className={cn(
-                        "font-medium",
+                        "text-xs leading-tight mt-1",
                         isActive 
-                          ? "text-white" 
-                          : isCompleted
-                          ? "text-slate-200"
-                          : isClickable
-                          ? "text-slate-300"
-                          : "text-slate-500"
-                      )}>
-                        {step.label}
-                      </p>
-                      <p className={cn(
-                        "text-sm leading-tight mt-1",
-                        isActive 
-                          ? "text-slate-300" 
-                          : "text-slate-400"
+                          ? "text-gray-600" 
+                          : "text-gray-500"
                       )}>
                         {step.description}
                       </p>
+                      
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {step.estimatedTime}
+                        </Badge>
+                        
+                        {isCompleted && (
+                          <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                            ✓ Complete
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -641,54 +619,64 @@ export function ApplicationForm() {
             })}
           </div>
 
-          <div className="mt-auto p-6 border-t border-slate-700">
-            {/* Draft controls */}
-            <div className="space-y-3 mb-4">
-              <Button
-                onClick={handleSaveDraft}
-                variant="outline"
-                size="sm"
-                className="w-full bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700"
-                disabled={isAutoSaving}
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Save Draft
-              </Button>
-              
-              <Button
-                onClick={downloadApplication}
-                variant="outline"
-                size="sm"
-                className="w-full bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download Application
-              </Button>
+          {/* Auto-save Status */}
+          {lastSaved && (
+            <div className="p-4 border-t border-gray-200 bg-gray-50/50">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className={cn(
+                  "w-2 h-2 rounded-full",
+                  isAutoSaving ? "bg-yellow-400 animate-pulse" : "bg-green-400"
+                )} />
+                <span>
+                  {isAutoSaving ? "Saving..." : `Last saved ${lastSaved.toLocaleTimeString()}`}
+                </span>
+              </div>
             </div>
+          )}
 
-            <div className="bg-slate-800/50 rounded-lg p-4">
-              <h3 className="text-white font-medium mb-2">Need Help?</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                Contact our support team if you have questions about the application process.
-              </p>
-            </div>
+          {/* Quick Actions */}
+          <div className="p-4 border-t border-gray-200 space-y-2">
+            <Button
+              onClick={downloadApplication}
+              variant="outline"
+              size="sm"
+              className="w-full justify-start"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Download Progress
+            </Button>
+            
+            <Link href="/">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Back to Home
+              </Button>
+            </Link>
           </div>
         </div>
 
+        {/* Mobile Sidebar Overlay */}
         {isMobile && sidebarOpen && (
           <div 
-            className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
+        {/* Main Content */}
         <div className="flex-1 flex flex-col min-h-screen">
+          {/* Desktop Header */}
           {!isMobile && (
-            <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+            <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
               <div className="px-6 lg:px-8 py-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                      <span className="text-2xl">{currentStepData?.icon}</span>
                       {currentStepData?.label}
                     </h1>
                     <p className="text-gray-600 mt-1">
@@ -696,25 +684,21 @@ export function ApplicationForm() {
                     </p>
                   </div>
                   
-                  <div className="flex items-center gap-4">
-                    {/* Manual save and download buttons */}
+                  <div className="flex items-center gap-4 opacity-100 visible">
+                    <Badge variant="outline" className="text-sm bg-white border-gray-300 text-gray-700">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {currentStepData?.estimatedTime}
+                    </Badge>
+                    
                     <Button
                       onClick={handleSaveDraft}
                       variant="outline"
                       size="sm"
                       disabled={isAutoSaving}
+                      className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       <Save className="h-4 w-4 mr-2" />
-                      Save Draft
-                    </Button>
-                    
-                    <Button
-                      onClick={downloadApplication}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
+                      {isAutoSaving ? "Saving..." : "Save Draft"}
                     </Button>
                   </div>
                 </div>
@@ -722,12 +706,13 @@ export function ApplicationForm() {
             </header>
           )}
 
+          {/* Form Content */}
           <main className="flex-1 overflow-y-auto">
             <div className="max-w-4xl mx-auto p-4 lg:p-8">
               <Tabs value={activeStep} className="w-full">
                 <div className={cn(
-                  "transition-all duration-300 ease-in-out",
-                  isAnimating ? "opacity-0 transform translate-y-4" : "opacity-100 transform translate-y-0"
+                  "transition-all duration-200 ease-in-out",
+                  isAnimating ? "opacity-0 transform translate-y-2" : "opacity-100 transform translate-y-0"
                 )}>
                   <TabsContent value="personal" className="mt-0">
                     <PersonalInfoForm form={form} onNext={goToNextStep} />
@@ -774,41 +759,46 @@ export function ApplicationForm() {
                   </TabsContent>
                 </div>
               </Tabs>
-
-              <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-700 p-4 mt-8 rounded-lg text-gray-950">
-                <div className="flex justify-between gap-3 max-w-md mx-auto lg:max-w-none text-gray-950">
-                  <Button
-                    variant="outline"
-                    onClick={goToPreviousStep}
-                    disabled={activeStep === STEPS[0].id || isAnimating}
-                    className={cn(
-                      "flex-1 lg:flex-none lg:px-6 h-12 border-2",
-                      "border-gray-300 text-gray-700 bg-white",
-                      "hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700",
-                      "dark:border-gray-600 dark:text-gray-100 dark:bg-gray-900",
-                      "dark:hover:border-blue-400 dark:hover:bg-blue-950 dark:hover:text-blue-300"
-                    )}
-                  >
-                    <ChevronLeft className="h-4 w-4 mr-1" />
-                    Previous
-                  </Button>
-                  
-                  {activeStep !== STEPS[STEPS.length - 1].id && (
-                    <Button 
-                      onClick={goToNextStep}
-                      disabled={isAnimating}
-                      className="flex-1 lg:flex-none lg:px-6 h-12 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg"
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  )}
-                </div>
-              </div>
             </div>
           </main>
+
+          {/* Navigation Footer */}
+          <div className="bg-white/95 backdrop-blur-sm border-t border-gray-200 p-4 lg:p-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-between gap-4">
+                <Button
+                  variant="outline"
+                  onClick={goToPreviousStep}
+                  disabled={activeStep === STEPS[0].id || isAnimating}
+                  className="flex-1 lg:flex-none lg:px-8 h-12"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-2" />
+                  Previous
+                </Button>
+                
+                <div className="hidden lg:flex items-center gap-2 text-sm text-gray-500">
+                  <span>Step {currentStepIndex + 1} of {STEPS.length}</span>
+                  <span>•</span>
+                  <span>{Math.round(progress)}% complete</span>
+                </div>
+                
+                {activeStep !== STEPS[STEPS.length - 1].id ? (
+                  <Button 
+                    onClick={goToNextStep}
+                    disabled={isAnimating}
+                    className="flex-1 lg:flex-none lg:px-8 h-12 bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white shadow-lg"
+                  >
+                    Continue
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                ) : (
+                  <div className="flex-1 lg:flex-none" />
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 } 

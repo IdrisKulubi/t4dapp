@@ -186,20 +186,26 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                     <FormControl>
                       <RadioGroup
                         onValueChange={(value) => field.onChange(value === "true")}
-                        defaultValue={field.value ? "true" : "false"}
-                        className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-6"
+                        value={field.value ? "true" : "false"}
+                        className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-8"
                       >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormItem className="flex items-center space-x-3 space-y-0 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
                           <FormControl>
-                            <RadioGroupItem value="true" />
+                            <RadioGroupItem 
+                              value="true" 
+                              className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700"
+                            />
                           </FormControl>
-                          <FormLabel className="font-normal text-gray-900">Yes</FormLabel>
+                          <FormLabel className="font-medium text-gray-900 cursor-pointer">Yes</FormLabel>
                         </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormItem className="flex items-center space-x-3 space-y-0 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer">
                           <FormControl>
-                            <RadioGroupItem value="false" />
+                            <RadioGroupItem 
+                              value="false" 
+                              className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700"
+                            />
                           </FormControl>
-                          <FormLabel className="font-normal text-gray-900">No</FormLabel>
+                          <FormLabel className="font-medium text-gray-900 cursor-pointer">No</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>

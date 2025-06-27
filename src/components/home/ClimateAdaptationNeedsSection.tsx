@@ -117,16 +117,7 @@ export function ClimateAdaptationNeedsSection() {
           })}
         </div>
 
-        {/* Mission Statement */}
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-2xl p-8 shadow-lg">
-            <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-            <p className="text-lg text-green-100 max-w-4xl mx-auto leading-relaxed">
-              Building a climate-resilient Africa through youth-led solutions that directly address 
-              these critical adaptation needs and create lasting impact for communities across the continent.
-            </p>
-          </div>
-        </div>
+       
       </div>
     </section>
   );

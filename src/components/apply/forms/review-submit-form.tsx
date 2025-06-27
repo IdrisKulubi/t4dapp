@@ -55,11 +55,20 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
   };
   
   const handleSubmit = async (data: ApplicationFormValues) => {
+    console.log("🔄 HandleSubmit called with data:", data);
+    console.log("✅ Terms accepted:", termsAccepted);
+    console.log("✅ Updates accepted:", updatesAccepted);
+    console.log("📝 Form state:", form.formState);
+    console.log("❌ Form errors:", form.formState.errors);
+    console.log("✅ Form is valid:", form.formState.isValid);
+    
     if (!termsAccepted || !updatesAccepted) {
+      console.log("❌ Terms not accepted, stopping submission");
       toast.error("Please accept the terms and conditions to proceed.");
       return;
     }
     
+    console.log("🚀 Setting isSubmitting to true");
     setIsSubmitting(true);
     
     // Add tracking ID for this submission attempt
@@ -68,6 +77,13 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
     
     try {
       console.log(`[Application ${submissionId}] Preparing data:`, data);
+      console.log(`[Application ${submissionId}] Terms accepted:`, termsAccepted);
+      console.log(`[Application ${submissionId}] Updates accepted:`, updatesAccepted);
+      
+      // Debug date fields before transformation
+      console.log(`[Application ${submissionId}] Original dateOfBirth:`, data.personal.dateOfBirth, typeof data.personal.dateOfBirth);
+      console.log(`[Application ${submissionId}] Original startDate:`, data.business.startDate, typeof data.business.startDate);
+      console.log(`[Application ${submissionId}] Original fundingDate:`, data.business.funding?.fundingDate, typeof data.business.funding?.fundingDate);
       
       // Ensure text fields meet minimum length requirements
       // Create a padded string if needed to pass validation
@@ -82,11 +98,24 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       
       // Transform the data to match the expected schema
       const submissionData = {
-        personal: data.personal,
+        personal: {
+          ...data.personal,
+          // Convert dateOfBirth string to Date object if it's a string
+          dateOfBirth: typeof data.personal.dateOfBirth === 'string' 
+            ? new Date(data.personal.dateOfBirth) 
+            : data.personal.dateOfBirth,
+        },
         business: {
-          ...data.business,
-          // Ensure country is correctly typed
-          country: (data.business.country as "ghana" | "kenya" | "nigeria" | "rwanda" | "tanzania" | "other"),
+          name: data.business.name,
+          // Convert startDate string to Date object if it's a string
+          startDate: typeof data.business.startDate === 'string' 
+            ? new Date(data.business.startDate) 
+            : data.business.startDate,
+          isRegistered: data.business.isRegistered,
+          registrationCertificateUrl: data.business.registrationCertificateUrl,
+          country: data.business.country,
+          city: data.business.city,
+          registeredCountries: data.business.registeredCountries || "Kenya",
           
           // Ensure text fields meet minimum length requirements
           description: ensureMinLength(data.business.description, 100),
@@ -97,21 +126,37 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
           productionCapacityLastSixMonths: ensureMinLength(data.business.productionCapacityLastSixMonths, 10),
           currentChallenges: ensureMinLength(data.business.currentChallenges, 50),
           supportNeeded: ensureMinLength(data.business.supportNeeded, 50),
+          additionalInformation: data.business.additionalInformation,
+          
+          // Financial fields
+          revenueLastTwoYears: data.financial?.annualRevenue || 0,
+          unitPrice: data.business.unitPrice || 1,
+          customerCountLastSixMonths: data.business.customerCountLastSixMonths || 0,
+          
+          // Employee fields
+          fullTimeEmployeesTotal: data.business.fullTimeEmployeesTotal || 0,
+          fullTimeEmployeesMale: data.business.fullTimeEmployeesMale || 0,
+          fullTimeEmployeesFemale: data.business.fullTimeEmployeesFemale || 0,
+          partTimeEmployeesMale: data.business.partTimeEmployeesMale || 0,
+          partTimeEmployeesFemale: data.business.partTimeEmployeesFemale || 0,
           
           // Use correct property names for the schema
           targetCustomers: data.business.customerSegments || [],
-          // Add empty string for registeredCountries if not present
-          registeredCountries: data.business.registeredCountries || "Kenya",
           
           funding: {
-            hasExternalFunding: false, // Default to false since we don't have this info
-            fundingSource: null,
-            fundingSourceOther: null,
-            fundingDate: null,
-            funderName: null,
-            amountUsd: null,
-            fundingInstrument: null,
-            fundingInstrumentOther: null,
+            hasExternalFunding: data.business.funding?.hasExternalFunding || false,
+            fundingSource: data.business.funding?.fundingSource || null,
+            fundingSourceOther: data.business.funding?.fundingSourceOther || null,
+            // Convert fundingDate string to Date object if it exists and is a string
+            fundingDate: data.business.funding?.fundingDate 
+              ? (typeof data.business.funding.fundingDate === 'string' 
+                  ? new Date(data.business.funding.fundingDate) 
+                  : data.business.funding.fundingDate)
+              : null,
+            funderName: data.business.funding?.funderName || null,
+            amountUsd: data.business.funding?.amountUsd || null,
+            fundingInstrument: data.business.funding?.fundingInstrument || null,
+            fundingInstrumentOther: data.business.funding?.fundingInstrumentOther || null,
           }
         },
         referralSource: null,
@@ -120,18 +165,32 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       
       console.log(`[Application ${submissionId}] Transformed data:`, submissionData);
       
+      // Debug transformed date fields
+      console.log(`[Application ${submissionId}] Transformed dateOfBirth:`, submissionData.personal.dateOfBirth, typeof submissionData.personal.dateOfBirth);
+      console.log(`[Application ${submissionId}] Transformed startDate:`, submissionData.business.startDate, typeof submissionData.business.startDate);
+      console.log(`[Application ${submissionId}] Transformed fundingDate:`, submissionData.business.funding.fundingDate, typeof submissionData.business.funding.fundingDate);
+      
+      // Debug transformed date fields
+      console.log(`[Application ${submissionId}] Transformed dateOfBirth:`, submissionData.personal.dateOfBirth, typeof submissionData.personal.dateOfBirth);
+      console.log(`[Application ${submissionId}] Transformed startDate:`, submissionData.business.startDate, typeof submissionData.business.startDate);
+      console.log(`[Application ${submissionId}] Transformed fundingDate:`, submissionData.business.funding.fundingDate, typeof submissionData.business.funding.fundingDate);
+      
       // Validate before submitting
       if (!submissionData.business.name || submissionData.business.name.length < 2) {
+        console.log("❌ Business name validation failed");
         toast.error("Business name must be at least 2 characters");
         setIsSubmitting(false);
         return;
       }
       
       if (!submissionData.business.city || submissionData.business.city.length < 2) {
+        console.log("❌ City validation failed");
         toast.error("City must be at least 2 characters");
         setIsSubmitting(false);
         return;
       }
+      
+      console.log(`[Application ${submissionId}] About to call submitApplication...`);
       
       // Submit data to the database using server action
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -161,12 +220,13 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       }
       
       toast.success("Application submitted successfully!");
-      // Redirect to homepage after success
-      router.push("/");
+      // Redirect to profile page after success
+      router.push("/profile");
     } catch (error) {
       console.error(`[Application ${submissionId}] Submission error:`, error);
       toast.error("There was a problem submitting your application. Please try again.");
     } finally {
+      console.log("🏁 Setting isSubmitting to false");
       setIsSubmitting(false);
     }
   };
@@ -198,7 +258,7 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
             type="button"
             variant="outline"
             onClick={downloadApplication}
-            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+            className="border-blue-200 text-blue-700 "
           >
             <Download className="h-4 w-4 mr-2" />
             Download Application Preview
@@ -207,7 +267,10 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       </div>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(handleSubmit, (errors) => {
+          console.log("❌ Form validation errors:", errors);
+          toast.error("Please fill all required fields correctly. " + errors.toString());
+        })} className="space-y-8">
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
               <div className="flex items-center gap-3 text-white">
@@ -520,6 +583,9 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
             >
               Previous: Support Needs
             </Button>
+            
+          
+            
             <Button 
               type="submit" 
               className="w-full md:w-auto bg-green-600 hover:bg-green-700"
