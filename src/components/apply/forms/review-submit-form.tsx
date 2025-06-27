@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { LoaderCircle } from "lucide-react";
 import { submitApplication } from "@/lib/actions/actions";
-import { safeToDate } from "@/lib/utils";
 import { generateApplicationDocx } from "@/lib/docx-generator";
 import { ApplicationFormValues } from "../application-form";
 import { useRouter } from "next/navigation";
