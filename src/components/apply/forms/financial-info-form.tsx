@@ -232,7 +232,7 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                                 return (
                                   <FormItem
                                     key={source.id}
-                                    className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                    className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                                   >
                                     <FormControl>
                                       <Checkbox
@@ -245,7 +245,7 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                                                 current.filter((value: any) => value !== source.id)
                                               );
                                         }}
-                                        className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                        className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700"
                                       />
                                     </FormControl>
                                     <FormLabel className="font-normal text-gray-900 cursor-pointer">

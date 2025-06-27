@@ -127,7 +127,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                             return (
                               <FormItem
                                 key={type.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-colors"
+                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-purple-400 hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -140,7 +140,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                                             current.filter((value: any) => value !== type.id)
                                           );
                                     }}
-                                    className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                    className="scale-125 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-purple-700"
                                   />
                                 </FormControl>
                                 <FormLabel className="font-normal text-gray-900 cursor-pointer">
@@ -235,7 +235,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                             return (
                               <FormItem
                                 key={expertise.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -248,7 +248,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                                             current.filter((value: any) => value !== expertise.id)
                                           );
                                     }}
-                                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                    className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700"
                                   />
                                 </FormControl>
                                 <FormLabel className="font-normal text-gray-900 cursor-pointer">
@@ -370,7 +370,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                             return (
                               <FormItem
                                 key={connection.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors"
+                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-green-400 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -383,7 +383,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                                             current.filter((value: any) => value !== connection.id)
                                           );
                                     }}
-                                    className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                                    className="scale-125 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-green-700"
                                   />
                                 </FormControl>
                                 <FormLabel className="font-normal text-gray-900 cursor-pointer">

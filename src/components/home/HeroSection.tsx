@@ -32,7 +32,7 @@ export function HeroSection() {
               transition={{ delay: 0.2, duration: 0.6 }}
             >
               <span className="inline-flex items-center px-4 py-2 text-sm font-semibold rounded-full bg-gradient-to-r from-teal-500/20 to-blue-500/20 text-teal-300 border border-teal-500/30 backdrop-blur-sm">
-                🌍 #InCountryYouthADAPT
+                🌍 #YouthADAPT
               </span>
             </motion.div>
             

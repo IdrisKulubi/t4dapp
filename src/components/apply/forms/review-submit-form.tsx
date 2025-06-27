@@ -13,21 +13,46 @@ import { LoaderCircle } from "lucide-react";
 import { submitApplication } from "@/lib/actions/actions";
 import { ApplicationFormValues } from "../application-form";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, FileText, Building, Leaf, DollarSign, HandHeart, Shield, User } from "lucide-react";
+import { CheckCircle2, FileText, Building, Leaf, DollarSign, HandHeart, Shield, User, Download } from "lucide-react";
 
 // Props type
 type ReviewSubmitFormProps = {
   form: UseFormReturn<ApplicationFormValues>;
   onPrevious: () => void;
+  onClearDraft?: () => void;
 };
 
-export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
+export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmitFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [updatesAccepted, setUpdatesAccepted] = useState(false);
   const router = useRouter();
   
   const formValues = form.getValues();
+  
+  // Download application as PDF/JSON
+  const downloadApplication = () => {
+    const applicationData = {
+      ...formValues,
+      metadata: {
+        downloadedAt: new Date().toISOString(),
+        status: "review_stage",
+      }
+    };
+
+    const dataStr = JSON.stringify(applicationData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `youth-adapt-application-preview-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Application preview downloaded successfully!");
+  };
   
   const handleSubmit = async (data: ApplicationFormValues) => {
     if (!termsAccepted || !updatesAccepted) {
@@ -130,6 +155,11 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
       
       console.log(`[Application ${submissionId}] Success! Application ID: ${response.data?.applicationId}`);
       
+      // Clear draft after successful submission
+      if (onClearDraft) {
+        onClearDraft();
+      }
+      
       toast.success("Application submitted successfully!");
       // Redirect to homepage after success
       router.push("/");
@@ -161,6 +191,19 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
         <p className="text-gray-600 max-w-2xl">
           Please review your application carefully before submitting. You cannot edit after submission.
         </p>
+        
+        {/* Download Preview Button */}
+        <div className="mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={downloadApplication}
+            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download Application Preview
+          </Button>
+        </div>
       </div>
       
       <Form {...form}>
@@ -431,28 +474,28 @@ export function ReviewSubmitForm({ form, onPrevious }: ReviewSubmitFormProps) {
             
             <div className="p-6 space-y-6">
               <div className="space-y-4">
-                <div className="flex items-start space-x-3">
+                <div className="flex items-start space-x-4 p-4 rounded-xl border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all duration-200">
                   <Checkbox 
                     id="terms"
                     checked={termsAccepted}
                     onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-                    className="mt-1 data-[state=checked]:bg-green-600   data-[state=unchecked]:bg-green-600 data-[state=checked]:border-green-600"
+                    className="mt-1 scale-125 data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-white data-[state=checked]:border-green-600 data-[state=unchecked]:border-gray-400 shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-green-700"
                   />
-                  <Label htmlFor="terms" className="text-sm font-normal leading-relaxed text-gray-900">
+                  <Label htmlFor="terms" className="text-sm font-normal leading-relaxed text-gray-900 cursor-pointer">
                     I confirm that all information provided in this application is accurate, and I understand
                     that providing false information may lead to disqualification from the program and potential
                     legal consequences.
                   </Label>
                 </div>
                 
-                <div className="flex items-start space-x-3">
+                <div className="flex items-start space-x-4 p-4 rounded-xl border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-all duration-200">
                   <Checkbox 
                     id="updates"
                     checked={updatesAccepted}
                     onCheckedChange={(checked) => setUpdatesAccepted(checked === true)}
-                    className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                    className="mt-1 scale-125 data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-white data-[state=checked]:border-green-600 data-[state=unchecked]:border-gray-400 shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-green-700"
                   />
-                  <Label htmlFor="updates" className="text-sm font-normal leading-relaxed text-gray-900">
+                  <Label htmlFor="updates" className="text-sm font-normal leading-relaxed text-gray-900 cursor-pointer">
                     I consent to receive updates about my application status and future opportunities related
                     to the program via email and other communication channels.
                   </Label>

@@ -82,7 +82,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
           {/* Basic Details Section */}
           <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
-              <div className="flex items-center gap-3 text-white">
+              <div className="flex items-center gap-3 text-black">
                 <User className="h-6 w-6" />
                 <h3 className="text-xl font-semibold">Basic Details</h3>
               </div>
@@ -100,7 +100,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       <FormControl>
                         <Input 
                           placeholder="Enter your first name" 
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className=" text-black focus:border-blue-500 focus:ring-blue-500 h-12"
                           {...field} 
                         />
                       </FormControl>
@@ -118,7 +118,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                       <FormControl>
                         <Input 
                           placeholder="Enter your last name" 
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className=" text-black focus:border-blue-500 focus:ring-blue-500 h-12"
                           {...field} 
                         />
                       </FormControl>

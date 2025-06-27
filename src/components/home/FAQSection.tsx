@@ -6,8 +6,8 @@ import { ChevronDownIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/out
 
 const faqs = [
   {
-    question: "What is the YouthAdapt Challenge?",
-    answer: "The YouthAdapt Challenge is a comprehensive program designed to identify, support, and accelerate promising youth-led climate adaptation solutions across Africa. We provide funding, mentorship, and resources to help entrepreneurs scale their impact in food security and infrastructure."
+    question: "What is the In-Country YouthADAPT Solutions Challenge?",
+    answer: "The In-Country YouthADAPT Solutions Challenge is a comprehensive program designed to identify, support, and accelerate promising youth-led climate adaptation solutions across Africa. We provide funding, mentorship, and resources to help entrepreneurs scale their impact in food security and infrastructure."
   },
   {
     question: "Who is eligible to apply?",
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     question: "How long is the program?",
-    answer: "The YouthAdapt Challenge is a 12-month program with intensive support in the first 6 months, followed by continued mentorship and network access. The program includes workshops, one-on-one sessions, and milestone-based funding releases."
+    answer: "The In-Country YouthADAPT Solutions Challenge is a 12-month program with intensive support in the first 6 months, followed by continued mentorship and network access. The program includes workshops, one-on-one sessions, and milestone-based funding releases."
   },
   {
     question: "What is the application process?",
@@ -95,7 +95,7 @@ export function FAQSection() {
           </h2>
           
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Find answers to the most common questions about the YouthAdapt Challenge. 
+            Find answers to the most common questions about the In-Country YouthADAPT Solutions Challenge. 
             Can&apos;t find what you&apos;re looking for? Contact our team directly.
           </p>
         </motion.div>

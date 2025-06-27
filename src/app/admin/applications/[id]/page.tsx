@@ -272,9 +272,9 @@ export default function ApplicationDetail({
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div><h3 className="text-sm font-medium">Business Name</h3><p>{application.business.name}</p></div>
-                      <div><h3 className="text-sm font-medium">Start Date</h3><p>{application.business.startDate}</p></div>
-                      <div><h3 className="text-sm font-medium">Registered?</h3><p>{application.business.isRegistered ? 'Yes' : 'No'}</p></div>
+                      <div><h3 className="text-sm text-black font-medium">Business Name</h3><p>{application.business.name}</p></div>
+                      <div><h3 className="text-sm text-black font-medium">Start Date</h3><p>{application.business.startDate}</p></div>
+                      <div><h3 className="text-sm text-black font-medium">Registered?</h3><p>{application.business.isRegistered ? 'Yes' : 'No'}</p></div>
                       {application.business.isRegistered && application.business.registrationCertificateUrl && (
                         <div>
                           <h3 className="text-sm font-medium">Registration Certificate</h3>

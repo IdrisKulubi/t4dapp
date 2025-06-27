@@ -16,17 +16,15 @@ import { Target } from "lucide-react";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ClimateAdaptationFormValues = z.infer<typeof climateAdaptationSchema>;
 
-// Secondary climate challenges options
+// Secondary climate challenges options - Updated with YouthADAPT specific needs
 const SECONDARY_CHALLENGES = [
-  { id: "drought", label: "Drought" },
-  { id: "flood", label: "Flooding" },
-  { id: "heatwave", label: "Heat Waves" },
-  { id: "storm", label: "Storms & Cyclones" },
-  { id: "sealevel", label: "Sea Level Rise" },
-  { id: "landslide", label: "Landslides" },
-  { id: "biodiversity", label: "Biodiversity Loss" },
-  { id: "waterscarcity", label: "Water Scarcity" },
-  { id: "foodsecurity", label: "Food Security" },
+  { id: "drought_water_scarcity", label: "Drought and Water Scarcity", description: "Resilient irrigation systems, water harvesting techniques, efficient water management" },
+  { id: "heat_stress_rising_temperatures", label: "Heat Stress and Rising Temperatures", description: "Heat-resilient infrastructure, reflective pavements, passive cooling innovations" },
+  { id: "flooding_stormwater", label: "Flooding and Stormwater Management", description: "Smart flood response systems, green infrastructure, permeable pavements" },
+  { id: "post_harvest_losses", label: "Post-Harvest Losses", description: "Solar-powered cold storage, hermetic storage bags, resilient market chains" },
+  { id: "livestock_crop_resilience", label: "Livestock and Crop Resilience", description: "Heat- and disease-tolerant breeds, sustainable rangeland practices, CSA" },
+  { id: "climate_information_access", label: "Climate Information Access", description: "Mobile advisory platforms, localized weather alerts, community-based resource hubs" },
+  { id: "inclusive_adaptation", label: "Inclusive Adaptation", description: "Gender-responsive approaches ensuring women and youth access inputs, training, financing" },
 ];
 
 // Props type
@@ -162,12 +160,42 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                           <SelectValue placeholder="Select primary climate challenge" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="drought">Drought</SelectItem>
-                        <SelectItem value="flood">Flooding</SelectItem>
-                        <SelectItem value="heatwave">Heat Waves</SelectItem>
-                        <SelectItem value="storm">Storms & Cyclones</SelectItem>
-                        <SelectItem value="sealevel">Sea Level Rise</SelectItem>
+                      <SelectContent className="max-h-80 overflow-y-auto">
+                        {/* Core YouthADAPT Adaptation Needs */}
+                        <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                          Core YouthADAPT Adaptation Needs
+                        </div>
+                        <SelectItem value="drought_water_scarcity">Drought and Water Scarcity</SelectItem>
+                        <SelectItem value="heat_stress_rising_temperatures">Heat Stress and Rising Temperatures</SelectItem>
+                        <SelectItem value="flooding_stormwater">Flooding and Stormwater Management</SelectItem>
+                        <SelectItem value="post_harvest_losses">Post-Harvest Losses</SelectItem>
+                        <SelectItem value="livestock_crop_resilience">Livestock and Crop Resilience</SelectItem>
+                        <SelectItem value="climate_information_access">Climate Information Access</SelectItem>
+                        <SelectItem value="inclusive_adaptation">Inclusive Adaptation</SelectItem>
+                        
+                        <div className="border-t my-2"></div>
+                        
+                        {/* Additional Climate Risks & Hazards */}
+                        <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                          Additional Climate Risks & Hazards
+                        </div>
+                        <SelectItem value="extreme_weather_events">Extreme Weather Events</SelectItem>
+                        <SelectItem value="sea_level_rise_coastal_erosion">Sea Level Rise & Coastal Erosion</SelectItem>
+                        <SelectItem value="desertification_land_degradation">Desertification & Land Degradation</SelectItem>
+                        <SelectItem value="biodiversity_ecosystem_loss">Biodiversity & Ecosystem Loss</SelectItem>
+                        <SelectItem value="vector_borne_diseases">Vector-Borne Diseases</SelectItem>
+                        <SelectItem value="food_insecurity_malnutrition">Food Insecurity & Malnutrition</SelectItem>
+                        <SelectItem value="water_quality_contamination">Water Quality & Contamination</SelectItem>
+                        <SelectItem value="infrastructure_vulnerability">Infrastructure Vulnerability</SelectItem>
+                        <SelectItem value="energy_security_access">Energy Security & Access</SelectItem>
+                        <SelectItem value="migration_displacement">Migration & Displacement</SelectItem>
+                        <SelectItem value="economic_climate_impacts">Economic Climate Impacts</SelectItem>
+                        <SelectItem value="agricultural_productivity_decline">Agricultural Productivity Decline</SelectItem>
+                        <SelectItem value="urban_heat_island_effects">Urban Heat Island Effects</SelectItem>
+                        <SelectItem value="wildfire_risk_management">Wildfire Risk Management</SelectItem>
+                        <SelectItem value="climate_induced_conflicts">Climate-Induced Conflicts</SelectItem>
+                        
+                        <div className="border-t my-2"></div>
                         <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
@@ -210,7 +238,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                         Select any additional climate challenges your solution addresses.
                       </FormDescription>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-4">
                       {SECONDARY_CHALLENGES.map((challenge) => (
                         <FormField
                           key={challenge.id}
@@ -220,7 +248,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                             return (
                               <FormItem
                                 key={challenge.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -234,12 +262,17 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                                             current.filter((value: any) => value !== challenge.id)
                                           );
                                     }}
-                                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                    className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700 mt-1"
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal text-gray-900 cursor-pointer">
-                                  {challenge.label}
-                                </FormLabel>
+                                <div className="flex-1 cursor-pointer">
+                                  <FormLabel className="font-medium text-gray-900 cursor-pointer block mb-1">
+                                    {challenge.label}
+                                  </FormLabel>
+                                  <p className="text-sm text-gray-600 leading-relaxed">
+                                    {challenge.description}
+                                  </p>
+                                </div>
                               </FormItem>
                             );
                           }}

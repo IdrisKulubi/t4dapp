@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle, Menu, X, LogIn, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, CheckCircle2, Circle, Menu, X, LogIn, Loader2, Save, Download } from "lucide-react";
 import { PersonalInfoForm } from "./forms/personal-info-form";
 import { BusinessInfoForm } from "./forms/business-info-form";
 import { ClimateAdaptationForm } from "./forms/climate-adaptation-form";
@@ -51,6 +51,9 @@ const applicationFormSchema = z.object({
 
 export type ApplicationFormValues = z.infer<typeof applicationFormSchema>;
 
+// Draft save key
+const DRAFT_SAVE_KEY = "t4dapp_application_draft";
+
 export function ApplicationForm() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -59,6 +62,8 @@ export function ApplicationForm() {
   const [progress, setProgress] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const isMobile = useMediaQuery("(max-width: 1024px)");
 
   const form = useForm<ApplicationFormValues>({
@@ -72,6 +77,7 @@ export function ApplicationForm() {
         email: "",
         phoneNumber: "",
         citizenship: undefined,
+        countryOfResidence: undefined,
         highestEducation: undefined,
       },
       business: {
@@ -139,7 +145,85 @@ export function ApplicationForm() {
     },
     mode: "onChange",
   });
-  
+
+  // Auto-save functionality
+  const saveDraft = useCallback(async () => {
+    try {
+      setIsAutoSaving(true);
+      const formData = form.getValues();
+      
+      // Save to localStorage
+      localStorage.setItem(DRAFT_SAVE_KEY, JSON.stringify({
+        data: formData,
+        timestamp: new Date().toISOString(),
+        activeStep,
+        completedSteps,
+      }));
+      
+      setLastSaved(new Date());
+      
+      // No toast notification for auto-save to avoid spam
+      // The floating indicator will show the status
+    } catch (error) {
+      console.error("Error saving draft:", error);
+    } finally {
+      setIsAutoSaving(false);
+    }
+  }, [form, activeStep, completedSteps]);
+
+  // Load draft on component mount
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_SAVE_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed.data) {
+          form.reset(parsed.data);
+          setActiveStep(parsed.activeStep || STEPS[0].id);
+          setCompletedSteps(parsed.completedSteps || []);
+          setLastSaved(new Date(parsed.timestamp));
+          
+          toast.info("Draft loaded from previous session", {
+            duration: 3000,
+            action: {
+              label: "Clear Draft",
+              onClick: () => {
+                localStorage.removeItem(DRAFT_SAVE_KEY);
+                window.location.reload();
+              },
+            },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error loading draft:", error);
+      localStorage.removeItem(DRAFT_SAVE_KEY);
+    }
+  }, [form]);
+
+  // Auto-save every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(saveDraft, 30000);
+    return () => clearInterval(interval);
+  }, [saveDraft]);
+
+  // Save draft when form data changes (debounced)
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      const timeoutId = setTimeout(saveDraft, 2000);
+      return () => clearTimeout(timeoutId);
+    });
+    return () => subscription.unsubscribe();
+  }, [form, saveDraft]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   // Calculate progress
   useEffect(() => {
     const currentIndex = STEPS.findIndex((step) => step.id === activeStep);
@@ -152,7 +236,7 @@ export function ApplicationForm() {
     if (status === "loading") return; // Still loading
     
     if (status === "unauthenticated") {
-      toast.error("You must be logged in to access the application form");
+      toast.error("You must be logged in to access the application formmmm");
       router.push("/login");
       return;
     }
@@ -162,24 +246,48 @@ export function ApplicationForm() {
     }
 
   }, [status, router, session, form]);
-  
-  // Show loading state while checking authentication
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
-        <Card className="w-full max-w-md shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-          <CardContent className="flex flex-col items-center justify-center p-8 space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <div className="text-center">
-              <p className="text-gray-900 font-medium">Verifying Authentication</p>
-              <p className="text-gray-600 text-sm">Please wait while we check your login status...</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-  
+
+  // Clear draft after successful submission
+  const clearDraft = () => {
+    localStorage.removeItem(DRAFT_SAVE_KEY);
+    setLastSaved(null);
+  };
+
+  // Manual save draft function
+  const handleSaveDraft = () => {
+    saveDraft();
+    toast.success("Draft saved manually!", {
+      duration: 2000,
+      position: "bottom-right",
+    });
+  };
+
+  // Download application as PDF/JSON
+  const downloadApplication = () => {
+    const formData = form.getValues();
+    const applicationData = {
+      ...formData,
+      metadata: {
+        savedAt: new Date().toISOString(),
+        step: activeStep,
+        completedSteps,
+      }
+    };
+
+    const dataStr = JSON.stringify(applicationData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `youth-adapt-application-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast.success("Application downloaded successfully!");
+  };
+
   // Show authentication required if not logged in
   if (!session?.user) {
     return (
@@ -225,6 +333,7 @@ export function ApplicationForm() {
         setTimeout(() => {
           setActiveStep(stepId);
           setIsAnimating(false);
+          scrollToTop(); // Scroll to top after step change
         }, 300);
       });
     } else {
@@ -234,6 +343,7 @@ export function ApplicationForm() {
       setTimeout(() => {
         setActiveStep(stepId);
         setIsAnimating(false);
+        scrollToTop(); // Scroll to top after step change
       }, 300);
     }
   };
@@ -321,6 +431,7 @@ export function ApplicationForm() {
         setTimeout(() => {
           setActiveStep(STEPS[currentIndex + 1].id);
           setIsAnimating(false);
+          scrollToTop(); // Scroll to top after step change
         }, 300);
       });
     }
@@ -333,6 +444,7 @@ export function ApplicationForm() {
       setTimeout(() => {
         setActiveStep(STEPS[currentIndex - 1].id);
         setIsAnimating(false);
+        scrollToTop(); // Scroll to top after step change
       }, 300);
     }
   };
@@ -341,6 +453,46 @@ export function ApplicationForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/30 to-green-50">
+      {/* Floating Auto-save Indicator */}
+      <div className={cn(
+        "fixed z-50 transition-all duration-300",
+        isMobile ? "top-20 right-4" : "top-4 right-4"
+      )}>
+        <div className={cn(
+          "flex items-center gap-2 px-3 py-2 rounded-full shadow-lg border transition-all duration-300 backdrop-blur-sm",
+          isAutoSaving 
+            ? "bg-blue-50/90 border-blue-200 text-blue-700" 
+            : lastSaved 
+            ? "bg-green-50/90 border-green-200 text-green-700"
+            : "bg-gray-50/90 border-gray-200 text-gray-600"
+        )}>
+          {isAutoSaving ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>
+                Saving...
+              </span>
+            </>
+          ) : lastSaved ? (
+            <>
+              <CheckCircle2 className="h-4 w-4" />
+              <span className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>
+                {isMobile 
+                  ? `Saved ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                  : `Auto-saved ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                }
+              </span>
+            </>
+          ) : (
+            <>
+              <Circle className="h-4 w-4" />
+              <span className={cn("font-medium", isMobile ? "text-xs" : "text-sm")}>
+                Not saved
+              </span>
+            </>
+          )}
+        </div>
+      </div>
       {/* Mobile Header */}
       {isMobile && (
         <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
@@ -405,6 +557,14 @@ export function ApplicationForm() {
                     style={{ width: `${progress}%` }}
                   />
                 </Progress>
+              </div>
+
+              {/* Auto-save info */}
+              <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
+                <div className="text-xs text-slate-300 text-center">
+                  <Save className="h-3 w-3 inline mr-1" />
+                  <span>Auto-save enabled</span>
+                </div>
               </div>
             </div>
           )}
@@ -482,6 +642,30 @@ export function ApplicationForm() {
           </div>
 
           <div className="mt-auto p-6 border-t border-slate-700">
+            {/* Draft controls */}
+            <div className="space-y-3 mb-4">
+              <Button
+                onClick={handleSaveDraft}
+                variant="outline"
+                size="sm"
+                className="w-full bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700"
+                disabled={isAutoSaving}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Draft
+              </Button>
+              
+              <Button
+                onClick={downloadApplication}
+                variant="outline"
+                size="sm"
+                className="w-full bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Application
+              </Button>
+            </div>
+
             <div className="bg-slate-800/50 rounded-lg p-4">
               <h3 className="text-white font-medium mb-2">Need Help?</h3>
               <p className="text-slate-400 text-sm leading-relaxed">
@@ -511,13 +695,27 @@ export function ApplicationForm() {
                       {currentStepData?.description}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm text-gray-500">
-                      Step {STEPS.findIndex(step => step.id === activeStep) + 1} of {STEPS.length}
-                    </p>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {Math.round(progress)}% Complete
-                    </p>
+                  
+                  <div className="flex items-center gap-4">
+                    {/* Manual save and download buttons */}
+                    <Button
+                      onClick={handleSaveDraft}
+                      variant="outline"
+                      size="sm"
+                      disabled={isAutoSaving}
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Draft
+                    </Button>
+                    
+                    <Button
+                      onClick={downloadApplication}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -570,7 +768,8 @@ export function ApplicationForm() {
                   <TabsContent value="review" className="mt-0">
                     <ReviewSubmitForm 
                       form={form} 
-                      onPrevious={goToPreviousStep} 
+                      onPrevious={goToPreviousStep}
+                      onClearDraft={clearDraft}
                     />
                   </TabsContent>
                 </div>
@@ -611,5 +810,5 @@ export function ApplicationForm() {
         </div>
       </div>
     </div>
-  );
+  )
 } 

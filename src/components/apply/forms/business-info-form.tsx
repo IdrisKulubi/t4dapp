@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { CalendarIcon, FileIcon, ExternalLinkIcon, XIcon, UploadIcon, Building2, MapPin, Target, TrendingUp, Package, Zap, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
@@ -140,7 +140,7 @@ function DocumentUpload({
                     placeholder={`https://drive.google.com/file/d/...`} 
                     {...field} 
                     value={field.value || ""} 
-                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+                    className="h-11 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                   />
                 </FormControl>
                 <FormDescription className="text-xs text-gray-500">
@@ -351,6 +351,16 @@ function DocumentUpload({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormProps) {
   const [showCertificateUpload, setShowCertificateUpload] = useState(false);
+  const [startDateInput, setStartDateInput] = useState("");
+
+  // Initialize startDateInput with existing value
+  useEffect(() => {
+    const currentValue = form.getValues("business.startDate");
+    if (currentValue) {
+      setStartDateInput(format(currentValue, "yyyy-MM-dd"));
+    }
+  }, [form]);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSubmit = async (data: any) => {
     toast.success("Business information saved successfully!");
@@ -373,7 +383,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
           {/* Basic Business Information Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className=" rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <Building2 className="h-6 w-6" />
@@ -392,7 +402,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                       <Input 
                         placeholder="Enter your business name" 
                         {...field} 
-                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 bg-white"
                       />
                     </FormControl>
                     <FormMessage />
@@ -404,44 +414,61 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 <FormField
                   control={form.control}
                   name="business.startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel className="text-gray-900 font-medium">Start Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "h-12 pl-3 text-left font-normal border-gray-300 text-gray-900",
-                                !field.value && "text-gray-500"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Select date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date > new Date()}
-                            initialFocus
+                  render={({ field }) => {
+                    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = e.target.value;
+                      setStartDateInput(value);
+                      if (value) {
+                        field.onChange(new Date(value));
+                      } else {
+                        field.onChange(undefined);
+                      }
+                    };
+
+                    return (
+                      <FormItem className="flex flex-col">
+                        <FormLabel className="text-gray-900 font-medium">Start Date *</FormLabel>
+                        <div className="relative">
+                          <Input
+                            type="date"
+                            value={startDateInput}
+                            onChange={handleInputChange}
+                            className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12 pr-10"
+                            max={format(new Date(), "yyyy-MM-dd")}
                           />
-                        </PopoverContent>
-                      </Popover>
-                      <FormDescription className="text-gray-600">
-                        When did your business start operations?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 hover:bg-blue-50"
+                              >
+                                <CalendarIcon className="h-4 w-4 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="end">
+                              <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    field.onChange(date);
+                                    setStartDateInput(format(date, "yyyy-MM-dd"));
+                                  }
+                                }}
+                                disabled={(date) => date > new Date()}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <FormDescription className="text-gray-600">
+                          When did your business start operations? Format: YYYY-MM-DD
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 
                 <FormField
@@ -451,24 +478,24 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     <FormItem className="flex flex-col">
                       <FormLabel className="text-gray-900 font-medium">Registration Status</FormLabel>
                       <FormControl>
-                        <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border">
+                        <div className="flex items-center space-x-4 p-5 bg-gradient-to-r from-gray-50 to-green-50 rounded-xl border-2 border-gray-200 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md">
                           <Switch
                             checked={field.value}
                             onCheckedChange={(checked) => {
-                              field.onChange(checked );
-                              setShowCertificateUpload(checked );
+                              field.onChange(checked);
+                              setShowCertificateUpload(checked);
                             }}
-                            className="data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-gray-900"
+                            className="scale-125 data-[state=checked]:bg-green-600 data-[state=unchecked]:bg-gray-400 data-[state=checked]:hover:bg-green-700 data-[state=unchecked]:hover:bg-gray-500 shadow-lg border-2 data-[state=checked]:border-green-600 data-[state=unchecked]:border-gray-400"
                           />
                           <span className={cn(
                             "text-sm font-medium",
-                            field.value ? "text-green-700" : "text-gray-700"
+                            field.value ? "text-green-700" : "text-gray-600"
                           )}>
                             {field.value ? "Registered" : "Not Registered"}
                           </span>
                         </div>
                       </FormControl>
-                      <FormDescription className="text-gray-600">
+                      <FormDescription className="text-gray-900">
                         Is your business legally registered to operate?
                       </FormDescription>
                       <FormMessage />
@@ -590,7 +617,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                         <SelectItem value="infrastructure" className="py-3">
                           <div>
                             <div className="font-medium">Infrastructure</div>
-                            <div className="text-xs text-gray-500">Developing and maintaining essential facilities and systems.</div>
+                            <div className="text-xs text-gray-500">Water management, renewable energy, climate-resilient construction, and sustainable infrastructure systems.</div>
                           </div>
                         </SelectItem>
                         <SelectItem value="other" className="py-3">
@@ -1033,7 +1060,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                             return (
                               <FormItem
                                 key={option.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -1046,7 +1073,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                                           );
                                       field.onChange(updatedValue);
                                     }}
-                                    className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                                    className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700"
                                   />
                                 </FormControl>
                                 <FormLabel className="font-normal text-gray-900 cursor-pointer">
