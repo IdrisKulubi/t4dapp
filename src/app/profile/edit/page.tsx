@@ -2,20 +2,15 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { getCurrentUserProfile } from "@/lib/actions/user.actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Separator } from "@/components/ui/separator";
 import { 
   User, 
   Mail, 
   Phone, 
   MapPin, 
-  Building, 
-  Camera,
-  Save,
   ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
@@ -60,40 +55,7 @@ export default async function ProfileEditPage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          {/* Profile Picture Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5 text-blue-600" />
-                Profile Picture
-              </CardTitle>
-              <CardDescription>
-                Update your profile picture to personalize your account
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-6">
-                <Avatar className="h-20 w-20 border-4 border-gray-200">
-                  <AvatarImage 
-                    src={userProfile.profileImage || ""} 
-                    alt={`${userProfile.firstName} ${userProfile.lastName}`}
-                  />
-                  <AvatarFallback className="text-xl font-bold bg-blue-100 text-blue-600">
-                    {userProfile.firstName?.[0]}{userProfile.lastName?.[0]}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm">
-                    <Camera className="h-4 w-4 mr-2" />
-                    Change Picture
-                  </Button>
-                  <p className="text-sm text-gray-500">
-                    JPG, PNG or GIF. Max size 2MB.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        
 
           {/* Personal Information Form */}
           <Card>
@@ -172,45 +134,13 @@ export default async function ProfileEditPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="organization">Organization</Label>
-                  <div className="relative">
-                    <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input 
-                      id="organization" 
-                      defaultValue={userProfile.organization || ""}
-                      placeholder="Enter your organization"
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
+                
 
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea 
-                    id="bio" 
-                    defaultValue={userProfile.bio || ""}
-                    placeholder="Tell us about yourself..."
-                    rows={4}
-                  />
-                  <p className="text-sm text-gray-500">
-                    Brief description about yourself and your work
-                  </p>
-                </div>
+              
 
                 <Separator />
 
-                <div className="flex justify-between">
-                  <Button variant="outline" asChild>
-                    <Link href="/profile">
-                      Cancel
-                    </Link>
-                  </Button>
-                  <Button type="submit" className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </Button>
-                </div>
+               
               </form>
             </CardContent>
           </Card>

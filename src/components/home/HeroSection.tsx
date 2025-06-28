@@ -89,7 +89,7 @@ export function HeroSection() {
             >
               <div className="bg-gradient-to-r from-[#00D0AB]/10 to-[#0B5FBA]/10 rounded-2xl p-6 border border-[#00D0AB]/20 backdrop-blur-sm">
                 <h3 className="text-xl font-bold text-[#00D0AB] mb-4">
-                  We're calling for innovative solutions that address:
+                  We&apos;re calling for innovative solutions that address:
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ export function HeroSection() {
                   </div>
                 </div>
                 <p className="text-slate-300 mt-4 text-sm leading-relaxed">
-                  Join Africa's next generation of climate innovators creating sustainable solutions for adaptation and resilience across the continent.
+                  Join Africa&apos;s next generation of climate innovators creating sustainable solutions for adaptation and resilience across the continent.
                 </p>
               </div>
             </motion.div>
