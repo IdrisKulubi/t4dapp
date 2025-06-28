@@ -108,10 +108,7 @@ export function PartnerLogosSection() {
                   />
                 </div>
                 
-                {/* Partner Name */}
-                <h3 className="text-center text-sm font-semibold text-slate-700 group-hover:text-[#0B5FBA] transition-colors duration-300">
-                  {partner.name}
-                </h3>
+               
                 
                 {/* Hover Effect Line */}
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></div>
