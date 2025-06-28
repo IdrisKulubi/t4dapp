@@ -164,7 +164,7 @@ export function SignupForm({ callbackUrl }: SignupFormProps) {
           )}
 
           {step === "success" && (
-            <Alert variant="success" className="dark:bg-green-900/50 dark:border-green-500/50 dark:text-green-200">
+            <Alert variant="default" className="dark:bg-green-900/50 dark:border-green-500/50 dark:text-green-200">
                 <CheckCircle className="h-4 w-4" />
                 <AlertTitle>Success!</AlertTitle>
                 <AlertDescription>

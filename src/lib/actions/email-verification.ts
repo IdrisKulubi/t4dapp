@@ -1,23 +1,15 @@
 "use server";
 
-import { eq, and, gte, sql, lt } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import db from "@/db/drizzle";
-import { emailVerificationCodes, users, verificationTokens } from "@/db/schema";
+import { emailVerificationCodes, users } from "@/db/schema";
 import { sendVerificationCode } from "@/lib/email";
-import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from 'uuid';
 
-const sendCodeSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
 
-const verifyCodeSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  code: z.string().length(6, "Verification code must be 6 digits"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  name: z.string().min(2, "Name must be at least 2 characters"),
-});
+
+
 
 async function isUserExisting(email: string): Promise<boolean> {
   const existingUser = await db.query.users.findFirst({
