@@ -63,8 +63,9 @@ export function SignupForm({ callbackUrl }: SignupFormProps) {
   };
 
   const handleVerifyCode = async () => {
+    setError("");
     setIsLoading(true);
-    const result = await verifyCodeAndCreateAccount({ email, code: verificationCode, password, name });
+    const result = await verifyCodeAndCreateAccount({ email, code: verificationCode.trim(), password, name });
     setIsLoading(false);
 
     if (result.success) {
@@ -142,12 +143,11 @@ export function SignupForm({ callbackUrl }: SignupFormProps) {
                     <h3 className="text-lg font-semibold dark:text-white">Verify Your Email</h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Enter the 6-digit code sent to {email}</p>
                 </div>
-                <InputOTP maxLength={6} value={verificationCode} onChange={(value) => {
-                    setVerificationCode(value);
-                    if (value.length === 6) {
-                        handleVerifyCode();
-                    }
-                }}>
+                <InputOTP 
+                  maxLength={6} 
+                  value={verificationCode} 
+                  onChange={(value) => setVerificationCode(value)}
+                >
                     <InputOTPGroup className="mx-auto">
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
@@ -157,6 +157,13 @@ export function SignupForm({ callbackUrl }: SignupFormProps) {
                         <InputOTPSlot index={5} />
                     </InputOTPGroup>
                 </InputOTP>
+                <Button 
+                    onClick={handleVerifyCode} 
+                    disabled={verificationCode.length !== 6 || isLoading}
+                    className="w-full"
+                >
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Verify & Create Account"}
+                </Button>
                  <Button variant="link" onClick={handleResendCode} disabled={resendTimer > 0 || isLoading}>
                     {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend Code"}
                  </Button>
