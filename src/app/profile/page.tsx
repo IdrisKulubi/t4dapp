@@ -103,9 +103,6 @@ export default async function ProfilePage() {
     userProfile.email,
     userProfile.phoneNumber,
     userProfile.country,
-    userProfile.organization,
-    userProfile.bio,
-    userProfile.profileImage
   ];
   
   const completedFields = profileFields.filter(field => field && field.toString().trim().length > 0);
@@ -150,7 +147,37 @@ export default async function ProfilePage() {
             </div>
 
             {/* Profile Completion */}
-           
+            <div className="lg:ml-auto">
+              <Card className="bg-white/10 border-white/20 text-white backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Profile Completion
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Progress value={completionPercentage} className="h-2" />
+                    <p className="text-sm text-blue-100">
+                      {completionPercentage}% Complete ({completedFields.length}/{profileFields.length} fields)
+                    </p>
+                    {completionPercentage < 100 && (
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="w-full bg-white/20 hover:bg-white/30 text-white border-white/30"
+                        asChild
+                      >
+                        <Link href="/profile/edit">
+                          <Edit className="h-4 w-4 mr-2" />
+                          Complete Profile
+                        </Link>
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
