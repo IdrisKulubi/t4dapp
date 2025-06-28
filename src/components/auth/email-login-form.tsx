@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
 
 interface EmailLoginFormProps {

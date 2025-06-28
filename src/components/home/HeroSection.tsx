@@ -50,7 +50,7 @@ export function HeroSection() {
             className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight"
             variants={itemVariants}
           >
-            Innovate for Africa's{" "}
+            Innovate for Africa&apos;s{" "}
             <span className="text-[#00D0AB]">Climate Future</span>
           </motion.h1>
 

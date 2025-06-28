@@ -4,10 +4,9 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { Globe, Leaf } from "lucide-react";
-import Link from "next/link";
-import { EmailLoginForm } from "./email-login-form";
+import { Globe } from "lucide-react";
 import { SignupForm } from "./signup-form";
+import { EmailLoginForm } from "./email-login-form";
 
 interface AuthCardProps {
   callbackUrl?: string;
