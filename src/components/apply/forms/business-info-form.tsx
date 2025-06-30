@@ -96,7 +96,6 @@ function DocumentUpload({
     if (currentUrl) {
       setFileName(getCleanFileName(currentUrl));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUrl]);
 
   const handleUploadComplete = (res: any) => {
@@ -121,14 +120,7 @@ function DocumentUpload({
     toast.success(`${label} removed successfully.`);
   };
 
-  const getFileName = (url: string) => {
-    try {
-      const urlParts = url.split('/');
-      return decodeURIComponent(urlParts[urlParts.length - 1]);
-    } catch {
-      return 'Document';
-    }
-  };
+ 
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();

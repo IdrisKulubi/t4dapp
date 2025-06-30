@@ -235,9 +235,14 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
       
       if (!response.success) {
         // Improved: Log and display the actual error message from the server
-        if (response.errors) {
+        if (response.errors && Array.isArray(response.errors)) {
           console.error(`[Application ${submissionId}] Validation errors:`, response.errors);
-          toast.error(`Validation failed: ${response.errors.map((e: unknown) => (typeof e === 'object' && e && 'message' in e) ? (e as { message: string }).message : String(e)).join(', ')}`);
+          const errorMessages = response.errors.map((e: unknown) => 
+            (typeof e === 'object' && e && 'message' in e) 
+              ? (e as { message: string }).message 
+              : String(e)
+          );
+          toast.error(`Validation failed: ${errorMessages.join(', ')}`);
         } else if (response.message) {
           console.error(`[Application ${submissionId}] Server error message:`, response.message);
           toast.error(`Submission failed: ${response.message}`);
@@ -248,7 +253,6 @@ export function ReviewSubmitForm({ form, onPrevious, onClearDraft }: ReviewSubmi
         return;
       }
       
-      console.log(`[Application ${submissionId}] Success! Application ID: ${response.data?.applicationId}`);
       
       // Clear draft after successful submission
       if (onClearDraft) {

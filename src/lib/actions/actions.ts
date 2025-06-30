@@ -22,6 +22,7 @@ const applicationSubmissionSchema = z.object({
     firstName: z.string().min(2).max(100),
     lastName: z.string().min(2).max(100),
     gender: z.enum(["male", "female", "other"]),
+    genderOther: z.string().optional(),
     dateOfBirth: z.date().min(minDate).max(maxDate),
     citizenship: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"]),
     countryOfResidence: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"]),
@@ -40,6 +41,8 @@ const applicationSubmissionSchema = z.object({
     startDate: z.date(),
     isRegistered: z.boolean(),
     registrationCertificateUrl: z.string().url().max(500).optional().nullable(),
+    sector: z.string().optional(),
+    sectorOther: z.string().optional(),
     country: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"]),
     city: z.string().min(2).max(100),
     registeredCountries: z.string(),
@@ -295,7 +298,10 @@ export async function submitApplication(formData: ApplicationSubmission) {
     // Send application submission confirmation email
     await sendApplicationSubmissionEmail({ 
       to: userEmail!, 
-      applicantName: userName || validatedData.personal.firstName 
+      applicantName: userName || validatedData.personal.firstName,
+      applicationId: application.id.toString(),
+      businessName: validatedData.business.name,
+      submissionDate: new Date().toISOString()
     });
     
     console.log("✅ Application submission process completed successfully.");
