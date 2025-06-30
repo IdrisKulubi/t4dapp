@@ -1,1 +1,0 @@
-ALTER TABLE "eligibility_results" ADD CONSTRAINT "eligibility_results_application_id_unique" UNIQUE("application_id");

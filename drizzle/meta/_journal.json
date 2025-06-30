@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1745268875472,
-      "tag": "0000_new_garia",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1746746954038,
-      "tag": "0001_minor_lake",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1749099927782,
-      "tag": "0002_organic_blink",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1749102260522,
-      "tag": "0003_violet_stardust",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1749503448408,
-      "tag": "0004_groovy_crystal",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1749531383729,
-      "tag": "0005_daffy_crusher_hogan",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1751014997566,
-      "tag": "0006_small_speed_demon",
+      "when": 1751275531568,
+      "tag": "0000_fine_glorian",
       "breakpoints": true
     }
   ]
