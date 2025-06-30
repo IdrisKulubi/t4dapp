@@ -22,6 +22,8 @@ export const personalInfoSchema = z.object({
     required_error: "Please select a gender",
   }),
   
+  genderOther: z.string().optional(),
+  
   dateOfBirth: z
     .date({
       required_error: "Date of birth is required",
@@ -54,6 +56,15 @@ export const personalInfoSchema = z.object({
       required_error: "Please select your highest level of education",
     }
   ),
+})
+.refine(data => {
+  if (data.gender === 'other') {
+    return data.genderOther && data.genderOther.length > 2;
+  }
+  return true;
+}, {
+  message: "Please specify your gender",
+  path: ["genderOther"],
 });
 
 export type PersonalInfoFormValues = z.infer<typeof personalInfoSchema>; 

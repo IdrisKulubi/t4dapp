@@ -73,7 +73,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
           <h2 className="text-xl font-bold">Personal Information</h2>
         </div>
         <p className="text-gray-600 max-w-2xl">
-          Please provide your personal details for the InCountryYouthADAPT Challenge 2025. All information will be kept confidential and secure.
+          Please provide your personal details for the In-Country YouthADAPT Challenge 2025. All information will be kept confidential and secure.
         </p>
       </div>
       
@@ -168,6 +168,26 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                   </FormItem>
                 )}
               />
+
+              {form.watch("personal.gender") === "other" && (
+                <FormField
+                  control={form.control}
+                  name="personal.genderOther"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-900 font-medium">Please Specify</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Please specify your gender"
+                          className=" text-black focus:border-blue-500 focus:ring-blue-500 h-12"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               
               {/* Date of Birth field */}
               <FormField
@@ -242,7 +262,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
                         </Popover>
                       </div>
                       <FormDescription className="text-gray-600">
-                        You must be between 18 and 35 years old. Format: YYYY-MM-DD
+                        You must be between 18 and 35 years old. Format: DD/MM/YYYY
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -415,7 +435,7 @@ export function PersonalInfoForm({ form, onNext }: PersonalInfoFormProps) {
               <div>
                 <h4 className="font-semibold text-blue-900 mb-2">Data Protection Notice</h4>
                 <p className="text-sm text-blue-800 leading-relaxed">
-                  We are committed to protecting your personal information. We collect and use your data for the InCountryYouthADAPT Challenge 2025. 
+                  We are committed to protecting your personal information. We collect and use your data for the In Country YouthADAPT Challenge 2025. 
                   We will not share your data with third parties without your consent, except as required by law. We have implemented security measures 
                   to protect your data from unauthorised access.
                 </p>

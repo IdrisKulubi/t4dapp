@@ -8,6 +8,13 @@
       "when": 1751275531568,
       "tag": "0000_fine_glorian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751313876144,
+      "tag": "0001_first_shooting_star",
+      "breakpoints": true
     }
   ]
 }

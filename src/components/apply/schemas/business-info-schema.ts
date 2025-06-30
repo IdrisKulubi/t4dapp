@@ -23,6 +23,7 @@ export const businessInfoSchema = z.object({
     sector: z.enum(["food-security", "infrastructure", "other"], {
       required_error: "Please select a sector"
     }).optional(),
+    sectorOther: z.string().optional(),
     
     // Location - Updated to focus on participating countries only
     country: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"], { 
@@ -169,6 +170,15 @@ export const businessInfoSchema = z.object({
       fundingInstrumentOther: z.string().max(100).optional().nullable(),
     }).optional(),
   })
+  .refine(data => {
+    if (data.sector === 'other') {
+      return data.sectorOther && data.sectorOther.length > 2;
+    }
+    return true;
+  }, {
+    message: "Please specify your sector",
+    path: ["sectorOther"],
+  })
 });
 
 export type BusinessInfoFormValues = z.infer<typeof businessInfoSchema>;
@@ -185,6 +195,7 @@ export const defaultBusinessInfo: BusinessInfoFormValues = {
     auditedAccountsUrl: null,
     taxComplianceUrl: null,
     sector: undefined,
+    sectorOther: undefined,
     country: "ghana" as const, // Fix linter error - use valid enum value instead of empty string
     city: "",
     registeredCountries: "",

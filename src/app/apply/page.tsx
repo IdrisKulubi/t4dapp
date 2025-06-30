@@ -21,7 +21,7 @@ export default async function ApplyPage() {
             <div>
               <CardTitle className="text-2xl font-bold text-gray-900">Login Required</CardTitle>
               <CardDescription className="text-gray-600 mt-2">
-                You must be logged in to submit an application for the InCountryYouthADAPT Challenge
+                You must be logged in to submit an application for the In-Country YouthADAPT Challenge
               </CardDescription>
             </div>
           </CardHeader>

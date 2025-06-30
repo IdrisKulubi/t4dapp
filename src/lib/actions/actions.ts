@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { applications, businesses, applicants, businessTargetCustomers, businessFunding, eligibilityResults, userProfiles } from "../../../db/schema";
+import { applications, businesses, applicants, businessTargetCustomers, businessFunding, eligibilityResults, userProfiles, users } from "../../../db/schema";
 import { revalidatePath } from "next/cache";
 import db from "../../../db/drizzle";
 import { checkEligibility } from "./eligibility";
@@ -111,190 +111,216 @@ export async function submitApplication(formData: ApplicationSubmission) {
     }
     
     const userId = session.user.id;
+    const userEmail = session.user.email;
+    const userName = session.user.name;
+
     console.log("📋 Submitting application for user:", userId);
     
     // Validate form data
     const validatedData = applicationSubmissionSchema.parse(formData);
-    
-    // Check if user already has an application
-    const existingApplication = await db.query.applications.findFirst({
-      where: eq(applications.userId, userId)
-    });
-    
-    if (existingApplication) {
-      return {
-        success: false,
-        message: "You have already submitted an application. Multiple applications are not allowed.",
-      };
-    }
-    
-    // Create or update user profile from application data
-    try {
-      const existingProfile = await db.query.userProfiles.findFirst({
-        where: eq(userProfiles.userId, userId)
+
+    // =================================================================================
+    // DATABASE TRANSACTION
+    // =================================================================================
+    const result = await db.transaction(async (tx) => {
+      // 1. Check if user already has an application
+      const existingApplication = await tx.query.applications.findFirst({
+        where: eq(applications.userId, userId)
       });
       
-      if (!existingProfile) {
-        // Create new user profile
-        await db.insert(userProfiles).values({
-          userId,
+      if (existingApplication) {
+        // We must throw an error to trigger the transaction rollback
+        throw new Error("You have already submitted an application. Multiple applications are not allowed.");
+      }
+
+      // 2. Ensure the user exists in the main 'user' table before proceeding
+      let user = await tx.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+
+      if (!user) {
+        // Session user ID not found in DB. This is an inconsistent state.
+        // Let's check if the email exists, which would cause a duplicate key error.
+        const userByEmail = await tx.query.users.findFirst({
+          where: eq(users.email, userEmail!),
+        });
+
+        if (userByEmail) {
+          // The email exists but is tied to a different user ID. This is a critical inconsistency.
+          // We must not proceed. We will throw an error that will be caught by the client.
+          throw new Error("Account conflict detected. An account with this email already exists but is not linked to your current login session. Please sign out and sign back in using your original login method (e.g., Google or email).");
+        } else {
+          // This is a rare case where the user's auth record truly doesn't exist in our DB.
+          // It is now safe to create it.
+          console.log(`User with ID ${userId} not found. Creating new user entry.`);
+          [user] = await tx.insert(users).values({
+            id: userId,
+            email: userEmail!,
+            name: userName,
+            emailVerified: new Date(), // Assume email is verified if they are logged in
+          }).returning();
+        }
+      }
+
+      // 3. Create or update user profile from application data
+      await tx.insert(userProfiles).values({
+        userId,
+        firstName: validatedData.personal.firstName,
+        lastName: validatedData.personal.lastName,
+        email: validatedData.personal.email,
+        role: 'applicant',
+        phoneNumber: validatedData.personal.phoneNumber,
+        country: validatedData.personal.countryOfResidence,
+        isCompleted: true,
+      }).onConflictDoUpdate({
+        target: userProfiles.userId,
+        set: {
           firstName: validatedData.personal.firstName,
           lastName: validatedData.personal.lastName,
           email: validatedData.personal.email,
-          role: 'applicant',
           phoneNumber: validatedData.personal.phoneNumber,
           country: validatedData.personal.countryOfResidence,
           isCompleted: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-        console.log("✅ Created user profile for:", userId);
-      }
-    } catch (profileError) {
-      console.error("⚠️ Error creating user profile (continuing with application):", profileError);
-      // Continue with application submission even if profile creation fails
-    }
-    
-    // Insert applicant information - updated to not include "other" fields
-    const newApplicant = {
-      userId,
-      firstName: validatedData.personal.firstName,
-      lastName: validatedData.personal.lastName,
-      gender: validatedData.personal.gender,
-      dateOfBirth: validatedData.personal.dateOfBirth.toISOString().split('T')[0],
-      citizenship: validatedData.personal.citizenship,
-      citizenshipOther: null, // Set to null since we no longer support "other" option
-      countryOfResidence: validatedData.personal.countryOfResidence,
-      residenceOther: null, // Set to null since we no longer support "other" option
-      phoneNumber: validatedData.personal.phoneNumber,
-      email: validatedData.personal.email,
-      highestEducation: validatedData.personal.highestEducation,
-    };
-    
-    const [applicant] = await db.insert(applicants).values(newApplicant).returning();
-    console.log("✅ Created applicant record:", applicant.id);
-    
-    // Insert business information - updated to not include "other" fields
-    const newBusiness = {
-      applicantId: applicant.id,
-      name: validatedData.business.name,
-      startDate: validatedData.business.startDate.toISOString().split('T')[0],
-      isRegistered: validatedData.business.isRegistered,
-      registrationCertificateUrl: validatedData.business.registrationCertificateUrl,
-      country: validatedData.business.country,
-      countryOther: null, // Set to null since we no longer support "other" option
-      city: validatedData.business.city,
-      registeredCountries: validatedData.business.registeredCountries,
-      description: validatedData.business.description,
-      problemSolved: validatedData.business.problemSolved,
-      revenueLastTwoYears: String(validatedData.business.revenueLastTwoYears),
-      fullTimeEmployeesTotal: validatedData.business.fullTimeEmployeesTotal,
-      fullTimeEmployeesMale: validatedData.business.fullTimeEmployeesMale,
-      fullTimeEmployeesFemale: validatedData.business.fullTimeEmployeesFemale,
-      partTimeEmployeesMale: validatedData.business.partTimeEmployeesMale,
-      partTimeEmployeesFemale: validatedData.business.partTimeEmployeesFemale,
-      climateAdaptationContribution: validatedData.business.climateAdaptationContribution,
-      productServiceDescription: validatedData.business.productServiceDescription,
-      climateExtremeImpact: validatedData.business.climateExtremeImpact,
-      unitPrice: String(validatedData.business.unitPrice),
-      customerCountLastSixMonths: validatedData.business.customerCountLastSixMonths,
-      productionCapacityLastSixMonths: validatedData.business.productionCapacityLastSixMonths,
-      currentChallenges: validatedData.business.currentChallenges,
-      supportNeeded: validatedData.business.supportNeeded,
-      additionalInformation: validatedData.business.additionalInformation,
-    };
-    
-    const [business] = await db.insert(businesses).values(newBusiness).returning();
-    
-    // Insert target customers
-    if (validatedData.business.targetCustomers.length > 0) {
-      const targetCustomerValues = validatedData.business.targetCustomers.map(segment => ({
-        businessId: business.id,
-        customerSegment: segment,
-      }));
-      
-      await db.insert(businessTargetCustomers).values(targetCustomerValues);
-    }
-    
-    // Insert funding information if business has external funding
-    if (validatedData.business.funding.hasExternalFunding) {
-      const fundingData = {
-        businessId: business.id,
-        hasExternalFunding: validatedData.business.funding.hasExternalFunding,
-        fundingSource: validatedData.business.funding.fundingSource,
-        fundingSourceOther: validatedData.business.funding.fundingSourceOther,
-        fundingDate: validatedData.business.funding.fundingDate 
-          ? validatedData.business.funding.fundingDate.toISOString().split('T')[0] 
-          : null,
-        funderName: validatedData.business.funding.funderName,
-        amountUsd: validatedData.business.funding.amountUsd ? String(validatedData.business.funding.amountUsd) : null,
-        fundingInstrument: validatedData.business.funding.fundingInstrument,
-        fundingInstrumentOther: validatedData.business.funding.fundingInstrumentOther,
+          updatedAt: new Date(),
+        }
+      });
+      console.log("✅ Upserted user profile for:", userId);
+
+      // 4. Insert applicant information
+      const newApplicant = {
+        userId,
+        firstName: validatedData.personal.firstName,
+        lastName: validatedData.personal.lastName,
+        gender: validatedData.personal.gender,
+        genderOther: validatedData.personal.genderOther,
+        dateOfBirth: validatedData.personal.dateOfBirth.toISOString().split('T')[0],
+        citizenship: validatedData.personal.citizenship,
+        countryOfResidence: validatedData.personal.countryOfResidence,
+        phoneNumber: validatedData.personal.phoneNumber,
+        email: validatedData.personal.email,
+        highestEducation: validatedData.personal.highestEducation,
       };
       
-      await db.insert(businessFunding).values(fundingData);
+      const [applicant] = await tx.insert(applicants).values(newApplicant).returning();
+      console.log("✅ Created applicant record:", applicant.id);
+      
+      // 5. Insert business information
+      const newBusiness = {
+        applicantId: applicant.id,
+        name: validatedData.business.name,
+        startDate: validatedData.business.startDate.toISOString().split('T')[0],
+        isRegistered: validatedData.business.isRegistered,
+        registrationCertificateUrl: validatedData.business.registrationCertificateUrl,
+        sector: validatedData.business.sector,
+        sectorOther: validatedData.business.sectorOther,
+        country: validatedData.business.country,
+        city: validatedData.business.city,
+        registeredCountries: validatedData.business.registeredCountries,
+        description: validatedData.business.description,
+        problemSolved: validatedData.business.problemSolved,
+        revenueLastTwoYears: String(validatedData.business.revenueLastTwoYears),
+        fullTimeEmployeesTotal: validatedData.business.fullTimeEmployeesTotal,
+        fullTimeEmployeesMale: validatedData.business.fullTimeEmployeesMale,
+        fullTimeEmployeesFemale: validatedData.business.fullTimeEmployeesFemale,
+        partTimeEmployeesMale: validatedData.business.partTimeEmployeesMale,
+        partTimeEmployeesFemale: validatedData.business.partTimeEmployeesFemale,
+        climateAdaptationContribution: validatedData.business.climateAdaptationContribution,
+        productServiceDescription: validatedData.business.productServiceDescription,
+        climateExtremeImpact: validatedData.business.climateExtremeImpact,
+        unitPrice: String(validatedData.business.unitPrice),
+        customerCountLastSixMonths: validatedData.business.customerCountLastSixMonths,
+        productionCapacityLastSixMonths: validatedData.business.productionCapacityLastSixMonths,
+        currentChallenges: validatedData.business.currentChallenges,
+        supportNeeded: validatedData.business.supportNeeded,
+        additionalInformation: validatedData.business.additionalInformation,
+      };
+      
+      const [business] = await tx.insert(businesses).values(newBusiness).returning();
+      
+      // 6. Insert target customers
+      if (validatedData.business.targetCustomers.length > 0) {
+        const targetCustomerValues = validatedData.business.targetCustomers.map(segment => ({
+          businessId: business.id,
+          customerSegment: segment,
+        }));
+        
+        await tx.insert(businessTargetCustomers).values(targetCustomerValues);
+      }
+      
+      // 7. Insert funding information
+      if (validatedData.business.funding.hasExternalFunding) {
+        const fundingData = {
+          businessId: business.id,
+          hasExternalFunding: validatedData.business.funding.hasExternalFunding,
+          fundingSource: validatedData.business.funding.fundingSource,
+          fundingSourceOther: validatedData.business.funding.fundingSourceOther,
+          fundingDate: validatedData.business.funding.fundingDate 
+            ? validatedData.business.funding.fundingDate.toISOString().split('T')[0] 
+            : null,
+          funderName: validatedData.business.funding.funderName,
+          amountUsd: validatedData.business.funding.amountUsd ? String(validatedData.business.funding.amountUsd) : null,
+          fundingInstrument: validatedData.business.funding.fundingInstrument,
+          fundingInstrumentOther: validatedData.business.funding.fundingInstrumentOther,
+        };
+        
+        await tx.insert(businessFunding).values(fundingData);
+      }
+      
+      // 8. Insert the main application record
+      const applicationData = {
+        userId: userId,
+        businessId: business.id,
+        status: 'submitted' as const,
+        referralSource: validatedData.referralSource,
+        referralSourceOther: validatedData.referralSourceOther,
+        submittedAt: new Date(),
+      };
+      
+      const [application] = await tx.insert(applications).values(applicationData).returning();
+
+      return { success: true, application };
+    });
+
+    if (!result.success) {
+      // This part might not be reached if an error is thrown, but it's good practice.
+      return { success: false, message: "An unknown error occurred during submission." };
     }
+
+    const { application } = result;
     
-    // Insert application and set status to 'submitted'
-    const applicationData = {
-      userId: userId,
-      businessId: business.id,
-      status: 'submitted' as const,
-      referralSource: validatedData.referralSource,
-      referralSourceOther: validatedData.referralSourceOther,
-      submittedAt: new Date(),
-    };
-    
-    const [application] = await db.insert(applications).values(applicationData).returning();
-    
-    // Run eligibility check algorithm
+    // Run eligibility check algorithm (outside the transaction)
+    console.log("🚀 Submitting application to eligibility check...");
     const eligibilityResult = await checkEligibility(application.id);
     
     // Send application submission confirmation email
-    try {
-      await sendApplicationSubmissionEmail({
-        to: validatedData.personal.email,
-        applicantName: `${validatedData.personal.firstName} ${validatedData.personal.lastName}`,
-        applicationId: application.id.toString(),
-        businessName: validatedData.business.name,
-        submissionDate: new Date().toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        }),
-      });
-      console.log("✅ Application submission email sent successfully");
-    } catch (emailError) {
-      console.error("⚠️ Failed to send application submission email:", emailError);
-      // Don't fail the entire submission if email fails
-    }
+    await sendApplicationSubmissionEmail({ 
+      to: userEmail!, 
+      applicantName: userName || validatedData.personal.firstName 
+    });
     
+    console.log("✅ Application submission process completed successfully.");
     revalidatePath("/apply");
-    
     return {
       success: true,
-      message: "Application submitted successfully",
-      data: {
-        applicantId: applicant.id,
-        businessId: business.id,
-        applicationId: application.id,
-        eligibility: eligibilityResult,
-      },
+      message: "Application submitted successfully!",
+      applicationId: application.id,
+      eligibility: eligibilityResult
     };
+    
   } catch (error) {
     console.error("❌ Error submitting application:", error);
     
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        message: "Validation error",
-        errors: error.errors,
+        message: "Validation failed. Please check your input.",
+        errors: error.flatten().fieldErrors,
       };
     }
     
     return {
       success: false,
-      message: "Failed to submit application",
+      message: error instanceof Error ? error.message : "An unexpected error occurred. Please try again.",
     };
   }
 }

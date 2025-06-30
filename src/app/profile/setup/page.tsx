@@ -30,7 +30,7 @@ export default async function ProfileSetupPage() {
             <UserCircle2 className="w-8 h-8 text-white" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold text-gray-900">Welcome to InCountryYouthADAPT!</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-900">Welcome to In-Country YouthADAPT!</CardTitle>
             <CardDescription className="text-gray-600 mt-2">
               Let&apos;s set up your profile to get you ready for the application process
             </CardDescription>
@@ -65,7 +65,7 @@ export default async function ProfileSetupPage() {
                 <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                   <span className="text-blue-600 font-medium text-xs">2</span>
                 </div>
-                <span>Access the InCountryYouthADAPT Challenge application</span>
+                <span>Access the In-Country YouthADAPT Challenge application</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-700">
                 <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">

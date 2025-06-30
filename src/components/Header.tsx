@@ -93,8 +93,8 @@ export function Header() {
             >
               <Link href="/" className="group block" onClick={closeMobileMenu}>
                 <h1 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold tracking-wide text-slate-800">
-                  <span className="hidden sm:inline">InCountryYouthADAPT Challenge 2025</span>
-                  <span className="sm:hidden">InCountryYouthADAPT 2025</span>
+                  <span className="hidden sm:inline">In-Country YouthADAPT Challenge 2025</span>
+                  <span className="sm:hidden">In-Country YouthADAPT 2025</span>
                 </h1>
               </Link>
             </motion.div>

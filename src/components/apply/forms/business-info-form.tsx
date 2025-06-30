@@ -69,11 +69,42 @@ function DocumentUpload({
 }: DocumentUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  const getCleanFileName = (url: string): string => {
+    if (!url) return 'Document';
+    // If it's a utfs.io URL, we can't get the original filename.
+    // Show a user-friendly generic name.
+    if (url.includes('utfs.io')) {
+      return 'Uploaded Document';
+    }
+    // For other URLs, try to get the last part.
+    try {
+      const urlParts = url.split('/');
+      const decoded = decodeURIComponent(urlParts[urlParts.length - 1]);
+      // Truncate if it's too long
+      if (decoded.length > 40) {
+        return `${decoded.substring(0, 25)}...`;
+      }
+      return decoded || 'Document';
+    } catch {
+      return 'Document';
+    }
+  };
+  
+  useEffect(() => {
+    if (currentUrl) {
+      setFileName(getCleanFileName(currentUrl));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUrl]);
 
   const handleUploadComplete = (res: any) => {
     setIsUploading(false);
-    if (res && res[0]?.url) {
-      form.setValue(formFieldName, res[0].url);
+    if (res && res[0]) {
+      const file = res[0];
+      form.setValue(formFieldName, file.url);
+      setFileName(file.name);
       toast.success(`${label} uploaded successfully!`, { id: `upload-${formFieldName}` });
     }
   };
@@ -86,6 +117,7 @@ function DocumentUpload({
 
   const handleDelete = () => {
     form.setValue(formFieldName, "");
+    setFileName(null);
     toast.success(`${label} removed successfully.`);
   };
 
@@ -169,8 +201,8 @@ function DocumentUpload({
                     </div>
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-emerald-900 truncate">
-                      {getFileName(currentUrl)}
+                    <p className="text-sm font-medium text-emerald-900 truncate" title={fileName || ""}>
+                      {fileName || getCleanFileName(currentUrl || "")}
                     </p>
                     <p className="text-xs text-emerald-600">
                       ✓ Successfully uploaded
@@ -241,72 +273,48 @@ function DocumentUpload({
                     
                     if (ready) {
                       return (
-                        <div 
+                        <div
                           className={cn(
-                            "relative group cursor-pointer transition-all duration-300 ease-out",
-                            isDragOver 
-                              ? "transform scale-[1.02]" 
-                              : "hover:transform hover:scale-[1.01]"
+                            'group relative cursor-pointer rounded-xl border-2 border-dashed p-4 text-center transition-all duration-300',
+                            isDragOver
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50/50'
                           )}
-                          onDragOver={handleDragOver}
-                          onDragLeave={handleDragLeave}
-                          onDrop={handleDrop}
+                           onDragOver={handleDragOver}
+                           onDragLeave={handleDragLeave}
+                           onDrop={handleDrop}
                         >
-                          <div className={cn(
-                            "flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl transition-all duration-300",
-                            isDragOver 
-                              ? "border-blue-400 bg-gradient-to-br from-blue-100 via-indigo-100 to-blue-100 shadow-lg" 
-                              : "border-gray-300 bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50 hover:via-indigo-50 hover:to-blue-50 hover:shadow-md"
-                          )}>
-                            <div className="flex flex-col items-center space-y-4">
-                              <div className={cn(
-                                "relative transition-all duration-300",
-                                isDragOver ? "transform scale-110" : "group-hover:transform group-hover:scale-105"
-                              )}>
-                                <div className={cn(
-                                  "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300",
-                                  isDragOver 
-                                    ? "bg-blue-200 shadow-lg" 
-                                    : "bg-blue-100 group-hover:bg-blue-200 group-hover:shadow-md"
-                                )}>
-                                  <UploadIcon className={cn(
-                                    "w-8 h-8 transition-all duration-300",
-                                    isDragOver 
-                                      ? "text-blue-700" 
-                                      : "text-blue-600 group-hover:text-blue-700"
-                                  )} />
-                                </div>
-                                {isDragOver && (
-                                  <div className="absolute inset-0 w-16 h-16 border-2 border-blue-400 rounded-2xl animate-ping"></div>
+                          <div className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
+                            <div
+                              className={cn(
+                                'flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 transition-all duration-300',
+                                isDragOver ? 'bg-blue-100' : 'group-hover:bg-blue-100'
+                              )}
+                            >
+                              <UploadIcon
+                                className={cn(
+                                  'h-7 w-7 text-gray-500 transition-all duration-300',
+                                  isDragOver ? 'text-blue-600' : 'group-hover:text-blue-500'
                                 )}
-                              </div>
-                              
-                              <div className="text-center space-y-2">
-                                <h3 className={cn(
-                                  "text-lg font-bold transition-colors duration-300",
-                                  isDragOver 
-                                    ? "text-blue-900" 
-                                    : "text-gray-900 group-hover:text-blue-900"
-                                )}>
-                                  {isDragOver ? "Drop your file here" : "Choose file or drag & drop"}
-                                </h3>
-                                <p className={cn(
-                                  "text-sm transition-colors duration-300",
-                                  isDragOver 
-                                    ? "text-blue-700 font-medium" 
-                                    : "text-gray-600 group-hover:text-blue-700"
-                                )}>
-                                  {isDragOver 
-                                    ? "Release to upload your document" 
-                                    : "PDF, DOC, DOCX files up to 10MB"
-                                  }
-                                </p>
-                                {!isDragOver && (
-                                  <p className="text-xs text-gray-500 group-hover:text-blue-600 transition-colors duration-300">
-                                    Your files are encrypted and secure
-                                  </p>
+                              />
+                            </div>
+                            <div className="sm:text-left">
+                              <p
+                                className={cn(
+                                  'text-base font-semibold transition-colors duration-300',
+                                  isDragOver ? 'text-blue-800' : 'text-gray-800 group-hover:text-blue-700'
                                 )}
-                              </div>
+                              >
+                                Click to upload or drag and drop
+                              </p>
+                              <p
+                                className={cn(
+                                  'mt-0.5 text-sm transition-colors duration-300',
+                                  isDragOver ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
+                                )}
+                              >
+                                PDF, DOC, or DOCX (max. 8MB)
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -331,9 +339,6 @@ function DocumentUpload({
                       </div>
                     );
                   },
-                  allowedContent() {
-                    return null;
-                  }
                 }}
                 disabled={isUploading}
               />
@@ -341,7 +346,7 @@ function DocumentUpload({
           )}
           
           <p className="text-xs text-gray-500">
-            Supported formats: PDF, DOC, DOCX • Maximum size: 10MB
+            Supported formats: PDF, DOC, DOCX • Maximum size: 8MB
           </p>
         </div>
       </div>
@@ -463,7 +468,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           </Popover>
                         </div>
                         <FormDescription className="text-gray-600">
-                          When did your business start operations? Format: YYYY-MM-DD
+                          When did your business start operations? Format: DD/MM/YYYY
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -505,26 +510,13 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
               </div>
               
               {showCertificateUpload && (
-                <FormField
-                  control={form.control}
-                  name="business.registrationCertificateUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Registration Certificate URL</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="https://example.com/my-certificate.pdf" 
-                          {...field} 
-                          value={field.value || ""}
-                          className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 h-12"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-gray-600">
-                        Provide a link to your registration certificate (Google Drive, Dropbox, etc.)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                <DocumentUpload
+                  endpoint="registrationCertificateUploader"
+                  formFieldName="business.registrationCertificateUrl"
+                  label="Registration Certificate"
+                  description="Upload your business registration certificate (e.g., Certificate of Incorporation)."
+                  currentUrl={form.watch("business.registrationCertificateUrl")}
+                  form={form}
                 />
               )}
             </div>
@@ -635,6 +627,26 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                   </FormItem>
                 )}
               />
+
+              {form.watch("business.sector") === "other" && (
+                <FormField
+                  control={form.control}
+                  name="business.sectorOther"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-900 font-medium">Please Specify Sector</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Please specify your business sector"
+                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
           </div>
           

@@ -27,9 +27,7 @@ export function ContactSupportButton() {
     }
   };
 
-  const handleEmailClick = () => {
-    window.open(`mailto:${email}?subject=InCountryYouthADAPT Challenge - Support Request`, '_blank');
-  };
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -78,22 +76,7 @@ export function ContactSupportButton() {
             </div>
           </div>
 
-          <div className="flex gap-3">
-            <Button
-              onClick={handleEmailClick}
-              className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl"
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Send Email
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsOpen(false)}
-              className="px-6 hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </Button>
-          </div>
+         
         </div>
       </DialogContent>
     </Dialog>
