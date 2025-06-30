@@ -39,6 +39,12 @@ const features = [
     title: "Investment Connections",
     description: "Direct access to our partner investor network and opportunities for follow-on funding to scale your impact.",
     color: "gca-blue"
+  },
+  {
+    icon: <CurrencyDollarIcon className="w-8 h-8" />,
+    title: "Scale-Up Support",
+    description: "Comprehensive scaling assistance including strategic partnerships, market expansion guidance, and access to follow-on investment opportunities.",
+    color: "gca-green"
   }
 ];
 

@@ -44,7 +44,7 @@ export const VerificationCodeEmail = ({
           </Text>
           
           <Text style={paragraph}>
-            The YouthADAPT Challenge is a unique opportunity for young entrepreneurs across Africa to showcase their climate adaptation solutions. We&apos;re excited to have you join us!
+            The YouthADAPT Challenge is a unique opportunity for young entrepreneurs across the five eligible countries to showcase their climate adaptation solutions. We&apos;re excited to have you join us!
           </Text>
           
           <Section style={footer}>
@@ -52,10 +52,10 @@ export const VerificationCodeEmail = ({
               Best regards,<br />
               The YouthADAPT Challenge Team
             </Text>
-            
+
             <Text style={footerText}>
-              <Link href="https://youth-adapt.org" style={link}>
-                youth-adapt.org
+              <Link href="https://incountryouthadapt.kenyacic.org/" style={link}>
+                incountryouthadapt.kenyacic.org
               </Link>
             </Text>
             
