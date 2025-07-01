@@ -41,6 +41,7 @@ const customerSegmentOptions = [
   { id: "institutions", label: "Institutions" },
   { id: "corporates", label: "Corporates" },
   { id: "government_and_ngos", label: "Government & NGOs" },
+  { id: "other", label: "Other" },
 ];
 
 type BusinessInfoFormProps = {
@@ -570,7 +571,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
           </div>
 
           {/* Sector Categorization Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <Target className="h-6 w-6" />
@@ -582,42 +583,64 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
               <FormField
                 control={form.control}
                 name="business.sector"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-900 font-medium">Which sector best describes your business?</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500">
-                          <SelectValue placeholder="Select sector" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="food-security" className="py-3">
-                          <div>
-                            <div className="font-medium">Food Security</div>
-                            <div className="text-xs text-gray-500">Ensuring reliable access to sufficient, safe, and nutritious food.</div>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="infrastructure" className="py-3">
-                          <div>
-                            <div className="font-medium">Infrastructure</div>
-                            <div className="text-xs text-gray-500">Water management, renewable energy, climate-resilient construction, and sustainable infrastructure systems.</div>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="other" className="py-3">
-                          <div>
-                            <div className="font-medium">Other</div>
-                            <div className="text-xs text-gray-500">Any other sector relevant to your business.</div>
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormDescription className="text-gray-600">
-                      Select the sector that most closely aligns with your business operations.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  // Function to get full sector display text
+                  const getSectorDisplayText = (value: string) => {
+                    switch (value) {
+                      case "food-security":
+                        return "Food Security\n\nEnsuring reliable access to sufficient, safe, and nutritious food.";
+                      case "infrastructure":
+                        return "Infrastructure\n\nWater management, renewable energy, climate-resilient construction, and sustainable infrastructure systems.";
+                      case "other":
+                        return "Other\n\nAny other sector relevant to your business.";
+                      default:
+                        return "";
+                    }
+                  };
+
+                  return (
+                    <FormItem>
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Which sector best describes your business?</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="min-h-[80px] h-auto border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500 py-3 dark:bg-gray-800">
+                            <SelectValue placeholder="Select sector">
+                              {field.value && (
+                                <div className="text-left whitespace-pre-line text-sm leading-relaxed text-gray-900 dark:text-gray-100">
+                                  {getSectorDisplayText(field.value)}
+                                </div>
+                              )}
+                            </SelectValue>
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="food-security" className="py-3">
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">Food Security</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Ensuring reliable access to sufficient, safe, and nutritious food.</div>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="infrastructure" className="py-3">
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">Infrastructure</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Water management, renewable energy, climate-resilient construction, and sustainable infrastructure systems.</div>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="other" className="py-3">
+                            <div>
+                              <div className="font-medium text-gray-900 dark:text-gray-100">Other</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">Any other sector relevant to your business.</div>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormDescription className="text-gray-600 dark:text-gray-400">
+                        Select the sector that most closely aligns with your business operations.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               {form.watch("business.sector") === "other" && (
@@ -626,11 +649,11 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                   name="business.sectorOther"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Please Specify Sector</FormLabel>
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Please Specify Sector</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Please specify your business sector"
-                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                           {...field}
                         />
                       </FormControl>
@@ -643,7 +666,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
           </div>
           
           {/* Location Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="bg-gradient-to-r from-teal-600 to-blue-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <MapPin className="h-6 w-6" />
@@ -658,13 +681,13 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                   name="business.country"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Country of Operation</FormLabel>
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Country of Operation</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className="h-12 border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500">
+                          <SelectTrigger className="h-12 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500">
                             <SelectValue placeholder="Select country" />
                           </SelectTrigger>
                         </FormControl>
@@ -676,7 +699,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           <SelectItem value="tanzania">Tanzania</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormDescription className="text-gray-600">
+                      <FormDescription className="text-gray-600 dark:text-gray-100">
                         Select the participating country where your business primarily operates
                       </FormDescription>
                       <FormMessage />
@@ -689,12 +712,12 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                   name="business.city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">City/Town</FormLabel>
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">City/Town</FormLabel>
                       <FormControl>
                         <Input 
                           placeholder="Enter city name" 
                           {...field} 
-                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                         />
                       </FormControl>
                       <FormMessage />
@@ -708,15 +731,15 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 name="business.registeredCountries"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 font-medium">Countries Where Registered</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Countries Where Registered</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="e.g., Kenya, Rwanda, Tanzania" 
                         {...field} 
-                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
-                    <FormDescription className="text-gray-600">
+                    <FormDescription className="text-gray-600 dark:text-gray-100">
                       List all participating countries where your business is registered to operate (separate with commas)
                     </FormDescription>
                     <FormMessage />
@@ -781,7 +804,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
           </div>
           
           {/* Business Performance Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="bg-gradient-to-r from-green-600 to-blue-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <TrendingUp className="h-6 w-6" />
@@ -803,10 +826,10 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                         value={field.value || ""}
-                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
-                    <FormDescription className="text-gray-600">
+                    <FormDescription className="text-gray-600 dark:text-gray-100">
                       Total revenue generated over the last two years (USD)
                     </FormDescription>
                     <FormMessage />
@@ -815,40 +838,25 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
               />
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-                  <h4 className="text-base font-semibold text-blue-900 mb-4 flex items-center gap-2">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800">
+                  <h4 className="text-base font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
                     <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                     Employment Data
                   </h4>
-                  <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="business.fullTimeEmployeesTotal"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-900 font-medium">Total Full-Time Employees</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              placeholder="0" 
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              value={field.value || ""}
-                              className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-11"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid grid-cols-2 gap-4">
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">Direct and indirect employment created by your business</p>
+                  
+                  {/* Direct Employment (Full-Time) */}
+                  <div className="mb-6">
+                    <h5 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-3 border-l-2 border-blue-500 pl-2">
+                      Direct Employment (Full-Time)
+                    </h5>
+                    <div className="space-y-4">
                       <FormField
                         control={form.control}
-                        name="business.fullTimeEmployeesMale"
+                        name="business.fullTimeEmployeesTotal"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-900 font-medium">Male (Full-Time)</FormLabel>
+                            <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Total Full-Time Employees</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -856,7 +864,88 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                 value={field.value || ""}
-                                className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-11"
+                                className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-11"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="business.fullTimeEmployeesMale"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Male (Full-Time)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="0" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                  value={field.value || ""}
+                                  className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-11"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={form.control}
+                          name="business.fullTimeEmployeesFemale"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Female (Full-Time)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  placeholder="0" 
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                  value={field.value || ""}
+                                  className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-11"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 border border-green-100 dark:border-green-800">
+                  <h4 className="text-base font-semibold text-green-900 dark:text-green-100 mb-2 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    Employment Data
+                  </h4>
+                  <p className="text-sm text-green-700 dark:text-green-300 mb-4">Indirect employment opportunities created</p>
+                  
+                  {/* Indirect Employment (Part-Time) */}
+                  <div className="mb-6">
+                    <h5 className="text-sm font-medium text-green-800 dark:text-green-200 mb-3 border-l-2 border-green-500 pl-2">
+                      Indirect Employment (Part-Time)
+                    </h5>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="business.partTimeEmployeesMale"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Male (Part-Time)</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="number" 
+                                placeholder="0" 
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                value={field.value || ""}
+                                className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-green-500 focus:ring-green-500 h-11"
                               />
                             </FormControl>
                             <FormMessage />
@@ -866,10 +955,10 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                       
                       <FormField
                         control={form.control}
-                        name="business.fullTimeEmployeesFemale"
+                        name="business.partTimeEmployeesFemale"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-gray-900 font-medium">Female (Full-Time)</FormLabel>
+                            <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Female (Part-Time)</FormLabel>
                             <FormControl>
                               <Input 
                                 type="number" 
@@ -877,7 +966,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                                 {...field}
                                 onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                                 value={field.value || ""}
-                                className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-11"
+                                className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-green-500 focus:ring-green-500 h-11"
                               />
                             </FormControl>
                             <FormMessage />
@@ -887,62 +976,12 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                     </div>
                   </div>
                 </div>
-                
-                <div className="bg-green-50 rounded-xl p-6 border border-green-100">
-                  <h4 className="text-base font-semibold text-green-900 mb-4 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                    Part-Time Employment
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="business.partTimeEmployeesMale"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-900 font-medium">Male (Part-Time)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              placeholder="0" 
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              value={field.value || ""}
-                              className="border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 h-11"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="business.partTimeEmployeesFemale"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-900 font-medium">Female (Part-Time)</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number" 
-                              placeholder="0" 
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                              value={field.value || ""}
-                              className="border-gray-300 text-gray-900 focus:border-green-500 focus:ring-green-500 h-11"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           </div>
           
           {/* Product/Service Information Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div className="bg-gradient-to-r from-indigo-600 to-green-700 p-6">
               <div className="flex items-center gap-3 text-white">
                 <Package className="h-6 w-6" />
@@ -956,15 +995,15 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 name="business.productServiceDescription"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 font-medium">Product/Service Description</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Product/Service Description</FormLabel>
                     <FormControl>
                       <Textarea 
                         placeholder="Describe your main products or services..." 
-                        className="min-h-[120px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                        className="min-h-[120px] border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 resize-none"
                         {...field} 
                       />
                     </FormControl>
-                    <FormDescription className="text-gray-600">
+                    <FormDescription className="text-gray-600 dark:text-gray-100">
                       Provide details about what you offer to customers
                     </FormDescription>
                     <FormMessage />
@@ -978,7 +1017,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                   name="business.unitPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Unit Price (USD)</FormLabel>
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Unit Price (USD)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -986,10 +1025,10 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           {...field}
                           onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           value={field.value || ""}
-                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                         />
                       </FormControl>
-                      <FormDescription className="text-gray-600">
+                      <FormDescription className="text-gray-600 dark:text-gray-100">
                         Average unit price of your product/service
                       </FormDescription>
                       <FormMessage />
@@ -1002,7 +1041,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                   name="business.customerCountLastSixMonths"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900 font-medium">Customers (Last 6 Months)</FormLabel>
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Customers (Last 6 Months)</FormLabel>
                       <FormControl>
                         <Input 
                           type="number" 
@@ -1010,10 +1049,10 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                           {...field}
                           onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                           value={field.value || ""}
-                          className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                          className="border-gray-300 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                         />
                       </FormControl>
-                      <FormDescription className="text-gray-600">
+                      <FormDescription className="text-gray-600 dark:text-gray-100">
                         Number of customers served in the last 6 months
                       </FormDescription>
                       <FormMessage />
@@ -1027,15 +1066,15 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 name="business.productionCapacityLastSixMonths"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-gray-900 font-medium">Production Capacity (Last 6 Months)</FormLabel>
+                    <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Production Capacity (Last 6 Months)</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="e.g., 500 units per month, 10 clients per week" 
                         {...field} 
-                        className="border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 h-12"
+                        className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
                       />
                     </FormControl>
-                    <FormDescription className="text-gray-600">
+                    <FormDescription className="text-gray-600 dark:text-gray-100">
                       Describe your production or service delivery capacity
                     </FormDescription>
                     <FormMessage />
@@ -1048,9 +1087,9 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                 name="business.customerSegments"
                 render={() => (
                   <FormItem>
-                    <div className="mb-4">
-                      <FormLabel className="text-gray-900 font-medium">Target Customer Segments</FormLabel>
-                      <FormDescription className="text-gray-600">
+                    <div className="mb-4 ">
+                      <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Target Customer Segments</FormLabel>
+                      <FormDescription className="text-gray-600 dark:text-gray-100">
                         Select all customer segments that apply to your business
                       </FormDescription>
                     </div>
@@ -1064,7 +1103,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                             return (
                               <FormItem
                                 key={option.id}
-                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
+                                className="flex flex-row items-start space-x-4 space-y-0 p-5 rounded-xl border-2 border-gray-200 dark:border-gray-600 hover:border-blue-400 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/20 dark:hover:to-blue-800/20 transition-all duration-200 shadow-sm hover:shadow-md cursor-pointer"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -1080,7 +1119,7 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                                     className="scale-125 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600 data-[state=unchecked]:border-gray-400 data-[state=unchecked]:bg-white shadow-lg border-2 hover:shadow-xl data-[state=checked]:hover:bg-blue-700"
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal text-gray-900 cursor-pointer">
+                                <FormLabel className="font-normal text-gray-900 dark:text-gray-100 cursor-pointer">
                                   {option.label}
                                 </FormLabel>
                               </FormItem>
@@ -1089,6 +1128,33 @@ export function BusinessInfoForm({ form, onNext, onPrevious }: BusinessInfoFormP
                         />
                       ))}
                     </div>
+                    
+                    {/* Conditional "Other" specification input */}
+                    {form.watch("business.customerSegments")?.includes("other") && (
+                      <div className="mt-4">
+                        <FormField
+                          control={form.control}
+                          name="business.customerSegmentsOther"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-gray-900 dark:text-gray-100 font-medium">Please Specify Other Customer Segments</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="Please specify your other customer segments"
+                                  className="border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 dark:bg-gray-800 focus:border-blue-500 focus:ring-blue-500 h-12"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <FormDescription className="text-gray-600 dark:text-gray-400">
+                                Describe any additional customer segments not listed above
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+                    
                     <FormMessage />
                   </FormItem>
                 )}

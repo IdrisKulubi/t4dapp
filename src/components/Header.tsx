@@ -68,7 +68,7 @@ export function Header() {
               </div>
               <div className="relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl bg-white shadow-md">
                 <Image 
-                  src="/images/AfDB.png" 
+                  src="/images/afdb-logo.png" 
                   alt="African Development Bank" 
                   fill
                   className="object-contain p-0.5 lg:p-1"

@@ -200,7 +200,7 @@ export function SupportNeedsForm({ form, onNext, onPrevious }: SupportNeedsFormP
                     <FormLabel className="text-gray-900 font-medium">Mentorship Needs</FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder="Describe what kind of mentorship you need" 
+                        placeholder="Detail any additional training you need to grow your business" 
                         className="min-h-[100px] border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500 resize-none" 
                         {...field}
                       />

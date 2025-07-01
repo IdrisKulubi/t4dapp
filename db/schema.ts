@@ -63,7 +63,8 @@ export const customerSegmentEnum = pgEnum('customer_segment', [
   'micro_small_medium_enterprises',
   'institutions',
   'corporates',
-  'government_and_ngos'
+  'government_and_ngos',
+  'other'
 ]);
 
 export const applicationStatusEnum = pgEnum('application_status', [
@@ -242,6 +243,7 @@ export const businesses = pgTable('businesses', {
   currentChallenges: text('current_challenges').notNull(),
   supportNeeded: text('support_needed').notNull(),
   additionalInformation: text('additional_information'),
+  customerSegmentsOther: text('customer_segments_other'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 });

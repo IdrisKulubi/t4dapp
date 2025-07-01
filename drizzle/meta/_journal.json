@@ -15,6 +15,13 @@
       "when": 1751313876144,
       "tag": "0001_first_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751368248178,
+      "tag": "0002_crazy_surge",
+      "breakpoints": true
     }
   ]
 }

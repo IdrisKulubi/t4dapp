@@ -69,9 +69,11 @@ const applicationSubmissionSchema = z.object({
         "micro_small_medium_enterprises",
         "institutions",
         "corporates",
-        "government_and_ngos"
+        "government_and_ngos",
+        "other"
       ])
     ),
+    customerSegmentsOther: z.string().optional().nullable(),
     funding: z.object({
       hasExternalFunding: z.boolean(),
       fundingSource: z.enum([
@@ -236,6 +238,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
         currentChallenges: validatedData.business.currentChallenges,
         supportNeeded: validatedData.business.supportNeeded,
         additionalInformation: validatedData.business.additionalInformation,
+        customerSegmentsOther: validatedData.business.customerSegmentsOther,
       };
       
       const [business] = await tx.insert(businesses).values(newBusiness).returning();
