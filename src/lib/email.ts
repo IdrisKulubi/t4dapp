@@ -29,7 +29,6 @@ export interface SendEmailParams {
 export const sendEmail = async (params: SendEmailParams) => {
   const { to, subject, react } = params;
   try {
-    console.log(`📨 Sending email to ${to}...`);
     const { data, error } = await resend.emails.send({
       from: fromEmail,
       to,
@@ -37,13 +36,10 @@ export const sendEmail = async (params: SendEmailParams) => {
       html: await render(react),
     });
     if (error) {
-      console.error(`❌ Error sending email to ${to}:`, error);
       throw new Error('Failed to send email');
     }
-    console.log(`✅ Email sent successfully to ${to}. Message ID: ${data?.id}`);
     return { success: true, data };
   } catch (error) {
-    console.error(`❌ Unexpected error sending email to ${to}:`, error);
     throw error;
   }
 };
@@ -57,7 +53,7 @@ export async function sendVerificationCode(props: {
 }) {
   return sendEmail({
     to: props.to,
-    subject: 'Your T4D Africa Verification Code',
+    subject: 'Your In-Country YouthADAPT Verification Code',
     react: VerificationCodeEmail({
       userEmail: props.to,
       verificationCode: props.verificationCode,
@@ -73,7 +69,7 @@ export async function sendApplicationSubmissionEmail(
 ) {
   return sendEmail({
     to: props.userEmail,
-    subject: '🎉 Application Submitted Successfully - T4D Africa Challenge',
+    subject: '🎉 Application Submitted Successfully - In-Country YouthADAPT',
     react: ApplicationSubmissionEmail(props),
   });
 }
@@ -93,7 +89,7 @@ interface PasswordResetEmailProps {
 export async function sendPasswordResetEmail(props: PasswordResetEmailProps) {
   return sendEmail({
     to: props.to,
-    subject: 'Reset Your T4D Africa Password',
+    subject: 'Reset Your In-Country YouthADAPT Password',
     react: PasswordResetEmail(props),
   });
 }
