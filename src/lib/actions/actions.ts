@@ -297,7 +297,7 @@ export async function submitApplication(formData: ApplicationSubmission) {
     
     // Send application submission confirmation email
     await sendApplicationSubmissionEmail({ 
-      to: userEmail!, 
+      userEmail: userEmail!, 
       applicantName: userName || validatedData.personal.firstName,
       applicationId: application.id.toString(),
       businessName: validatedData.business.name,

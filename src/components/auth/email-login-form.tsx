@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
 interface EmailLoginFormProps {
   callbackUrl?: string;
@@ -66,6 +67,13 @@ export function EmailLoginForm({ callbackUrl }: EmailLoginFormProps) {
             <Button type="button" variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </Button>
+        </div>
+        <div className="text-right">
+          <Link href="/forgot-password" passHref>
+            <Button variant="link" className="px-0 text-sm font-normal">
+              Forgot Password?
+            </Button>
+          </Link>
         </div>
       </div>
 

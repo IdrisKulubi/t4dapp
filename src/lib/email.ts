@@ -1,89 +1,101 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
-import { VerificationCodeEmail } from '@/components/emails/verification-code-email';
-import { ApplicationSubmissionEmail } from '@/components/emails/application-submission-email';
+import React from 'react';
+import {
+  ApplicationSubmissionEmail,
+  ApplicationSubmissionEmailProps,
+} from '@/components/emails/application-submission-email';
+import {
+  VerificationCodeEmail,
+} from '@/components/emails/verification-code-email';
+import {
+  PasswordResetEmail,
+} from '@/components/emails/password-reset-email';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const fromEmail =
+  process.env.FROM_EMAIL || 'YouthADAPT <verify@incountryouthadapt.kenyacic.org>';
 
-export interface SendVerificationCodeParams {
+if (!process.env.RESEND_API_KEY) {
+  console.warn('⚠️ RESEND_API_KEY is not set. Emails will not be sent.');
+}
+
+export interface SendEmailParams {
+  to: string;
+  subject: string;
+  react: React.ReactElement;
+}
+
+export const sendEmail = async (params: SendEmailParams) => {
+  const { to, subject, react } = params;
+  try {
+    console.log(`📨 Sending email to ${to}...`);
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
+      to,
+      subject,
+      html: await render(react),
+    });
+    if (error) {
+      console.error(`❌ Error sending email to ${to}:`, error);
+      throw new Error('Failed to send email');
+    }
+    console.log(`✅ Email sent successfully to ${to}. Message ID: ${data?.id}`);
+    return { success: true, data };
+  } catch (error) {
+    console.error(`❌ Unexpected error sending email to ${to}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Sends a verification code email.
+ */
+export async function sendVerificationCode(props: {
   to: string;
   verificationCode: string;
+}) {
+  return sendEmail({
+    to: props.to,
+    subject: 'Your T4D Africa Verification Code',
+    react: VerificationCodeEmail({
+      userEmail: props.to,
+      verificationCode: props.verificationCode,
+    }),
+  });
 }
 
-export interface SendApplicationSubmissionEmailParams {
+/**
+ * Sends an application submission confirmation email.
+ */
+export async function sendApplicationSubmissionEmail(
+  props: ApplicationSubmissionEmailProps
+) {
+  return sendEmail({
+    to: props.userEmail,
+    subject: '🎉 Application Submitted Successfully - T4D Africa Challenge',
+    react: ApplicationSubmissionEmail(props),
+  });
+}
+
+/**
+ * Props for the password reset email.
+ */
+interface PasswordResetEmailProps {
   to: string;
-  applicantName: string;
-  applicationId: string;
-  businessName: string;
-  submissionDate: string;
+  code: string;
+  userName?: string;
 }
 
-export async function sendVerificationCode({
-  to,
-  verificationCode,
-}: SendVerificationCodeParams) {
-  try {
-    const emailHtml = await render(
-      VerificationCodeEmail({
-        verificationCode,
-        userEmail: to,
-      })
-    );
-
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'youthADAPT <veryfy@strathspace.com>',
-      to: [to],
-      subject: 'Your YouthADAPT Challenge Verification Code',
-      html: emailHtml,
-    });
-
-    if (error) {
-      console.error('Error sending verification email:', error);
-      throw new Error('Failed to send verification email');
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    console.error('Error sending verification email:', error);
-    throw error;
-  }
-}
-
-export async function sendApplicationSubmissionEmail({
-  to,
-  applicantName,
-  applicationId,
-  businessName,
-  submissionDate,
-}: SendApplicationSubmissionEmailParams) {
-  try {
-    const emailHtml = await render(
-      ApplicationSubmissionEmail({
-        applicantName,
-        applicationId,
-        businessName,
-        submissionDate,
-        userEmail: to,
-      })
-    );
-
-    const { data, error } = await resend.emails.send({
-      from: process.env.EMAIL_FROM || 'YouthADAPT <noreply@yourdomain.com>',
-      to: [to],
-      subject: '🎉 Application Submitted Successfully - YouthADAPT Challenge',
-      html: emailHtml,
-    });
-
-    if (error) {
-      console.error('Error sending application submission email:', error);
-      throw new Error('Failed to send application submission email');
-    }
-
-    return { success: true, data };
-  } catch (error) {
-    console.error('Error sending application submission email:', error);
-    throw error;
-  }
+/**
+ * Sends a password reset email with a verification code.
+ */
+export async function sendPasswordResetEmail(props: PasswordResetEmailProps) {
+  return sendEmail({
+    to: props.to,
+    subject: 'Reset Your T4D Africa Password',
+    react: PasswordResetEmail(props),
+  });
 }
 
 export function generateVerificationCode(): string {

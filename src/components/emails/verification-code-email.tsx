@@ -9,10 +9,11 @@ import {
   Preview,
   Section,
   Text,
+  render,
 } from '@react-email/components';
 import * as React from 'react';
 
-interface VerificationCodeEmailProps {
+export interface VerificationCodeEmailProps {
   verificationCode: string;
   userEmail: string;
 }
@@ -68,6 +69,10 @@ export const VerificationCodeEmail = ({
     </Body>
   </Html>
 );
+
+export const renderVerificationCodeEmail = (props: VerificationCodeEmailProps) => {
+    return render(<VerificationCodeEmail {...props} />);
+};
 
 export default VerificationCodeEmail;
 

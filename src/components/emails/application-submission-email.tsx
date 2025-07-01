@@ -8,10 +8,11 @@ import {
   Preview,
   Section,
   Text,
+  render,
 } from '@react-email/components';
 import * as React from 'react';
 
-interface ApplicationSubmissionEmailProps {
+export interface ApplicationSubmissionEmailProps {
   applicantName: string;
   applicationId: string;
   businessName: string;
@@ -103,6 +104,10 @@ export const ApplicationSubmissionEmail = ({
     </Body>
   </Html>
 );
+
+export const renderApplicationSubmissionEmail = (props: ApplicationSubmissionEmailProps) => {
+    return render(<ApplicationSubmissionEmail {...props} />);
+}
 
 export default ApplicationSubmissionEmail;
 
