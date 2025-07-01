@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { ChevronDownIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { SupportModal } from "@/components/support/support-modal";
 
 const faqs = [
   {
@@ -56,9 +57,18 @@ const staggerContainer = {
 
 export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const openSupportModal = () => {
+    setIsSupportModalOpen(true);
+  };
+
+  const closeSupportModal = () => {
+    setIsSupportModalOpen(false);
   };
 
   return (
@@ -166,22 +176,44 @@ export function FAQSection() {
           viewport={{ once: true }}
           transition={{ delay: 0.5, duration: 0.6 }}
         >
-          <p className="text-slate-600 mb-6 max-w-2xl mx-auto">
+          <p className="text-slate-600 mb-8 max-w-2xl mx-auto">
             Still have questions? Our team is here to help you navigate the application process.
           </p>
-          <motion.a
-            href="/apply"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white font-semibold hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span>Start Your Application</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </motion.a>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <motion.button
+              onClick={openSupportModal}
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white border-2 border-[#00D0AB] text-[#00D0AB] font-semibold hover:bg-[#00D0AB] hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <QuestionMarkCircleIcon className="w-5 h-5" />
+              <span>Contact Support</span>
+            </motion.button>
+            
+            <motion.a
+              href="/apply"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white font-semibold hover:from-[#00D0AB]/90 hover:to-[#0B5FBA]/90 transition-all duration-300 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>Start Your Application</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.a>
+          </div>
         </motion.div>
       </div>
+
+      {/* Support Modal */}
+      <SupportModal
+        isOpen={isSupportModalOpen}
+        onClose={closeSupportModal}
+        defaultCategory="general_inquiry"
+        defaultSubject="Question about YouthADAPT Challenge"
+        context="FAQ Section - User has questions about the application process"
+      />
     </section>
   );
 } 

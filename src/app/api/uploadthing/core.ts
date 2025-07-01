@@ -62,6 +62,7 @@ export const ourFileRouter = {
   cr12Uploader: documentUploader,
   auditedAccountsUploader: documentUploader,
   taxComplianceUploader: documentUploader,
+  registrationCertificateUploader: documentUploader,
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter; 

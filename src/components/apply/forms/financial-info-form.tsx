@@ -159,6 +159,9 @@ export function FinancialInfoForm({ form, onNext, onPrevious }: FinancialInfoFor
                         }}
                       />
                     </FormControl>
+                    <FormDescription className="text-gray-600">
+                    How much of your company&apos;s revenue is retained as profit after covering its costs.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

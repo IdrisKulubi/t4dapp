@@ -24,3 +24,11 @@ export function safeToDate(value: unknown): Date | null {
   
   return null;
 }
+
+/**
+ * Generates a random 6-digit verification code.
+ * @returns A string representing the 6-digit code.
+ */
+export function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}

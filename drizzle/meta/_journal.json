@@ -8,6 +8,27 @@
       "when": 1751275531568,
       "tag": "0000_fine_glorian",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751313876144,
+      "tag": "0001_first_shooting_star",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751368248178,
+      "tag": "0002_crazy_surge",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1751371110541,
+      "tag": "0003_dear_santa_claus",
+      "breakpoints": true
     }
   ]
 }

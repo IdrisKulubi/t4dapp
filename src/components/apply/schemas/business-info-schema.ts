@@ -22,7 +22,8 @@ export const businessInfoSchema = z.object({
     // Sector Categorization
     sector: z.enum(["food-security", "infrastructure", "other"], {
       required_error: "Please select a sector"
-    }).optional(),
+    }),
+    sectorOther: z.string().optional(),
     
     // Location - Updated to focus on participating countries only
     country: z.enum(["ghana", "kenya", "nigeria", "rwanda", "tanzania"], { 
@@ -41,12 +42,14 @@ export const businessInfoSchema = z.object({
       .min(20, { message: "Problem description must be at least 20 characters" })
       .max(1000, { message: "Problem description must not exceed 1000 characters" }),
     
-    // Business Performance
+    // Business Performance & Employment Data
     revenueLastTwoYears: z
       .number()
       .min(0, { message: "Revenue cannot be negative" })
       .optional()
       .nullable(),
+    
+    // Direct Employment (Full-Time Employees)
     fullTimeEmployeesTotal: z
       .number()
       .int({ message: "Please enter a whole number" })
@@ -65,6 +68,8 @@ export const businessInfoSchema = z.object({
       .min(0, { message: "Cannot be negative" })
       .optional()
       .nullable(),
+    
+    // Indirect Employment (Part-Time Employees)
     partTimeEmployeesMale: z
       .number()
       .int({ message: "Please enter a whole number" })
@@ -99,16 +104,18 @@ export const businessInfoSchema = z.object({
       .min(10, { message: "Production capacity description must be at least 10 characters" })
       .optional(),
     
-    // Customer Segments - Updated to match what actions file expects as "targetCustomers"
+    // Customer Segments - Updated to include "other" option
     customerSegments: z.array(
       z.enum([
         "household_individuals",
         "micro_small_medium_enterprises",
         "institutions",
         "corporates",
-        "government_and_ngos"
+        "government_and_ngos",
+        "other"
       ])
     ).optional(),
+    customerSegmentsOther: z.string().optional(),
     
     // Target Customers (alias for customerSegments to match actions file)
     targetCustomers: z.array(
@@ -117,7 +124,8 @@ export const businessInfoSchema = z.object({
         "micro_small_medium_enterprises",
         "institutions",
         "corporates",
-        "government_and_ngos"
+        "government_and_ngos",
+        "other"
       ])
     ).optional(),
     
@@ -169,6 +177,40 @@ export const businessInfoSchema = z.object({
       fundingInstrumentOther: z.string().max(100).optional().nullable(),
     }).optional(),
   })
+  .refine(data => {
+    if (data.sector === 'other') {
+      return data.sectorOther && data.sectorOther.trim().length >= 3;
+    }
+    return true;
+  }, {
+    message: "Please specify your sector (minimum 3 characters)",
+    path: ["sectorOther"],
+  })
+  .refine(data => {
+    // Validate that male + female full-time employees equals total full-time employees
+    const total = data.fullTimeEmployeesTotal || 0;
+    const male = data.fullTimeEmployeesMale || 0;
+    const female = data.fullTimeEmployeesFemale || 0;
+    
+    // Only validate if any of these fields have values
+    if (total > 0 || male > 0 || female > 0) {
+      return (male + female) === total;
+    }
+    return true;
+  }, {
+    message: "The sum of male and female full-time employees must equal the total full-time employees",
+    path: ["fullTimeEmployeesTotal"],
+  })
+  .refine(data => {
+    // Validate that customerSegmentsOther is provided when "other" is selected
+    if (data.customerSegments?.includes("other")) {
+      return data.customerSegmentsOther && data.customerSegmentsOther.trim().length >= 3;
+    }
+    return true;
+  }, {
+    message: "Please specify your other customer segments (minimum 3 characters)",
+    path: ["customerSegmentsOther"],
+  }),
 });
 
 export type BusinessInfoFormValues = z.infer<typeof businessInfoSchema>;
@@ -184,7 +226,8 @@ export const defaultBusinessInfo: BusinessInfoFormValues = {
     cr12Url: null,
     auditedAccountsUrl: null,
     taxComplianceUrl: null,
-    sector: undefined,
+    sector: "food-security" as const,
+    sectorOther: undefined,
     country: "ghana" as const, // Fix linter error - use valid enum value instead of empty string
     city: "",
     registeredCountries: "",
@@ -201,6 +244,7 @@ export const defaultBusinessInfo: BusinessInfoFormValues = {
     customerCountLastSixMonths: null,
     productionCapacityLastSixMonths: "",
     customerSegments: [],
+    customerSegmentsOther: undefined,
     targetCustomers: [],
     climateAdaptationContribution: "",
     climateExtremeImpact: "",

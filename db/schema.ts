@@ -63,7 +63,8 @@ export const customerSegmentEnum = pgEnum('customer_segment', [
   'micro_small_medium_enterprises',
   'institutions',
   'corporates',
-  'government_and_ngos'
+  'government_and_ngos',
+  'other'
 ]);
 
 export const applicationStatusEnum = pgEnum('application_status', [
@@ -76,6 +77,32 @@ export const applicationStatusEnum = pgEnum('application_status', [
   'finalist',
   'approved',
   'rejected'
+]);
+
+export const supportCategoryEnum = pgEnum('support_category', [
+  'technical_issue',
+  'application_help',
+  'account_problem',
+  'payment_issue',
+  'feature_request',
+  'bug_report',
+  'general_inquiry',
+  'other'
+]);
+
+export const supportPriorityEnum = pgEnum('support_priority', [
+  'low',
+  'medium',
+  'high',
+  'urgent'
+]);
+
+export const supportStatusEnum = pgEnum('support_status', [
+  'open',
+  'in_progress',
+  'waiting_for_user',
+  'resolved',
+  'closed'
 ]);
 
 // Tables
@@ -199,6 +226,7 @@ export const applicants = pgTable('applicants', {
   firstName: varchar('first_name', { length: 100 }).notNull(),
   lastName: varchar('last_name', { length: 100 }).notNull(),
   gender: genderEnum('gender').notNull(),
+  genderOther: text('gender_other'),
   dateOfBirth: date('date_of_birth').notNull(),
   citizenship: countryEnum('citizenship').notNull(),
   citizenshipOther: varchar('citizenship_other', { length: 100 }),
@@ -218,6 +246,8 @@ export const businesses = pgTable('businesses', {
   startDate: date('start_date').notNull(),
   isRegistered: boolean('is_registered').notNull(),
   registrationCertificateUrl: varchar('registration_certificate_url', { length: 500 }),
+  sector: varchar('sector', { length: 100 }),
+  sectorOther: text('sector_other'),
   country: countryEnum('country').notNull(),
   countryOther: varchar('country_other', { length: 100 }),
   city: varchar('city', { length: 100 }).notNull(),
@@ -239,6 +269,7 @@ export const businesses = pgTable('businesses', {
   currentChallenges: text('current_challenges').notNull(),
   supportNeeded: text('support_needed').notNull(),
   additionalInformation: text('additional_information'),
+  customerSegmentsOther: text('customer_segments_other'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull()
 });
@@ -369,6 +400,51 @@ export const evaluationHistory = pgTable('evaluation_history', {
   createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
+// Support system tables
+export const supportTickets = pgTable('support_tickets', {
+  id: serial('id').primaryKey(),
+  ticketNumber: varchar('ticket_number', { length: 20 }).notNull().unique(), // e.g., "TKT-2024-001"
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  category: supportCategoryEnum('category').notNull(),
+  priority: supportPriorityEnum('priority').default('medium').notNull(),
+  status: supportStatusEnum('status').default('open').notNull(),
+  subject: varchar('subject', { length: 200 }).notNull(),
+  description: text('description').notNull(),
+  userEmail: varchar('user_email', { length: 255 }).notNull(),
+  userName: varchar('user_name', { length: 200 }).notNull(),
+  attachmentUrl: varchar('attachment_url', { length: 500 }), // Optional file attachment
+  assignedTo: text('assigned_to').references(() => users.id), // Admin user assigned to ticket
+  resolvedAt: timestamp('resolved_at'),
+  resolvedBy: text('resolved_by').references(() => users.id),
+  resolutionNotes: text('resolution_notes'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+}, (table) => ({
+  ticketNumberIdx: index("support_tickets_ticket_number_idx").on(table.ticketNumber),
+  userIdIdx: index("support_tickets_user_id_idx").on(table.userId),
+  statusIdx: index("support_tickets_status_idx").on(table.status),
+  categoryIdx: index("support_tickets_category_idx").on(table.category),
+  priorityIdx: index("support_tickets_priority_idx").on(table.priority),
+  createdAtIdx: index("support_tickets_created_at_idx").on(table.createdAt),
+}));
+
+export const supportResponses = pgTable('support_responses', {
+  id: serial('id').primaryKey(),
+  ticketId: integer('ticket_id').notNull().references(() => supportTickets.id, { onDelete: 'cascade' }),
+  responderId: text('responder_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  responderName: varchar('responder_name', { length: 200 }).notNull(),
+  responderRole: varchar('responder_role', { length: 50 }).notNull(), // 'user', 'admin', 'support'
+  message: text('message').notNull(),
+  attachmentUrl: varchar('attachment_url', { length: 500 }), // Optional file attachment
+  isInternal: boolean('is_internal').default(false), // Internal notes not visible to user
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+}, (table) => ({
+  ticketIdIdx: index("support_responses_ticket_id_idx").on(table.ticketId),
+  responderIdIdx: index("support_responses_responder_id_idx").on(table.responderId),
+  createdAtIdx: index("support_responses_created_at_idx").on(table.createdAt),
+}));
+
 // Relations
 export const applicantRelations = relations(applicants, ({ one, many }) => ({
   user: one(users, {
@@ -486,12 +562,40 @@ export const evaluationHistoryRelations = relations(evaluationHistory, ({ one })
     fields: [evaluationHistory.applicationId],
     references: [applications.id]
   }),
-  newConfiguration: one(scoringConfigurations, {
-    fields: [evaluationHistory.newConfigId],
+  previousConfig: one(scoringConfigurations, {
+    fields: [evaluationHistory.previousConfigId],
     references: [scoringConfigurations.id]
   }),
-  evaluator: one(users, {
-    fields: [evaluationHistory.evaluatedBy],
+  newConfig: one(scoringConfigurations, {
+    fields: [evaluationHistory.newConfigId],
+    references: [scoringConfigurations.id]
+  })
+}));
+
+// Support system relations
+export const supportTicketsRelations = relations(supportTickets, ({ one, many }) => ({
+  user: one(users, {
+    fields: [supportTickets.userId],
+    references: [users.id]
+  }),
+  assignedToUser: one(users, {
+    fields: [supportTickets.assignedTo],
+    references: [users.id]
+  }),
+  resolvedByUser: one(users, {
+    fields: [supportTickets.resolvedBy],
+    references: [users.id]
+  }),
+  responses: many(supportResponses)
+}));
+
+export const supportResponsesRelations = relations(supportResponses, ({ one }) => ({
+  ticket: one(supportTickets, {
+    fields: [supportResponses.ticketId],
+    references: [supportTickets.id]
+  }),
+  responder: one(users, {
+    fields: [supportResponses.responderId],
     references: [users.id]
   })
 }));

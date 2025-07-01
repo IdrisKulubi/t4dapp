@@ -62,7 +62,7 @@ export default async function ApplicationPreparationPage() {
             Application Preparation Guide
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Before you begin your InCountryYouthADAPT Challenge application, let&apos;s ensure you have 
+            Before you begin your In-Country YouthADAPT Challenge application, let&apos;s ensure you have 
             everything you need for a smooth and successful submission process.
           </p>
         </div>
@@ -71,9 +71,7 @@ export default async function ApplicationPreparationPage() {
         <Alert className="mb-8 border-amber-200 bg-amber-50">
           <AlertTriangle className="h-5 w-5 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            <strong>Important:</strong> We are looking for <strong>real, implementable solutions</strong> to climate adaptation challenges. 
-            Your application should demonstrate a concrete business or innovation that addresses actual climate-related problems 
-            with measurable impact potential.
+             We are looking for real, implementable solutions to climate adaptation challenges with concrete business innovations that address actual climate-related problems with measurable impact potential.
           </AlertDescription>
         </Alert>
 

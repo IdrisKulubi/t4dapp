@@ -68,7 +68,7 @@ export function Header() {
               </div>
               <div className="relative h-8 w-16 lg:h-12 lg:w-24 p-1 lg:p-2 rounded-xl bg-white shadow-md">
                 <Image 
-                  src="/images/AfDB.png" 
+                  src="/images/afdb-logo.png" 
                   alt="African Development Bank" 
                   fill
                   className="object-contain p-0.5 lg:p-1"
@@ -93,8 +93,8 @@ export function Header() {
             >
               <Link href="/" className="group block" onClick={closeMobileMenu}>
                 <h1 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold tracking-wide text-slate-800">
-                  <span className="hidden sm:inline">InCountryYouthADAPT Challenge 2025</span>
-                  <span className="sm:hidden">InCountryYouthADAPT 2025</span>
+                  <span className="hidden sm:inline">In-Country YouthADAPT Challenge 2025</span>
+                  <span className="sm:hidden">In-Country YouthADAPT 2025</span>
                 </h1>
               </Link>
             </motion.div>

@@ -7,6 +7,8 @@ import { motion } from "framer-motion";
 import { Globe } from "lucide-react";
 import { SignupForm } from "./signup-form";
 import { EmailLoginForm } from "./email-login-form";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 interface AuthCardProps {
   callbackUrl?: string;
@@ -14,6 +16,10 @@ interface AuthCardProps {
 }
 
 export function AuthCard({ callbackUrl, defaultTab = "signin" }: AuthCardProps) {
+  const { data: session } = useSession();
+  if (session) {
+    redirect("/");
+  }
   return (
     <div className="w-full max-w-md">
       <motion.div

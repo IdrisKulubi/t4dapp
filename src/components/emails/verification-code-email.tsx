@@ -9,10 +9,11 @@ import {
   Preview,
   Section,
   Text,
+  render,
 } from '@react-email/components';
 import * as React from 'react';
 
-interface VerificationCodeEmailProps {
+export interface VerificationCodeEmailProps {
   verificationCode: string;
   userEmail: string;
 }
@@ -32,7 +33,7 @@ export const VerificationCodeEmail = ({
           <Heading style={heading}>Verify Your Email Address</Heading>
           
           <Text style={paragraph}>
-            Welcome to the YouthADAPT Challenge! To complete your registration, please verify your email address using the code below:
+            Welcome to the In-Country YouthADAPT Challenge! To complete your registration, please verify your email address using the code below:
           </Text>
           
           <Section style={codeSection}>
@@ -50,7 +51,7 @@ export const VerificationCodeEmail = ({
           <Section style={footer}>
             <Text style={footerText}>
               Best regards,<br />
-              The YouthADAPT Challenge Team
+              The In-Country YouthADAPT Challenge Team
             </Text>
 
             <Text style={footerText}>
@@ -68,6 +69,10 @@ export const VerificationCodeEmail = ({
     </Body>
   </Html>
 );
+
+export const renderVerificationCodeEmail = (props: VerificationCodeEmailProps) => {
+    return render(<VerificationCodeEmail {...props} />);
+};
 
 export default VerificationCodeEmail;
 
