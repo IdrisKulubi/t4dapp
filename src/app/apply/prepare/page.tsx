@@ -71,7 +71,7 @@ export default async function ApplicationPreparationPage() {
         <Alert className="mb-8 border-amber-200 bg-amber-50">
           <AlertTriangle className="h-5 w-5 text-amber-600" />
           <AlertDescription className="text-amber-800">
-            <strong>Important:</strong> We are looking for <strong>real, implementable solutions</strong> to climate adaptation challenges with concrete business innovations that address actual climate-related problems with measurable impact potential.
+             We are looking for real, implementable solutions to climate adaptation challenges with concrete business innovations that address actual climate-related problems with measurable impact potential.
           </AlertDescription>
         </Alert>
 
