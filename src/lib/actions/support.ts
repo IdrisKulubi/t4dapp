@@ -66,6 +66,7 @@ export async function createSupportTicket(data: CreateSupportTicketData) {
     }).returning();
 
     revalidatePath("/admin/support");
+    revalidatePath("/profile");
     
     return {
       success: true,
@@ -242,10 +243,20 @@ export async function getSupportTicketById(ticketId: number) {
  * Add a response to a support ticket
  */
 export async function addSupportResponse(data: AddResponseData) {
+  console.log("🎯 addSupportResponse called with data:", JSON.stringify(data, null, 2));
+  
   try {
     // Get current user session
     const session = await auth();
+    console.log("🔐 Session data:", {
+      hasSession: !!session,
+      userId: session?.user?.id,
+      userRole: session?.user?.role,
+      userName: session?.user?.name
+    });
+    
     if (!session?.user?.id) {
+      console.log("❌ No user session found");
       return {
         success: false,
         message: "You must be logged in to add a response.",
@@ -256,15 +267,27 @@ export async function addSupportResponse(data: AddResponseData) {
     const userName = session.user.name || "Unknown User";
     const userRole = session.user.role || "user";
 
+    console.log("👤 User info:", { userId, userName, userRole });
+
     // Validate input data
+    console.log("🔍 Validating input data...");
     const validatedData = addResponseSchema.parse(data);
+    console.log("✅ Validation passed:", validatedData);
 
     // Check if ticket exists and user has access
+    console.log("🎫 Checking if ticket exists:", validatedData.ticketId);
     const ticket = await db.query.supportTickets.findFirst({
       where: eq(supportTickets.id, validatedData.ticketId)
     });
 
+    console.log("🎫 Ticket found:", {
+      exists: !!ticket,
+      ticketUserId: ticket?.userId,
+      ticketStatus: ticket?.status
+    });
+
     if (!ticket) {
+      console.log("❌ Ticket not found");
       return {
         success: false,
         message: "Support ticket not found",
@@ -272,13 +295,23 @@ export async function addSupportResponse(data: AddResponseData) {
     }
 
     // Check permissions - users can only respond to their own tickets, admins can respond to any
+    console.log("🔒 Checking permissions...", {
+      userRole,
+      isAdmin: userRole === "admin",
+      ticketUserId: ticket.userId,
+      currentUserId: userId,
+      hasAccess: userRole === "admin" || ticket.userId === userId
+    });
+    
     if (userRole !== "admin" && ticket.userId !== userId) {
+      console.log("❌ Permission denied");
       return {
         success: false,
         message: "You don't have permission to respond to this ticket",
       };
     }
 
+    console.log("💾 Inserting response into database...");
     // Add the response
     const [response] = await db.insert(supportResponses).values({
       ticketId: validatedData.ticketId,
@@ -290,23 +323,38 @@ export async function addSupportResponse(data: AddResponseData) {
       isInternal: validatedData.isInternal && userRole === "admin", // Only admins can create internal notes
     }).returning();
 
+    console.log("✅ Response inserted:", {
+      responseId: response.id,
+      ticketId: response.ticketId,
+      responderRole: response.responderRole
+    });
+
+    console.log("🔄 Updating ticket status if needed...");
     // Update ticket status if it was resolved and user is responding
     if (ticket.status === "resolved" && userRole === "user") {
+      console.log("🔄 Reopening resolved ticket...");
       await db.update(supportTickets)
         .set({ 
           status: "open",
           updatedAt: new Date()
         })
         .where(eq(supportTickets.id, validatedData.ticketId));
+      console.log("✅ Ticket reopened");
     } else {
+      console.log("🔄 Updating ticket timestamp...");
       // Just update the updatedAt timestamp
       await db.update(supportTickets)
         .set({ updatedAt: new Date() })
         .where(eq(supportTickets.id, validatedData.ticketId));
+      console.log("✅ Timestamp updated");
     }
 
+    console.log("🔄 Revalidating paths...");
     revalidatePath("/admin/support");
+    revalidatePath("/profile");
+    console.log("✅ Paths revalidated");
     
+    console.log("🎉 addSupportResponse completed successfully");
     return {
       success: true,
       message: "Response added successfully!",
@@ -318,9 +366,11 @@ export async function addSupportResponse(data: AddResponseData) {
     };
 
   } catch (error) {
-    console.error("Error adding support response:", error);
+    console.error("💥 Error in addSupportResponse:", error);
+    console.error("💥 Error stack:", error instanceof Error ? error.stack : "No stack trace");
     
     if (error instanceof z.ZodError) {
+      console.log("💥 Zod validation error:", error.flatten().fieldErrors);
       return {
         success: false,
         message: "Validation failed. Please check your input.",
@@ -339,10 +389,20 @@ export async function addSupportResponse(data: AddResponseData) {
  * Update support ticket status (Admin only)
  */
 export async function updateSupportTicketStatus(data: UpdateTicketStatusData) {
+  console.log("🎯 updateSupportTicketStatus called with data:", JSON.stringify(data, null, 2));
+  
   try {
     // Get current user session
     const session = await auth();
+    console.log("🔐 Session data:", {
+      hasSession: !!session,
+      userId: session?.user?.id,
+      userRole: session?.user?.role,
+      isAdmin: session?.user?.role === "admin"
+    });
+    
     if (!session?.user?.id || session.user.role !== "admin") {
+      console.log("❌ Admin permission required");
       return {
         success: false,
         message: "You must be an admin to update ticket status.",
@@ -350,16 +410,27 @@ export async function updateSupportTicketStatus(data: UpdateTicketStatusData) {
     }
 
     const userId = session.user.id;
+    console.log("👤 Admin user ID:", userId);
     
     // Validate input data
+    console.log("🔍 Validating input data...");
     const validatedData = updateTicketStatusSchema.parse(data);
+    console.log("✅ Validation passed:", validatedData);
 
     // Check if ticket exists
+    console.log("🎫 Checking if ticket exists:", validatedData.ticketId);
     const ticket = await db.query.supportTickets.findFirst({
       where: eq(supportTickets.id, validatedData.ticketId)
     });
 
+    console.log("🎫 Ticket found:", {
+      exists: !!ticket,
+      currentStatus: ticket?.status,
+      ticketId: ticket?.id
+    });
+
     if (!ticket) {
+      console.log("❌ Ticket not found");
       return {
         success: false,
         message: "Support ticket not found",
@@ -367,6 +438,7 @@ export async function updateSupportTicketStatus(data: UpdateTicketStatusData) {
     }
 
     // Prepare update data
+    console.log("🔧 Preparing update data...");
     const updateData: any = {
       status: validatedData.status,
       updatedAt: new Date()
@@ -384,22 +456,33 @@ export async function updateSupportTicketStatus(data: UpdateTicketStatusData) {
       }
     }
 
+    console.log("🔧 Update data prepared:", updateData);
+
+    console.log("💾 Updating ticket in database...");
     // Update the ticket
     await db.update(supportTickets)
       .set(updateData)
       .where(eq(supportTickets.id, validatedData.ticketId));
-
-    revalidatePath("/admin/support");
     
+    console.log("✅ Ticket updated successfully");
+
+    console.log("🔄 Revalidating paths...");
+    revalidatePath("/admin/support");
+    revalidatePath("/profile");
+    console.log("✅ Paths revalidated");
+    
+    console.log("🎉 updateSupportTicketStatus completed successfully");
     return {
       success: true,
       message: "Ticket status updated successfully!",
     };
 
   } catch (error) {
-    console.error("Error updating support ticket status:", error);
+    console.error("💥 Error in updateSupportTicketStatus:", error);
+    console.error("💥 Error stack:", error instanceof Error ? error.stack : "No stack trace");
     
     if (error instanceof z.ZodError) {
+      console.log("💥 Zod validation error:", error.flatten().fieldErrors);
       return {
         success: false,
         message: "Validation failed. Please check your input.",

@@ -14,8 +14,16 @@ import {
   Eye,
   Settings
 } from "lucide-react";
+import { getCurrentUser } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 
 export default async function AdminDashboard() {
+
+const user = await getCurrentUser();
+console.log(user);
+ if (user?.role !== "admin") {
+  redirect("/");
+ }
   // Fetch real stats from the database
   const statsResult = await getApplicationStats();
   
