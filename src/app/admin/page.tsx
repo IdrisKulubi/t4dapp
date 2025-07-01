@@ -12,7 +12,8 @@ import {
   TrendingUp,
   Activity,
   Eye,
-  Settings
+  Settings,
+  MessageSquare
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
@@ -218,6 +219,20 @@ console.log(user);
                   <div className="text-left">
                     <div className="font-medium">Manage Scoring Criteria</div>
                     <div className="text-xs text-gray-500">Configure evaluation metrics</div>
+                  </div>
+                </Link>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start h-12 border-cyan-200 hover:bg-cyan-50 hover:border-cyan-300 transition-all duration-200" 
+                asChild
+              >
+                <Link href="/admin/support">
+                  <MessageSquare className="h-5 w-5 mr-3 text-cyan-600" />
+                  <div className="text-left">
+                    <div className="font-medium">Support Tickets</div>
+                    <div className="text-xs text-gray-500">View and respond to user queries</div>
                   </div>
                 </Link>
               </Button>

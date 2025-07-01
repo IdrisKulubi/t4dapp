@@ -52,18 +52,21 @@ import {
   addSupportResponse, 
   updateSupportTicketStatus 
 } from "@/lib/actions/support";
-import { 
-  updateTicketStatusSchema,
-  type UpdateTicketStatusData
-} from "@/lib/types/support";
+
 
 const responseFormSchema = z.object({
   message: z.string().min(1, "Message cannot be empty").max(2000, "Message must be less than 2000 characters"),
   isInternal: z.boolean().default(false),
 });
 
+const statusUpdateFormSchema = z.object({
+  status: z.enum(["open", "in_progress", "waiting_for_user", "resolved", "closed"]),
+  resolutionNotes: z.string().optional().nullable(),
+  assignedTo: z.string().optional().nullable(),
+});
+
 type ResponseFormData = z.infer<typeof responseFormSchema>;
-type StatusUpdateFormData = UpdateTicketStatusData;
+type StatusUpdateFormData = z.infer<typeof statusUpdateFormSchema>;
 
 interface SupportTicketModalProps {
   ticketId: number;
@@ -137,7 +140,7 @@ export function SupportTicketModal({ ticketId, isOpen, onClose, onUpdate }: Supp
   });
 
   const statusForm = useForm<StatusUpdateFormData>({
-    resolver: zodResolver(updateTicketStatusSchema),
+    resolver: zodResolver(statusUpdateFormSchema),
     defaultValues: {
       status: "open",
       resolutionNotes: "",
@@ -274,7 +277,6 @@ export function SupportTicketModal({ ticketId, isOpen, onClose, onUpdate }: Supp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTitle></DialogTitle>
       <DialogContent className="max-w-2xl sm:max-w-4xl w-[95vw] h-[95vh] p-0 gap-0 flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 p-4 sm:p-6 border-b border-border bg-card">
