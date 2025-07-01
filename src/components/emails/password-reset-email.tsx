@@ -65,9 +65,7 @@ const container = {
   padding: '20px 0 48px',
 };
 
-const logo = {
-  margin: '0 auto',
-};
+
 
 const paragraph = {
   fontSize: '16px',
