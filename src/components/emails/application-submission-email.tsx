@@ -40,7 +40,7 @@ export const ApplicationSubmissionEmail = ({
           </Text>
           
           <Text style={paragraph}>
-            Congratulations! Your application for the YouthADAPT Challenge has been successfully submitted. 
+            Congratulations! Your application for the In-Country YouthADAPT Challenge has been successfully submitted. 
             We&apos;re excited to review your climate adaptation solution and learn more about {businessName}.
           </Text>
           
@@ -82,7 +82,7 @@ export const ApplicationSubmissionEmail = ({
           <Section style={footer}>
             <Text style={footerText}>
               Best regards,<br />
-              The YouthADAPT Challenge Team<br />
+              The In-Country YouthADAPT Challenge Team<br />
               Global Center on Adaptation (GCA)<br />
               African Development Bank (AfDB)<br />
               Kenya Climate Innovation Center (KCIC)
@@ -95,7 +95,7 @@ export const ApplicationSubmissionEmail = ({
             </Text>
             
             <Text style={disclaimer}>
-              This email was sent to {userEmail} regarding your YouthADAPT Challenge application. 
+              This email was sent to {userEmail} regarding your In-Country YouthADAPT Challenge application. 
               Please keep this email for your records.
             </Text>
           </Section>

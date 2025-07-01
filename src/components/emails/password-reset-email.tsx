@@ -4,7 +4,6 @@ import {
   Head,
   Hr,
   Html,
-  Img,
   Preview,
   Section,
   Text,
@@ -17,9 +16,7 @@ interface PasswordResetEmailProps {
   code: string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000';
+
 
 export const PasswordResetEmail = ({
   userName = 'User',
@@ -27,19 +24,13 @@ export const PasswordResetEmail = ({
 }: PasswordResetEmailProps) => (
   <Html>
     <Head />
-    <Preview>T4D Africa - Reset Your Password</Preview>
+    <Preview>In-Country YouthADAPT - Reset Your Password</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Img
-          src={`${baseUrl}/public/images/gca-logo.png`}
-          width="150"
-          height="auto"
-          alt="T4D Africa Logo"
-          style={logo}
-        />
+      
         <Text style={paragraph}>Hi {userName},</Text>
         <Text style={paragraph}>
-          We received a request to reset the password for your T4D Africa
+          We received a request to reset the password for your In-Country YouthADAPT
           account. Please use the verification code below to proceed. This code is
           valid for 15 minutes.
         </Text>
@@ -52,7 +43,7 @@ export const PasswordResetEmail = ({
         </Text>
         <Hr style={hr} />
         <Text style={footer}>
-          T4D Africa Challenge, a GCA and KCIC initiative.
+          In-Country YouthADAPT Challenge, a GCA, AfDB and KCIC initiative.
         </Text>
       </Container>
     </Body>
