@@ -12,6 +12,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }>) {
   return (
+
+    
     <div className="flex flex-col min-h-screen">
       <header className="border-b bg-background">
         <div className="container mx-auto py-4 px-4 flex justify-between items-center">

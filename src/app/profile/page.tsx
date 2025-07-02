@@ -23,8 +23,7 @@ import {
   Settings,
   ExternalLink,
   TrendingUp,
-  
-
+  MessageSquare,
   Briefcase,
   GraduationCap,
   Heart,
@@ -33,6 +32,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
+import { UserSupportTickets } from "@/components/support/UserSupportTickets";
 
 // Helper function to get status color
 function getStatusColor(status: string) {
@@ -185,7 +185,7 @@ export default async function ProfilePage() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-3 bg-gray-900/90 backdrop-blur-sm rounded-full p-1.5 mb-8">
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 bg-gray-900/90 backdrop-blur-sm rounded-full p-1.5 mb-8">
             <TabsTrigger
               value="overview"
               className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white data-[state=active]:bg-[#0B5FBA] data-[state=active]:text-white data-[state=active]:shadow-lg"
@@ -206,6 +206,13 @@ export default async function ProfilePage() {
             >
               <TrendingUp className="h-5 w-5" />
               Progress
+            </TabsTrigger>
+            <TabsTrigger
+              value="support"
+              className="flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white data-[state=active]:bg-[#0B5FBA] data-[state=active]:text-white data-[state=active]:shadow-lg"
+            >
+              <MessageSquare className="h-5 w-5" />
+              Support
             </TabsTrigger>
           </TabsList>
 
@@ -589,6 +596,11 @@ export default async function ProfilePage() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Support Tab */}
+          <TabsContent value="support" className="space-y-6">
+            <UserSupportTickets />
           </TabsContent>
 
         </Tabs>
