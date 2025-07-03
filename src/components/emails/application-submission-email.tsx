@@ -29,7 +29,7 @@ export const ApplicationSubmissionEmail = ({
 }: ApplicationSubmissionEmailProps) => (
   <Html>
     <Head />
-    <Preview>Your YouthADAPT Challenge application has been submitted successfully</Preview>
+    <Preview>Your In-Country YouthADAPT Challenge application has been submitted successfully</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={content}>
@@ -90,7 +90,7 @@ export const ApplicationSubmissionEmail = ({
             
             <Text style={footerText}>
               <Link href={`${process.env.NEXTAUTH_URL || 'https://incountryouthadapt.org'}`} style={link}>
-                Visit YouthADAPT Challenge
+                Visit In-Country YouthADAPT Challenge
               </Link>
             </Text>
             

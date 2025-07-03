@@ -45,7 +45,7 @@ export const VerificationCodeEmail = ({
           </Text>
           
           <Text style={paragraph}>
-            The YouthADAPT Challenge is a unique opportunity for young entrepreneurs across the five eligible countries to showcase their climate adaptation solutions. We&apos;re excited to have you join us!
+            The In-Country YouthADAPT Challenge is a unique opportunity for young entrepreneurs across the five eligible countries to showcase their climate adaptation solutions. We&apos;re excited to have you join us!
           </Text>
           
           <Section style={footer}>

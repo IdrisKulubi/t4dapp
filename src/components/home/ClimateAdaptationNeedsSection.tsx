@@ -1,146 +1,204 @@
 "use client";
 
 import { 
-  Droplets, 
-  Thermometer, 
-  CloudRain, 
-  Wheat, 
-  Rabbit, 
-  Smartphone, 
-  Users,
-  AlertTriangle,
-  ExternalLink,
-  FileText
+  MapPin,
+  Coffee,
+  Train,
+  Car,
+  Bus,
+  Beef,
+  ChevronRight,
+  Globe
 } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
 
-const adaptationNeeds = [
+const countryAdaptationNeeds = [
   {
-    icon: Droplets,
-    title: "Drought and Water Scarcity",
-    description: "Resilient irrigation systems, water harvesting techniques, and efficient water management.",
-    color: "from-[#0B5FBA] to-cyan-600"
+    id: 'ghana',
+    country: "Ghana",
+    icon: Coffee,
+    title: "Coffee Plantation Adaptation",
+    description: "Climate-resilient coffee farming techniques, drought-resistant varieties, and sustainable processing methods for enhanced productivity.",
+    challenge: "Rising temperatures and irregular rainfall patterns threaten coffee yields",
+    solutions: "Shade-grown coffee systems, water-efficient irrigation, and climate-smart agricultural practices",
+    color: "from-[#0B5FBA] to-[#00D0AB]",
+    flag: "🇬🇭",
+    imageUrl: "/images/coffee-ghana.jpg"
   },
   {
-    icon: Thermometer,
-    title: "Heat Stress and Rising Temperatures", 
-    description: "Heat-resilient infrastructure, reflective pavements, and passive cooling innovations.",
-    color: "from-red-600 to-orange-600"
+    id: 'tanzania',
+    country: "Tanzania", 
+    icon: Train,
+    title: "Standard Gauge Railway Infrastructure",
+    description: "Climate-resilient railway systems, flood-resistant infrastructure, and sustainable transportation solutions.",
+    challenge: "Extreme weather events and flooding threaten railway operations and safety",
+    solutions: "Elevated track systems, improved drainage, and weather-resistant materials",
+    color: "from-[#00D0AB] to-[#0B5FBA]",
+    flag: "🇹🇿",
+    imageUrl: "/images/railway-tanzania.jpg"
   },
   {
-    icon: CloudRain,
-    title: "Flooding and Stormwater Management",
-    description: "Smart flood response systems, green infrastructure (e.g., rain gardens, wetlands), and permeable pavements.",
-    color: "from-indigo-600 to-[#0B5FBA]"
+    id: 'rwanda',
+    country: "Rwanda",
+    icon: Bus,
+    title: "Commuter Bus Transport Systems",
+    description: "Sustainable public transportation, electric vehicle infrastructure, and climate-adaptive transit solutions.",
+    challenge: "Air quality concerns and need for sustainable urban mobility solutions",
+    solutions: "Electric bus fleets, smart charging infrastructure, and integrated transport planning",
+    color: "from-[#0B5FBA] to-[#00D0AB]",
+    flag: "🇷🇼",
+    imageUrl: "/images/bus-rwanda.jpg"
   },
   {
-    icon: Wheat,
-    title: "Post-Harvest Losses",
-    description: "Solar-powered cold storage, hermetic storage bags, and resilient market chains.",
-    color: "from-amber-600 to-yellow-600"
+    id: 'kenya',
+    country: "Kenya",
+    icon: Car,
+    title: "Leseru Road Infrastructure",
+    description: "Climate-resilient road construction, flood-resistant design, and sustainable infrastructure development.",
+    challenge: "Severe weather events and flooding damage critical road infrastructure",
+    solutions: "Permeable pavements, improved drainage systems, and climate-adaptive road design",
+    color: "from-[#00D0AB] to-[#0B5FBA]",
+    flag: "🇰🇪",
+    imageUrl: "/images/road-kenya.jpg"
   },
   {
-    icon: Rabbit,
-    title: "Livestock and Crop Resilience",
-    description: "Heat- and disease-tolerant breeds, sustainable rangeland practices, and CSA (Climate-Smart Agriculture).",
-    color: "from-[#00D0AB] to-emerald-600"
-  },
-  {
-    icon: Smartphone,
-    title: "Climate Information Access",
-    description: "Mobile advisory platforms, localized weather alerts, and community-based resource hubs.",
-    color: "from-purple-600 to-violet-600"
-  },
-  {
-    icon: Users,
-    title: "Inclusive Adaptation",
-    description: "Gender-responsive approaches ensuring women and youth access inputs, training, financing, and market tools.",
-    color: "from-pink-600 to-rose-600"
+    id: 'nigeria',
+    country: "Nigeria",
+    icon: Beef,
+    title: "Livestock Management Systems",
+    description: "Climate-smart livestock farming, drought-resistant grazing systems, and sustainable pastoral practices.",
+    challenge: "Drought, desertification, and resource conflicts affecting livestock productivity",
+    solutions: "Improved pasture management, water-efficient systems, and climate-resilient breeding",
+    color: "from-[#0B5FBA] to-[#00D0AB]",
+    flag: "🇳🇬",
+    imageUrl: "/images/cattle-nigeria.jpg"
   }
 ];
 
 export function ClimateAdaptationNeedsSection() {
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+
   return (
     <section className="py-20 bg-gradient-to-br from-slate-50 via-blue-50 to-green-50">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#00D0AB] to-[#0B5FBA] text-white px-8 py-4 rounded-full mb-6">
-            <h2 className="text-2xl font-bold">Climate Adaptation Needs</h2>
+            <Globe className="h-6 w-6" />
+            <h2 className="text-2xl font-bold">Country-Specific Climate Adaptation Needs</h2>
           </div>
           <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-            <span className="font-semibold text-[#00D0AB]">Core to the YouthADAPT Challenge</span>
+            <span className="font-semibold text-[#00D0AB]">Targeted Solutions for Five African Nations</span>
           </p>
           <p className="text-lg text-gray-600 max-w-5xl mx-auto mt-4 leading-relaxed">
-            The YouthADAPT Challenge is rooted in identifying and addressing critical climate adaptation needs across Africa. 
-            These needs reflect the urgent challenges faced by communities and enterprises due to climate change, and guide 
-            the innovative solutions we aim to support through this program.
+            Each country faces unique climate adaptation challenges. The In-Country YouthADAPT Challenge focuses on 
+            sector-specific solutions tailored to address the most pressing infrastructure and agricultural 
+            needs across Ghana, Tanzania, Rwanda, Kenya, and Nigeria.
           </p>
         </div>
 
-        {/* Alert Banner */}
-        <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-2xl p-6 mb-12 shadow-lg">
-          <div className="flex items-center gap-4">
-            <AlertTriangle className="h-8 w-8 flex-shrink-0" />
-            <div>
-              <h3 className="text-xl font-bold mb-2">🚨 Key Adaptation Needs</h3>
-              <p className="text-red-100">
-                These adaptation needs are not just thematic areas—they represent the foundation for action. 
-                Each applicant is encouraged to demonstrate how their innovation directly addresses one or more 
-                of these core adaptation needs.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Adaptation Needs Grid */}
+        {/* Interactive Country Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {adaptationNeeds.map((need, index) => {
-            const IconComponent = need.icon;
+          {countryAdaptationNeeds.map((country) => {
+            const IconComponent = country.icon;
+            const isSelected = selectedCountry === country.id;
+            
             return (
               <div 
-                key={index}
-                className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                key={country.id}
+                className={`bg-white rounded-2xl shadow-lg border-2 overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 ${
+                  isSelected 
+                    ? 'border-[#00D0AB] ring-4 ring-[#00D0AB]/20 scale-105' 
+                    : 'border-gray-100 hover:border-[#0B5FBA]/30'
+                }`}
+                onClick={() => setSelectedCountry(isSelected ? null : country.id)}
               >
-                <div className={`bg-gradient-to-r ${need.color} p-6`}>
-                  <div className="flex items-center gap-4 text-white">
-                    <IconComponent className="h-8 w-8 flex-shrink-0" />
-                    <h3 className="text-lg font-bold leading-tight">{need.title}</h3>
+                {/* Country Header */}
+                <div className={`bg-gradient-to-r ${country.color} p-6`}>
+                  <div className="flex items-center justify-between text-white">
+                    <div className="flex items-center gap-4">
+                      <div className="text-3xl">{country.flag}</div>
+                      <div>
+                        <h3 className="text-xl font-bold">{country.country}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <MapPin className="h-4 w-4" />
+                          <span className="text-sm opacity-90">Focus Area</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className={`h-6 w-6 transition-transform duration-300 ${isSelected ? 'rotate-90' : ''}`} />
                   </div>
                 </div>
+
+                {/* Image */}
+                <div className="h-48 relative overflow-hidden">
+                  <Image
+                    src={country.imageUrl}
+                    alt={`${country.title} in ${country.country}`}
+                    fill
+                    className="object-cover transition-transform duration-300 hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+
+                {/* Content */}
                 <div className="p-6">
-                  <p className="text-gray-700 leading-relaxed">
-                    {need.description}
+                  <div className="flex items-center gap-3 mb-4">
+                    <IconComponent className="h-6 w-6 text-[#0B5FBA]" />
+                    <h4 className="text-lg font-bold text-gray-800">{country.title}</h4>
+                  </div>
+                  
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    {country.description}
                   </p>
+
+                  {/* Expandable Details */}
+                  {isSelected && (
+                    <div className="mt-6 pt-6 border-t border-gray-200 space-y-4 animate-in slide-in-from-top duration-300">
+                      <div>
+                        <h5 className="font-semibold text-red-600 mb-2 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                          Key Challenge
+                        </h5>
+                        <p className="text-sm text-gray-600">{country.challenge}</p>
+                      </div>
+                      
+                      <div>
+                        <h5 className="font-semibold text-[#00D0AB] mb-2 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-[#00D0AB] rounded-full"></div>
+                          Adaptation Solutions
+                        </h5>
+                        <p className="text-sm text-gray-600">{country.solutions}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Read More Section */}
+        {/* Bottom CTA */}
         <div className="mt-16 text-center">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-2xl mx-auto">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <FileText className="h-8 w-8 text-[#0B5FBA]" />
-              <h3 className="text-xl font-bold text-gray-800">Want to Learn More?</h3>
-            </div>
-            <p className="text-gray-600 mb-6 leading-relaxed">
-              Explore our comprehensive documentation on climate adaptation needs and potential solutions 
-              for food security and resilient infrastructure across the eligible countries.
+          <div className="bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] rounded-2xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold text-white mb-4">Ready to Make an Impact?</h3>
+            <p className="text-blue-100 mb-6 text-lg">
+              Click on any country above to explore specific adaptation challenges and discover 
+              how your innovation can address these critical needs.
             </p>
-            <a
-              href="https://cfg6261wt2.ufs.sh/f/e4b8ICxUXin877xqTNA3HlSVOTJr9idAWDsaGKIuzXpo8nw0"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0B5FBA] to-[#00D0AB] text-white px-8 py-4 rounded-full font-semibold hover:from-[#0B5FBA]/90 hover:to-[#00D0AB]/90 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-            >
-              <span>Read the Needs Assessment Report</span>
-              <ExternalLink className="h-5 w-5" />
-            </a>
+            <div className="flex items-center justify-center gap-4 text-white">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-white rounded-full"></div>
+                <span>Click to expand details</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-white/70 rounded-full"></div>
+                <span>Country-specific solutions</span>
+              </div>
+            </div>
           </div>
         </div>
-
-       
       </div>
     </section>
   );

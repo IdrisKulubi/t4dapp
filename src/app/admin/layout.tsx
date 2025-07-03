@@ -18,7 +18,7 @@ export default function AdminLayout({
       <header className="border-b bg-background">
         <div className="container mx-auto py-4 px-4 flex justify-between items-center">
           <Link href="/admin" className="font-bold text-xl">
-            YouthAdapt Admin
+            In-Country YouthAdapt Admin
           </Link>
           <nav>
             <ul className="flex space-x-8">
@@ -58,7 +58,7 @@ export default function AdminLayout({
       
       <footer className="border-t py-6 bg-background">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          YouthAdapt Challenge Admin Panel © {new Date().getFullYear()}
+         In-Country YouthAdapt Challenge Admin Panel © {new Date().getFullYear()}
         </div>
       </footer>
     </div>

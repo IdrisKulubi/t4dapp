@@ -45,7 +45,7 @@ console.log(user);
               Admin Dashboard
             </h1>
             <p className="text-gray-600 text-lg">
-              Manage and monitor YouthAdapt Challenge applications
+              Manage and monitor In-Country YouthAdapt Challenge applications
             </p>
           </div>
           <div className="flex gap-3">

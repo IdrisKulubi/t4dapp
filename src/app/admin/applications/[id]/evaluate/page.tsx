@@ -343,7 +343,7 @@ export default function EvaluateApplicationPage({ params }: { params: Promise<{ 
               <CardHeader>
                 <CardTitle>Evaluation Sections</CardTitle>
                 <CardDescription>
-                  Click on each section to score the criteria. Each section has specific weightings based on the YouthAdapt Challenge requirements.
+                  Click on each section to score the criteria. Each section has specific weightings based on the In-Country YouthAdapt Challenge requirements.
                 </CardDescription>
               </CardHeader>
               <CardContent>

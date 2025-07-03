@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Apply | YouthAdapt Challenge",
+  title: "Apply | In-Country YouthAdapt Challenge",
   description: "Application form for the In-country YouthAdapt Challenge program",
 };
 

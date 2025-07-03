@@ -100,7 +100,7 @@ export function FeaturesSection() {
           </h2>
           
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            The YouthADAPT Challenge offers comprehensive support to transform your climate innovation 
+            The In-Country YouthADAPT Challenge offers comprehensive support to transform your climate innovation 
             from concept to market-ready solution with measurable impact.
           </p>
         </motion.div>

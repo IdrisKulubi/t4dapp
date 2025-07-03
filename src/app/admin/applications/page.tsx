@@ -102,7 +102,7 @@ export default function ApplicationsPage({
               Applications Management
             </h1>
             <p className="text-gray-600 mt-2">
-              Manage and review YouthAdapt Challenge applications
+              Manage and review In-Country YouthAdapt Challenge applications
             </p>
           </div>
           <div className="flex gap-3">

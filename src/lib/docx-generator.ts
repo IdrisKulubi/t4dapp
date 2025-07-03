@@ -97,7 +97,7 @@ export async function generateApplicationDocx({ formData, applicantName, submiss
     new Paragraph({
       children: [
         new TextRun({
-          text: "YouthADAPT Challenge 2025",
+          text: "In-Country YouthADAPT Challenge 2025",
           bold: true,
           size: 48,
           color: "1D4ED8"
