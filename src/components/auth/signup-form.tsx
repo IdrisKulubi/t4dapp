@@ -191,7 +191,7 @@ export function SignupForm({ callbackUrl }: SignupFormProps) {
       )}
 
       <p className="text-xs text-center text-gray-500 dark:text-gray-400 pt-4">
-        By creating an account, you agree to our terms for the YouthADAPT Challenge {currentYear}.
+        By creating an account, you agree to our terms for the In-Country YouthADAPT Challenge {currentYear}.
       </p>
     </div>
   );

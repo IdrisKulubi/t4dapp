@@ -529,7 +529,7 @@ export function ApplicationForm() {
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-gray-900">Application Form</h1>
-                  <p className="text-sm text-gray-500">YouthADAPT Challenge</p>
+                  <p className="text-sm text-gray-500">In-Country YouthADAPT Challenge</p>
                 </div>
               </div>
               

@@ -66,7 +66,7 @@ function getStatusDescription(status: string) {
     case 'dragons_den':
       return 'Amazing! You\'ve been selected for the Dragon\'s Den pitch event.';
     case 'finalist':
-      return 'Outstanding! You are now a finalist in the YouthADAPT Challenge.';
+      return 'Outstanding! You are now a finalist in the In-Country YouthADAPT Challenge.';
     case 'approved':
       return 'Congratulations! Your application has been approved for funding.';
     case 'rejected':
@@ -131,7 +131,7 @@ export default async function ProfilePage() {
                   {userProfile.firstName} {userProfile.lastName}
                 </h1>
                 <p className="text-blue-100 text-lg mb-2">
-                  {userProfile.organization || 'YouthADAPT Participant'}
+                  {userProfile.organization || 'In-Country YouthADAPT Participant'}
                 </p>
                 <div className="flex flex-wrap justify-center lg:justify-start gap-2 text-sm">
                   <span className="bg-white/20 px-3 py-1 rounded-full flex items-center gap-1">
@@ -480,7 +480,7 @@ export default async function ProfilePage() {
                   <FileText className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
                   <h3 className="text-lg font-medium mb-2">No Application Found</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-6">
-                    You haven&apos;t submitted an application yet. Start your YouthADAPT journey today!
+                    You haven&apos;t submitted an application yet. Start your In-Country YouthADAPT journey today!
                   </p>
                   <Button asChild className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700">
                     <Link href="/apply">

@@ -38,7 +38,7 @@ export function AuthCard({ callbackUrl, defaultTab = "signin" }: AuthCardProps) 
             </div>
             <div className="space-y-1">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Welcome to YouthADAPT
+                Welcome to In-Country YouthADAPT
               </h1>
               <p className="text-gray-500 dark:text-gray-400">
                 Sign in or create an account to continue

@@ -163,7 +163,7 @@ export function ClimateAdaptationForm({ form, onNext, onPrevious }: ClimateAdapt
                       <SelectContent className="max-h-80 overflow-y-auto">
                         {/* Core YouthADAPT Adaptation Needs */}
                         <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                          Core YouthADAPT Adaptation Needs
+                          Core In-Country YouthADAPT Adaptation Needs
                         </div>
                         <SelectItem value="drought_water_scarcity">Drought and Water Scarcity</SelectItem>
                         <SelectItem value="heat_stress_rising_temperatures">Heat Stress and Rising Temperatures</SelectItem>
