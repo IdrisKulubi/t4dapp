@@ -10,6 +10,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { sendVerificationCodeAction, verifyCodeAndCreateAccount, resendVerificationCode } from "@/lib/actions/email-verification";
+import Link from "next/link";
 
 interface SignupFormProps {
   callbackUrl?: string;
@@ -190,9 +191,27 @@ export function SignupForm({ callbackUrl }: SignupFormProps) {
         </Alert>
       )}
 
-      <p className="text-xs text-center text-gray-500 dark:text-gray-400 pt-4">
-        By creating an account, you agree to our terms for the In-Country YouthADAPT Challenge {currentYear}.
-      </p>
+      {/* Updated Terms and Privacy Section */}
+      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-4">
+          <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Data Usage & Retention</h4>
+          <p className="text-xs text-blue-800 dark:text-blue-200 mb-3">
+            Your data will be used solely for the In-Country YouthADAPT Challenge {currentYear}. We retain application data for 5 years, account information for 2 years after inactivity, and then permanently delete it.
+          </p>
+          <p className="text-xs text-center text-gray-600 dark:text-gray-400">
+            By creating an account, you agree to our{" "}
+            <Link 
+              href="/terms-and-privacy" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#0B5FBA] hover:text-[#00D0AB] font-medium underline"
+            >
+              Terms and Privacy Policy
+            </Link>
+            {" "}for the In-Country YouthADAPT Challenge {currentYear}.
+          </p>
+        </div>
+      </div>
     </div>
   );
 } 
